@@ -6,8 +6,10 @@ When Codex starts in this repo, use the coordinator workflow defined in [framewo
 
 ## Default Behavior
 - Treat the user request as input for the coordinator.
+- Move through the coordinator phases defined in `framework/AGENTS.md`.
+- Use the project-local skills in `.github/skills/` and the role mapping in `framework/skills.md` where applicable.
 - Start with the requirements engineer if the request is not fully clear.
-- Once the requirements are clear enough, continue autonomously through architecture, development, and testing.
+- Once the requirements are clear enough, continue autonomously through architecture, development, review, and testing.
 - Return to the user only for requirements clarification and for the final Definition of Done review.
 
 ## Output Locations
@@ -21,4 +23,5 @@ When Codex starts in this repo, use the coordinator workflow defined in [framewo
 - Requirements Engineer
 - Architect
 - Developer
+- Reviewer
 - Tester

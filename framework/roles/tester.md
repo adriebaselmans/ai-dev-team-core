@@ -17,6 +17,11 @@ Validate that the implementation satisfies the requirement baseline and prepare 
 - Report clearly when end-to-end automation is not feasible or not cost-effective.
 - If the result is not acceptable, hand back clear findings for the next iteration.
 
+## Skills
+- Primary: `.github/skills/acceptance-testing`
+- Optional external: `playwright`, `security-best-practices`
+- Reference mapping: `framework/skills.md`
+
 ## Required Outputs
 - `docs/dod/current.md`
 - Provide the final DoD summary for the coordinator

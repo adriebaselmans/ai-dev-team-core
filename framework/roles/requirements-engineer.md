@@ -15,5 +15,9 @@ Turn the user need into a requirement baseline that is clear enough to implement
 - Mark unresolved assumptions explicitly when they are acceptable.
 - Hand off to the coordinator when the requirement baseline is implementation-ready.
 
+## Skills
+- Primary: `.github/skills/requirements-clarification`
+- Reference mapping: `framework/skills.md`
+
 ## Required Output
 - `docs/requirements/current.md`

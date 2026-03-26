@@ -1,7 +1,19 @@
 # Decisions
 
-## 2026-03-26
-- Chose a simple root layout: `framework/`, `docs/`, `src/`.
-- Chose `AGENTS.md` as the canonical instruction layer.
-- Chose a five-role team: coordinator, requirements engineer, architect, developer, tester.
-- Chose an autonomous flow after requirements clarity, with user interaction only for clarification and final DoD review.
+Use this file for important project decisions that future agents must understand.
+
+## Entry Format
+- Date
+- Decision
+- Context
+- Reason
+- Consequence
+
+## Rules
+- Record only meaningful decisions.
+- Prefer one clear decision entry per topic.
+- Include why the decision was made, not only what was chosen.
+- Update this file when a decision changes; do not silently overwrite the old rationale.
+
+## Entries
+- No project decisions yet.

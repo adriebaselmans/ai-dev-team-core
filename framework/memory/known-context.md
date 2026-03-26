@@ -1,7 +1,12 @@
 # Known Context
 
-- This repository is a skeleton for an AI-driven development team.
-- The coordinator is the default entry point for all user requests.
-- Requirements clarification is the only mandatory early user interaction.
-- After requirements are clear, the team should work autonomously until final review.
-- Durable project knowledge should be stored in this memory folder.
+Use this file for stable project truths, conventions, and standing assumptions.
+
+## Rules
+- Keep this file concise.
+- Store only context that is expected to remain true across multiple iterations.
+- Move time-bound change history to `project-log.md`.
+- Move rationale for important choices to `decisions.md`.
+
+## Current Baseline
+- No project-specific context yet.

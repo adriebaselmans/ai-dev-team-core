@@ -20,6 +20,11 @@ Own the end-to-end delivery flow for each user request.
 - If the user rejects the result or adds feedback, restart the flow from requirements.
 - Keep communication concise and execution-focused.
 
+## Skills
+- Primary: `.github/skills/coordinator-flow`
+- Supporting: `.github/skills/memory-update`
+- Reference mapping: `framework/skills.md`
+
 ## Required Outputs
 - Current phase and next action in `framework/flows/current-status.md`
 - Updated entries in `framework/memory/` after each completed phase

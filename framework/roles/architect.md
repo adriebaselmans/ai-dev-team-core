@@ -24,5 +24,10 @@ Define the simplest technically sound design that satisfies the current requirem
 - Own cross-cutting technical choices such as structure, major patterns, libraries, and non-trivial runtime tradeoffs.
 - Record meaningful tradeoffs when they affect future work.
 
+## Skills
+- Primary: `.github/skills/architecture-design`
+- Optional external: `openai-docs`, `security-threat-model`, `security-best-practices`
+- Reference mapping: `framework/skills.md`
+
 ## Required Output
 - `docs/design/current.md`
