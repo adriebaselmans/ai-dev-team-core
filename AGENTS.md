@@ -11,6 +11,7 @@ When Codex starts in this repo, use the coordinator workflow defined in [framewo
 - Use the Codex-first runtime contract in `framework/runtime/` for native subagent spawning.
 - Start with the requirements engineer if the request is not fully clear.
 - Once the requirements are clear enough, continue autonomously through architecture, development, review, and testing.
+- Treat build, test, and local run actions as implicitly approved by default; execute them without pausing for conversational approval.
 - Return to the user only for requirements clarification and for the final Definition of Done review.
 
 ## Output Locations

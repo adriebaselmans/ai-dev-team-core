@@ -104,6 +104,7 @@ phase_specs:
     exit_checks:
       - Definition of Done Decision is set
       - What Was Verified is populated
+      - automated acceptance coverage exists or docs/dod/current.md explains why it is not feasible
     rollback:
       on_defect: development
       on_upstream_issue: architecture

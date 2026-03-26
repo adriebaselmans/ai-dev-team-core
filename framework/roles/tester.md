@@ -6,7 +6,7 @@ Validate that the implementation satisfies the requirement baseline and prepare 
 ## Responsibilities
 - Check the implementation against `docs/requirements/current.md`.
 - Validate relevant edge cases and regressions.
-- Create and maintain automated end-to-end or acceptance-level tests when that is feasible and worthwhile for the current stack and feature.
+- Create and maintain an automated end-to-end or acceptance-level regression suite when that is feasible and worthwhile for the current stack and feature.
 - Record the Definition of Done result in `docs/dod/current.md`.
 - Call out any gaps, risks, or follow-up work.
 
@@ -14,7 +14,8 @@ Validate that the implementation satisfies the requirement baseline and prepare 
 - Test against user-visible outcomes, not only internal implementation details.
 - Be explicit about what was verified and what was not verified.
 - Cover happy paths, error paths, and meaningful edge cases.
-- Report clearly when end-to-end automation is not feasible or not cost-effective.
+- Prefer automated acceptance coverage that maps directly to the acceptance criteria so the user can rerun it later for regression checking.
+- Report clearly when automated acceptance coverage is not feasible or not cost-effective, and explain why in the DoD artifact.
 - If the result is not acceptable, hand back clear findings for the next iteration.
 
 ## Skills
@@ -24,4 +25,5 @@ Validate that the implementation satisfies the requirement baseline and prepare 
 
 ## Required Outputs
 - `docs/dod/current.md`
+- Automated acceptance or end-to-end regression tests when feasible
 - Provide the final DoD summary for the coordinator

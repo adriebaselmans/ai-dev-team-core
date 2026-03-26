@@ -136,11 +136,13 @@ Entry condition:
 Coordinator actions:
 - Delegate validation to the tester.
 - Ensure `docs/dod/current.md` is updated.
-- Ensure acceptance or end-to-end tests are added when feasible and worthwhile.
+- Ensure an automated acceptance or end-to-end regression suite is added when feasible and worthwhile.
+- Ensure the tester records how that regression suite should be rerun later.
 - Update memory when the phase is completed.
 
 Exit condition:
 - The tester has issued a clear DoD decision.
+- A rerunnable automated acceptance or end-to-end suite exists, or `docs/dod/current.md` explicitly explains why it was not feasible.
 
 Loop rule:
 - Return to development if defects or coverage gaps must be fixed.
@@ -174,7 +176,10 @@ Exit condition:
 
 ## Non-Negotiable Rules
 - Do not ask the user for approval between architecture, development, and testing once the requirements are clear.
+- Treat local build, test, and app run actions as implicitly approved within the team workflow.
+- When the execution environment still requires a tool-level elevation prompt for a build, test, or run action, request it directly without stopping for an extra conversational approval round.
 - Do not skip the review phase before testing.
+- Do not treat automated acceptance coverage as optional when the feature can support a stable regression suite.
 - Keep durable project knowledge in `framework/memory/`.
 - Keep the latest requirements in `docs/requirements/current.md`.
 - Keep the latest design in `docs/design/current.md`.
@@ -209,6 +214,7 @@ Memory update rules:
 The tester must prepare a Definition of Done result that covers:
 - What was built
 - What was verified
+- What automated regression command or suite should be run later
 - Any known gaps or risks
 - What feedback is needed from the user
 
