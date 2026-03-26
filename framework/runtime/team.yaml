@@ -1,0 +1,65 @@
+version: 1
+runtime: codex-first
+top_level_role: coordinator
+specialist_spawn_mode: native_subagents
+
+roles:
+  coordinator:
+    agent_type: default
+    primary_skill: .github/skills/coordinator-flow
+    supporting_skills:
+      - .github/skills/memory-update
+    user_facing: true
+    writes:
+      - framework/flows/current-status.md
+      - framework/memory/project-log.md
+      - framework/memory/decisions.md
+      - framework/memory/known-context.md
+  requirements-engineer:
+    agent_type: default
+    primary_skill: .github/skills/requirements-clarification
+    user_facing: false
+    writes:
+      - docs/requirements/current.md
+  architect:
+    agent_type: default
+    primary_skill: .github/skills/architecture-design
+    optional_external_skills:
+      - openai-docs
+      - security-threat-model
+      - security-best-practices
+    user_facing: false
+    writes:
+      - docs/design/current.md
+  developer:
+    agent_type: worker
+    primary_skill: .github/skills/implementation-clean-code
+    supporting_skills:
+      - .github/skills/unit-testing
+    user_facing: false
+    writes:
+      - src/
+  reviewer:
+    agent_type: worker
+    primary_skill: .github/skills/code-review
+    optional_external_skills:
+      - security-best-practices
+    user_facing: false
+    writes:
+      - docs/review/current.md
+  tester:
+    agent_type: worker
+    primary_skill: .github/skills/acceptance-testing
+    optional_external_skills:
+      - playwright
+      - security-best-practices
+    user_facing: false
+    writes:
+      - docs/dod/current.md
+
+spawn_rules:
+  - Only the coordinator spawns specialist subagents.
+  - Spawn specialists only for bounded tasks with clear artifact ownership.
+  - Do not spawn a specialist for direct user interaction.
+  - Prefer one active specialist on the critical path unless multiple specialists can work in parallel without overlapping write ownership.
+  - The coordinator remains responsible for validation, routing, and phase transition decisions.

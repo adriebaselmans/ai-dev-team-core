@@ -16,10 +16,11 @@ Use this skill when acting as the reviewer in this repository.
 - `docs/requirements/current.md`
 - `docs/design/current.md`
 - `framework/clean-code.md`
+- `framework/runtime/review-template.md`
 - Relevant implementation and tests in `src/`
 
 ## Required Outputs
-- Review findings for the coordinator
+- Updated `docs/review/current.md`
 - Clear decision: approved for testing or rework required
 
 ## Review Checklist
@@ -32,6 +33,7 @@ Use this skill when acting as the reviewer in this repository.
 - Are lint issues or actionable warnings left unresolved without good reason?
 
 ## Output Format
+- Use `framework/runtime/review-template.md`
 - Findings ordered by severity
 - File references where possible
 - Short note on residual risks or testing concerns

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "runtime": "codex-first",
+  "phase": "idle",
+  "owner": "coordinator",
+  "state": "ready for first user need",
+  "next_action": "receive a user need and start requirements clarification",
+  "active_feature": null,
+  "active_subagents": [],
+  "last_transition": null
+}

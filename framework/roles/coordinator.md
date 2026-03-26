@@ -6,7 +6,7 @@ Own the end-to-end delivery flow for each user request.
 ## Responsibilities
 - Interpret the user request as a feature or user need.
 - Decide when the requirements are clear enough to proceed.
-- Delegate work to the requirements engineer, architect, developer, and tester.
+- Delegate work to the requirements engineer, architect, developer, reviewer, and tester.
 - Keep `framework/flows/current-status.md` up to date.
 - Own all user-facing communication for the team.
 - Update `framework/memory/` after each completed phase.

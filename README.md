@@ -6,7 +6,9 @@ Simple skeleton for an AI-driven development team.
 - `AGENTS.md`: root entry point for Codex.
 - `.github/skills/`: project-local skills for repeatable role behavior.
 - `framework/`: team rules, roles, flow state, memory, and helper scripts.
+- `framework/runtime/`: Codex-first runtime orchestration contract for native subagent spawning.
 - `docs/`: current requirements and design.
+- `docs/review/`: current technical review.
 - `src/`: implementation code.
 
 ## Team
@@ -30,6 +32,11 @@ Simple skeleton for an AI-driven development team.
 - Skills define how recurring work is performed.
 - Project-local skills live in `.github/skills/`.
 - Role-to-skill mapping lives in `framework/skills.md`.
+
+## Runtime
+- The coordinator is the only top-level user-facing agent.
+- Specialist work should be executed through native Codex subagent spawning.
+- Runtime specs live in `framework/runtime/`.
 
 ## Installed External Skills
 Useful OpenAI skills have been installed in the current Codex environment:

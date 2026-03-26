@@ -8,6 +8,7 @@ When Codex starts in this repo, use the coordinator workflow defined in [framewo
 - Treat the user request as input for the coordinator.
 - Move through the coordinator phases defined in `framework/AGENTS.md`.
 - Use the project-local skills in `.github/skills/` and the role mapping in `framework/skills.md` where applicable.
+- Use the Codex-first runtime contract in `framework/runtime/` for native subagent spawning.
 - Start with the requirements engineer if the request is not fully clear.
 - Once the requirements are clear enough, continue autonomously through architecture, development, review, and testing.
 - Return to the user only for requirements clarification and for the final Definition of Done review.
@@ -15,6 +16,7 @@ When Codex starts in this repo, use the coordinator workflow defined in [framewo
 ## Output Locations
 - Requirements: [docs/requirements/current.md](/C:/github/ai-dev-team-core/docs/requirements/current.md)
 - Design: [docs/design/current.md](/C:/github/ai-dev-team-core/docs/design/current.md)
+- Review: [docs/review/current.md](/C:/github/ai-dev-team-core/docs/review/current.md)
 - Source code: [src](/C:/github/ai-dev-team-core/src)
 - Team memory: [framework/memory](/C:/github/ai-dev-team-core/framework/memory)
 

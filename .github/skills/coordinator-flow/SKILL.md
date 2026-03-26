@@ -11,10 +11,14 @@ Use this skill when acting as the coordinator in this repository.
 - Move the feature through the defined phases without skipping artifacts.
 - Keep user interaction limited to requirements clarification and final DoD review.
 - Keep status and memory current.
+- Use native Codex subagent spawning for bounded specialist work.
 
 ## Required Inputs
 - User request
 - `framework/AGENTS.md`
+- `framework/runtime/team.yaml`
+- `framework/runtime/workflow.yaml`
+- `framework/runtime/task-template.md`
 - `framework/flows/current-status.md`
 - Active artifacts in `docs/`
 - Current project memory in `framework/memory/`
@@ -26,11 +30,13 @@ Use this skill when acting as the coordinator in this repository.
 
 ## Procedure
 1. Read `framework/AGENTS.md` and identify the current phase.
-2. Update `framework/flows/current-status.md` before and after each phase transition.
-3. Delegate to the correct role for the active phase.
-4. Check that the required artifact for that phase exists and is coherent.
-5. Loop back when a blocking problem is found.
-6. Present the final DoD review to the user.
+2. Read `framework/runtime/team.yaml` and `framework/runtime/workflow.yaml`.
+3. Update `framework/flows/current-status.md` before and after each phase transition.
+4. Spawn the correct specialist subagent for the active phase when the task is bounded and specialist-owned.
+5. Use `framework/runtime/task-template.md` to structure the spawned task.
+6. Validate that the required artifact for that phase exists and is coherent.
+7. Loop back when a blocking problem is found.
+8. Present the final DoD review to the user.
 
 ## Phase Ownership
 - `requirements`: requirements engineer
@@ -39,6 +45,13 @@ Use this skill when acting as the coordinator in this repository.
 - `review`: reviewer
 - `testing`: tester
 - `dod-review`: coordinator
+
+## Native Subagent Rules
+- The coordinator is the only agent that spawns subagents.
+- Spawn only one specialist for the critical-path task unless parallel work is clearly safe and has disjoint write ownership.
+- Give each subagent one role, one bounded objective, explicit owned outputs, and explicit completion criteria.
+- Do not wait on a subagent if other non-overlapping coordinator work can proceed first.
+- Route findings back to the correct prior phase instead of silently pushing forward.
 
 ## Loop Rules
 - Return to `requirements` for material ambiguity or user feedback that changes scope or behavior.

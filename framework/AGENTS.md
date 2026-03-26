@@ -15,6 +15,7 @@ Take a user need or feature description and deliver an end-to-end implementation
 
 Detailed role instructions live in `framework/roles/`.
 Role-to-skill mapping lives in `framework/skills.md`.
+Codex-first runtime specs live in `framework/runtime/`.
 
 ## Skills
 - Project-local skills live in `.github/skills/`.
@@ -22,6 +23,15 @@ Role-to-skill mapping lives in `framework/skills.md`.
 - Skills define repeatable execution patterns.
 - Prefer project-local skills for this repository's workflow and artifacts.
 - Use reusable external skills when they are available and fit cleanly.
+
+## Runtime Orchestration
+- This repository is Codex-first for runtime orchestration.
+- The coordinator should use native subagent spawning for bounded specialist work.
+- `framework/runtime/team.yaml` defines role registry and spawn rules.
+- `framework/runtime/workflow.yaml` defines the phase state machine and rollback rules.
+- `framework/runtime/task-template.md` defines the standard subagent task payload.
+- `framework/runtime/review-template.md` defines the standard reviewer output shape.
+- `framework/runtime/state.json` is the placeholder runtime state snapshot.
 
 ## Coordinator Runbook
 The coordinator owns the full feature flow and moves the team through these phases:
@@ -168,10 +178,12 @@ Exit condition:
 - Keep durable project knowledge in `framework/memory/`.
 - Keep the latest requirements in `docs/requirements/current.md`.
 - Keep the latest design in `docs/design/current.md`.
+- Keep the latest review in `docs/review/current.md`.
 - Keep the latest DoD review in `docs/dod/current.md`.
 - Keep implementation in `src/`.
 - Follow the engineering standards in `framework/clean-code.md`.
 - Use the role-aligned skills in `.github/skills/` and `framework/skills.md` where applicable.
+- Use `framework/runtime/` as the machine-readable contract for native subagent orchestration.
 - The coordinator is responsible for updating `framework/flows/current-status.md`.
 - The coordinator is responsible for updating `framework/memory/` after each completed phase.
 - Specialists do not communicate with the user directly; the coordinator owns all user-facing interaction.
