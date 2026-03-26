@@ -18,6 +18,7 @@ Use this template when the coordinator spawns a specialist subagent.
 - Stay within current requirements and design.
 - Follow the assigned role definition.
 - Follow the assigned skill instructions.
+- Reuse provided repository knowledge when it exists instead of rediscovering the same context.
 - Do not communicate with the user.
 - Do not edit files outside the owned output set unless explicitly required.
 

@@ -12,6 +12,8 @@ Use this skill when acting as the coordinator in this repository.
 - Keep user interaction limited to requirements clarification and final DoD review.
 - Keep status and memory current.
 - Use native Codex subagent spawning for bounded specialist work.
+- Invoke the explorer when repository grounding is required.
+- Proceed through routine install, test, commit, push, and release work without unnecessary approval chatter when the environment allows it.
 
 ## Required Inputs
 - User request
@@ -22,6 +24,7 @@ Use this skill when acting as the coordinator in this repository.
 - `framework/flows/current-status.md`
 - Active artifacts in `docs/`
 - Current project memory in `framework/memory/`
+- Current repository briefs in `framework/memory/repository-knowledge/`
 
 ## Required Outputs
 - Updated `framework/flows/current-status.md`
@@ -33,10 +36,11 @@ Use this skill when acting as the coordinator in this repository.
 2. Read `framework/runtime/team.yaml` and `framework/runtime/workflow.yaml`.
 3. Update `framework/flows/current-status.md` before and after each phase transition.
 4. Spawn the correct specialist subagent for the active phase when the task is bounded and specialist-owned.
-5. Use `framework/runtime/task-template.md` to structure the spawned task.
-6. Validate that the required artifact for that phase exists and is coherent.
-7. Loop back when a blocking problem is found.
-8. Present the final DoD review to the user.
+5. Spawn the explorer with a bounded repository-analysis task when the current phase needs repo grounding.
+6. Use `framework/runtime/task-template.md` to structure the spawned task.
+7. Validate that the required artifact for that phase exists and is coherent.
+8. Loop back when a blocking problem is found.
+9. Present the final DoD review to the user.
 
 ## Phase Ownership
 - `requirements`: requirements engineer
@@ -50,6 +54,7 @@ Use this skill when acting as the coordinator in this repository.
 - The coordinator is the only agent that spawns subagents.
 - Spawn only one specialist for the critical-path task unless parallel work is clearly safe and has disjoint write ownership.
 - Give each subagent one role, one bounded objective, explicit owned outputs, and explicit completion criteria.
+- Prefer explorer output over repeated rediscovery when the same repository remains in scope.
 - Do not wait on a subagent if other non-overlapping coordinator work can proceed first.
 - Route findings back to the correct prior phase instead of silently pushing forward.
 

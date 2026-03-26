@@ -8,6 +8,8 @@ This repository uses project-local skills as the operational layer beneath the t
 
 ## Primary Project Skills
 - `coordinator-flow`
+- `repository-exploration`
+- `repository-knowledge-compaction`
 - `requirements-clarification`
 - `architecture-design`
 - `implementation-clean-code`
@@ -29,3 +31,4 @@ These are useful when installed and available in Codex:
 - Use the matching skill to decide how to perform the work.
 - Prefer project-local skills for team-specific flow and artifacts.
 - Prefer reusable external skills for general-purpose capability when they fit cleanly.
+- The `repository-exploration` skill is also intended to be directly user-invokable when a user asks for grounded analysis of a specific repository.

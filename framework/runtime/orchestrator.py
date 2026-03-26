@@ -12,8 +12,8 @@ from state_manager import (
     sync_status_markdown,
     transition_state,
 )
-from task_builder import build_task_payload
-from validators import validate_phase, validate_status_sync
+from task_builder import build_specialist_task_payload, build_task_payload
+from validators import validate_phase, validate_repository_knowledge_store, validate_status_sync
 
 
 PHASE_STATE_TEXT = {
@@ -102,6 +102,27 @@ def cmd_next_task(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_specialist_task(args: argparse.Namespace) -> int:
+    team = load_team_spec()
+    state = load_state()
+    role = args.role
+    if role not in team.get("roles", {}):
+        print(f"Unknown role: {role}", file=sys.stderr)
+        return 1
+
+    payload = build_specialist_task_payload(
+        role,
+        team,
+        objective=args.objective,
+        active_feature=args.feature or state.get("active_feature"),
+        inputs=list(args.input or []) or None,
+        owned_outputs=list(args.output or []) or None,
+        completion=args.completion,
+    )
+    print(payload)
+    return 0
+
+
 def cmd_validate(args: argparse.Namespace) -> int:
     state = load_state()
     phase = args.phase or state["phase"]
@@ -115,6 +136,13 @@ def cmd_validate(args: argparse.Namespace) -> int:
         for message in sync_result.messages:
             print(message)
         return 0 if result.valid and sync_result.valid else 1
+    return 0 if result.valid else 1
+
+
+def cmd_validate_repository_knowledge(_: argparse.Namespace) -> int:
+    result = validate_repository_knowledge_store()
+    for message in result.messages:
+        print(message)
     return 0 if result.valid else 1
 
 
@@ -208,9 +236,21 @@ def build_parser() -> argparse.ArgumentParser:
     validate.add_argument("--check-status", action="store_true", help="Also validate markdown/json status sync")
     validate.set_defaults(func=cmd_validate)
 
+    validate_repo = sub.add_parser("validate-repository-knowledge", help="Validate repository knowledge artifacts")
+    validate_repo.set_defaults(func=cmd_validate_repository_knowledge)
+
     next_task = sub.add_parser("next-task", help="Print the bounded task payload for a phase")
     next_task.add_argument("--phase", help="Phase to build a task for")
     next_task.set_defaults(func=cmd_next_task)
+
+    specialist_task = sub.add_parser("specialist-task", help="Print a bounded task payload for a support specialist role")
+    specialist_task.add_argument("--role", required=True, help="Role key from framework/runtime/team.yaml")
+    specialist_task.add_argument("--objective", required=True, help="Bounded task objective")
+    specialist_task.add_argument("--feature", help="Override active feature text")
+    specialist_task.add_argument("--input", action="append", help="Additional input path or note", default=[])
+    specialist_task.add_argument("--output", action="append", help="Override owned output path", default=[])
+    specialist_task.add_argument("--completion", help="Override completion criteria")
+    specialist_task.set_defaults(func=cmd_specialist_task)
 
     set_phase = sub.add_parser("set-phase", help="Manually set the active phase")
     set_phase.add_argument("--phase", required=True, help="Phase to set")

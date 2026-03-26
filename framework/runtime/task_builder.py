@@ -47,6 +47,36 @@ def _skill_file(role_spec: dict[str, object]) -> list[str]:
     return files
 
 
+def _render_task_payload(
+    *,
+    role: str,
+    objective: str,
+    owned_outputs: list[str],
+    inputs: list[str],
+    completion: str,
+    feature: str | None,
+    phase: str | None,
+) -> str:
+    template = TASK_TEMPLATE_PATH.read_text(encoding="utf-8")
+    payload = template
+    payload = payload.replace("`<role-name>`", f"`{role}`")
+    payload = payload.replace("`<bounded task objective>`", f"`{objective}`")
+    payload = payload.replace(
+        "- `<artifact or files this subagent owns>`",
+        "\n".join(f"- `{item}`" for item in owned_outputs) or "- `None`",
+    )
+    payload = payload.replace(
+        "- `<required docs, code areas, memory, and role/skill files>`",
+        "\n".join(f"- `{item}`" for item in inputs),
+    )
+    payload = payload.replace("- `<what must be true for the task to be complete>`", f"- {completion}")
+
+    header = [f"Feature: `{feature or 'unspecified'}`"]
+    if phase is not None:
+        header.append(f"Phase: `{phase}`")
+    return "\n".join(header) + "\n\n" + payload
+
+
 def build_task_payload(phase: str, team_spec: dict, workflow_spec: dict, active_feature: str | None) -> str:
     p_spec = phase_spec(phase)
     owner = p_spec["owner"]
@@ -56,26 +86,42 @@ def build_task_payload(phase: str, team_spec: dict, workflow_spec: dict, active_
     inputs.append(_role_file(owner))
     inputs.extend(_skill_file(role_spec))
     deduped_inputs = list(dict.fromkeys(inputs))
-
-    template = TASK_TEMPLATE_PATH.read_text(encoding="utf-8")
-    payload = template
-    payload = payload.replace("`<role-name>`", f"`{owner}`")
-    payload = payload.replace("`<bounded task objective>`", f"`{PHASE_OBJECTIVES.get(phase, 'Complete the assigned phase work.')}`")
-    payload = payload.replace(
-        "- `<artifact or files this subagent owns>`",
-        "\n".join(f"- `{item}`" for item in owned_outputs) or "- `None`",
-    )
-    payload = payload.replace(
-        "- `<required docs, code areas, memory, and role/skill files>`",
-        "\n".join(f"- `{item}`" for item in deduped_inputs),
-    )
-    payload = payload.replace(
-        "- `<what must be true for the task to be complete>`",
-        f"- {PHASE_COMPLETION.get(phase, 'Phase outputs are complete and validated.')}",
+    return _render_task_payload(
+        role=owner,
+        objective=PHASE_OBJECTIVES.get(phase, "Complete the assigned phase work."),
+        owned_outputs=owned_outputs,
+        inputs=deduped_inputs,
+        completion=PHASE_COMPLETION.get(phase, "Phase outputs are complete and validated."),
+        feature=active_feature,
+        phase=phase,
     )
 
-    header = [
-        f"Feature: `{active_feature or 'unspecified'}`",
-        f"Phase: `{phase}`",
-    ]
-    return "\n".join(header) + "\n\n" + payload
+
+def build_specialist_task_payload(
+    role: str,
+    team_spec: dict,
+    *,
+    objective: str,
+    active_feature: str | None,
+    inputs: list[str] | None = None,
+    owned_outputs: list[str] | None = None,
+    completion: str | None = None,
+) -> str:
+    role_spec = team_spec["roles"][role]
+    derived_inputs = [_role_file(role)]
+    derived_inputs.extend(_skill_file(role_spec))
+    if inputs:
+        derived_inputs.extend(inputs)
+    deduped_inputs = list(dict.fromkeys(derived_inputs))
+
+    outputs = owned_outputs or list(role_spec.get("writes", []))
+    completion_text = completion or "Owned outputs are updated and ready for coordinator review."
+    return _render_task_payload(
+        role=role,
+        objective=objective,
+        owned_outputs=outputs,
+        inputs=deduped_inputs,
+        completion=completion_text,
+        feature=active_feature,
+        phase=None,
+    )

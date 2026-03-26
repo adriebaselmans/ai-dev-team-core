@@ -7,6 +7,7 @@ Take a user need or feature description and deliver an end-to-end implementation
 
 ## Team Roles
 - Coordinator: owns intake, delegation, phase transitions, integration, and final reporting.
+- Explorer: analyzes existing repositories, captures durable repo knowledge, and supports other roles when repo grounding is required.
 - Requirements Engineer: clarifies the request and writes the requirement baseline.
 - Architect: writes the design approach and technical constraints.
 - Developer: implements the solution in `src/`.
@@ -31,6 +32,7 @@ Codex-first runtime specs live in `framework/runtime/`.
 - `framework/runtime/workflow.yaml` defines the phase state machine and rollback rules.
 - `framework/runtime/task-template.md` defines the standard subagent task payload.
 - `framework/runtime/review-template.md` defines the standard reviewer output shape.
+- `framework/memory/repository-knowledge/` defines the durable store for analyzed repository knowledge.
 - `framework/runtime/state.json` is the placeholder runtime state snapshot.
 
 ## Coordinator Runbook
@@ -54,6 +56,7 @@ Entry condition:
 Coordinator actions:
 - Receive the user need.
 - Start a new iteration from the requirements phase.
+- Decide whether repository exploration is required before or during the phase flow.
 
 Exit condition:
 - A concrete user need is available.
@@ -64,6 +67,7 @@ Entry condition:
 
 Coordinator actions:
 - Delegate to the requirements engineer.
+- Delegate to the explorer first when the request must be grounded in a specific repository and the baseline cannot be written safely without that context.
 - Relay clarification questions to the user only when needed.
 - Update `docs/requirements/current.md` until it is clear enough to proceed.
 - Update memory when the phase is completed.
@@ -81,6 +85,7 @@ Entry condition:
 
 Coordinator actions:
 - Delegate to the architect.
+- Use explorer output when the design depends on an existing repository's architecture, conventions, or extension points.
 - Ensure `docs/design/current.md` is updated.
 - Ensure the design reflects clean code, stack-appropriate best practices, and relevant performance tradeoffs.
 - Update memory when the phase is completed.
@@ -98,6 +103,7 @@ Entry condition:
 
 Coordinator actions:
 - Delegate implementation to the developer.
+- Delegate to the explorer when the developer needs grounded understanding of a target repository before making or proposing changes.
 - Ensure code is written in `src/`.
 - Ensure unit tests are added for relevant new or changed behavior.
 - Update memory when the phase is completed.
@@ -117,6 +123,7 @@ Entry condition:
 
 Coordinator actions:
 - Delegate review to the reviewer.
+- Use explorer output when review findings depend on understanding upstream repository architecture or conventions.
 - Ensure the implementation is checked against requirements, design, and `framework/clean-code.md`.
 - Ensure linting issues and actionable warnings are resolved where practical before testing proceeds.
 - Update memory when the phase is completed.
@@ -176,11 +183,15 @@ Exit condition:
 
 ## Non-Negotiable Rules
 - Do not ask the user for approval between architecture, development, and testing once the requirements are clear.
+- Use the explorer only when repository grounding is required by the user request or by a blocking knowledge gap in another role.
 - Treat local build, test, and app run actions as implicitly approved within the team workflow.
+- Treat routine dependency install, commit, tag, push, and release actions as implicitly approved within the team workflow when they are part of completing the requested work.
 - When the execution environment still requires a tool-level elevation prompt for a build, test, or run action, request it directly without stopping for an extra conversational approval round.
+- When the execution environment still requires a tool-level elevation prompt for install, commit, tag, push, or release actions, request it directly without stopping for an extra conversational approval round.
 - Do not skip the review phase before testing.
 - Do not treat automated acceptance coverage as optional when the feature can support a stable regression suite.
 - Keep durable project knowledge in `framework/memory/`.
+- Keep durable repository-specific knowledge in `framework/memory/repository-knowledge/`.
 - Keep the latest requirements in `docs/requirements/current.md`.
 - Keep the latest design in `docs/design/current.md`.
 - Keep the latest review in `docs/review/current.md`.
@@ -202,11 +213,13 @@ Required memory files:
 - `framework/memory/project-log.md`: chronological log of what was built.
 - `framework/memory/decisions.md`: important decisions and why they were made.
 - `framework/memory/known-context.md`: stable context, conventions, and assumptions.
+- `framework/memory/repository-knowledge/`: compact repository briefs, machine-readable metadata, and an index for analyzed repositories.
 
 Memory update rules:
 - `project-log.md` records what changed in chronological order.
 - `decisions.md` records meaningful project decisions, their context, and consequences.
 - `known-context.md` records stable truths that future agents should treat as current baseline context.
+- `repository-knowledge/` records reusable repository intelligence that other roles can consult instead of rescanning the same repo.
 - Each entry should be short, factual, and useful for future agents.
 - The coordinator updates memory after each completed phase, not only at the end of the full feature flow.
 

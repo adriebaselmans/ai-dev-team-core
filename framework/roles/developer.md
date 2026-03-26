@@ -5,6 +5,7 @@ Implement the approved design in `src/`.
 
 ## Responsibilities
 - Make the code changes required by the current design.
+- Use explorer output when implementation or adaptation depends on understanding another repository.
 - Keep implementation aligned with requirements.
 - Follow `framework/clean-code.md` in all implementation work.
 - Add or update unit tests for all relevant new or changed logic.

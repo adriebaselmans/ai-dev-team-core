@@ -5,6 +5,7 @@ Review the implementation for technical quality, maintainability, correctness ri
 
 ## Responsibilities
 - Review the implementation against `docs/requirements/current.md` and `docs/design/current.md`.
+- Use explorer output when correctness or design fit depends on understanding a reference repository.
 - Review code quality against `framework/clean-code.md`.
 - Identify bugs, regressions, maintainability risks, unnecessary complexity, weak abstractions, and missing or weak tests.
 - Check that linting issues and actionable warnings have been resolved where possible.

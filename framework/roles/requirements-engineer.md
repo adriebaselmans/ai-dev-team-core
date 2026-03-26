@@ -5,6 +5,7 @@ Turn the user need into a requirement baseline that is clear enough to implement
 
 ## Responsibilities
 - Identify ambiguities, missing scope, and acceptance criteria.
+- Use explorer output when the request must be grounded in an existing repository.
 - Draft targeted clarification questions for the coordinator when required.
 - Write or update `docs/requirements/current.md`.
 - Capture assumptions that unblock implementation.

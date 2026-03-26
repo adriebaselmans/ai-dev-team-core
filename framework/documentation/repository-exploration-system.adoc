@@ -1,0 +1,117 @@
+= Repository Exploration System
+:toc: left
+:toclevels: 3
+:sectanchors:
+:sectnums:
+
+== Purpose
+
+This document explains the Explorer role and the repository knowledge storage model.
+
+It exists because repository-grounded work does not fit cleanly into a pure feature-delivery phase model. Sometimes the team must first understand another codebase before requirements, design, implementation, or review can proceed safely.
+
+== Why The Explorer Exists
+
+The base delivery system already had strong phase specialists, but it lacked a dedicated role for reverse engineering and codebase orientation.
+
+That gap created three problems:
+
+- repeated rediscovery of the same repository
+- weak traceability for repository-derived claims
+- no durable place to store compact repository intelligence
+
+The Explorer solves those problems without adding a mandatory new phase to every workflow.
+
+== Activation Rules
+
+The coordinator should use the Explorer only when one of these is true:
+
+- the user asks to base work on a specific repository or application
+- a specialist is blocked because a reference repository is not yet understood well enough
+
+The Explorer is a support role, not a default phase owner.
+
+== Outputs
+
+Repository knowledge is stored in `framework/memory/repository-knowledge/`.
+
+Each analyzed repository should have:
+
+- `brief.md`: compact human-readable summary
+- `facts.json`: machine-readable stable facts
+
+The directory also contains:
+
+- `index.md`: repository inventory
+- `TEMPLATE.md`: standard brief layout
+
+== Knowledge Model
+
+The brief captures the high-signal narrative:
+
+- repository identity and revision
+- purpose
+- top-level architecture
+- key directories and entry points
+- important flows for the current work
+- conventions, constraints, risks, and extension points
+- open questions
+
+The JSON facts file captures compact fields that later agents or tooling can parse cheaply.
+
+Recommended fields include:
+
+- `name`
+- `source`
+- `revision`
+- `last_updated`
+- `languages`
+- `frameworks`
+- `entry_points`
+- `key_directories`
+- `commands`
+- `open_questions`
+
+== Coordinator Integration
+
+The coordinator decides whether repository grounding is required.
+
+If it is, the coordinator can generate a bounded support-role task with:
+
+[source,powershell]
+----
+python framework/runtime/orchestrator.py specialist-task --role explorer --objective "Analyze the target repository and produce a reusable repo brief"
+----
+
+That task should point the explorer at:
+
+- the target repository
+- the question or feature that needs grounding
+- the expected owned outputs in `framework/memory/repository-knowledge/`
+
+== Interaction With Other Roles
+
+The Explorer does not replace the existing specialists.
+
+Instead:
+
+- requirements uses explorer output to write grounded scope and acceptance criteria
+- architecture uses explorer output to align with real structure and extension points
+- development uses explorer output when adapting or integrating with a reference codebase
+- review uses explorer output when fit or correctness depends on the reference repository
+
+== Design Tradeoffs
+
+This design intentionally favors:
+
+- simple file-based storage
+- explicit coordinator routing
+- compact reusable summaries
+
+It intentionally does not yet add:
+
+- semantic retrieval infrastructure
+- automatic repository cloning
+- a mandatory exploration phase for every task
+
+These choices keep the framework lightweight while still aligning it with current agent-engineering patterns around bounded specialists, explicit routing, and durable context.

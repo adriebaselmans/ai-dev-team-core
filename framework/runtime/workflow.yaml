@@ -20,6 +20,8 @@ phase_specs:
 
   requirements:
     owner: requirements-engineer
+    conditional_support_roles:
+      - explorer
     required_inputs:
       - user_need
       - framework/roles/requirements-engineer.md
@@ -37,6 +39,8 @@ phase_specs:
 
   architecture:
     owner: architect
+    conditional_support_roles:
+      - explorer
     required_inputs:
       - docs/requirements/current.md
       - framework/clean-code.md
@@ -54,6 +58,8 @@ phase_specs:
 
   development:
     owner: developer
+    conditional_support_roles:
+      - explorer
     required_inputs:
       - docs/requirements/current.md
       - docs/design/current.md
@@ -74,6 +80,8 @@ phase_specs:
 
   review:
     owner: reviewer
+    conditional_support_roles:
+      - explorer
     required_inputs:
       - docs/requirements/current.md
       - docs/design/current.md
@@ -93,6 +101,8 @@ phase_specs:
 
   testing:
     owner: tester
+    conditional_support_roles:
+      - explorer
     required_inputs:
       - docs/requirements/current.md
       - docs/design/current.md

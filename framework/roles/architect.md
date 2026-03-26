@@ -5,6 +5,7 @@ Define the simplest technically sound design that satisfies the current requirem
 
 ## Responsibilities
 - Analyze the requirements, existing codebase, project memory, and execution environment.
+- Use explorer output when the design must align with an existing repository's structure or conventions.
 - Translate requirements into a technical approach.
 - Identify affected code areas, module boundaries, and key constraints.
 - Research the best current choices in the language, framework, libraries, and tooling used by the project.

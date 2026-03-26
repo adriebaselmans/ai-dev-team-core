@@ -13,6 +13,7 @@ It describes:
 
 - the agents and their responsibilities
 - how the coordinator drives work across phases
+- how repository exploration fits in as a conditional support capability
 - how the runtime contract supports native subagent execution
 - how artifacts move from requirements to delivery
 - how memory, review, and testing keep the system durable and auditable
@@ -27,6 +28,7 @@ At a high level:
 
 - the *Coordinator* is the only user-facing agent
 - specialist agents own bounded work products
+- the *Explorer* can be invoked as a support specialist when repository grounding is required
 - each major delivery phase has an explicit artifact
 - the runtime contract describes the team, workflow, validation, and task payload shape
 - project memory is updated after each completed phase
@@ -45,6 +47,7 @@ skinparam DefaultTextAlignment center
 actor User
 rectangle "Coordinator" as Coordinator
 rectangle "Specialist Agents" as Specialists {
+  rectangle "Explorer" as Explorer
   rectangle "Requirements Engineer" as RE
   rectangle "Architect" as Arch
   rectangle "Developer" as Dev
@@ -55,12 +58,14 @@ database "Project Artifacts\n/docs, /src, /framework/memory" as Artifacts
 rectangle "Runtime Contract\n/framework/runtime" as Runtime
 
 User --> Coordinator : feature request\napproval or feedback
+Coordinator --> Explorer : repository analysis task\nwhen needed
 Coordinator --> RE : requirements task
 Coordinator --> Arch : architecture task
 Coordinator --> Dev : implementation task
 Coordinator --> Rev : technical review task
 Coordinator --> Test : validation task
 
+Explorer --> Artifacts : repository brief\n+ facts
 RE --> Artifacts : requirements baseline
 Arch --> Artifacts : design baseline
 Dev --> Artifacts : code + unit tests
@@ -78,6 +83,7 @@ Runtime --> Coordinator : task payloads,\nphase validation rules
 The system is designed around a small set of strong constraints:
 
 - *Controlled delegation*: specialists are used for bounded, role-owned tasks.
+- *Conditional repo grounding*: repository exploration happens only when it materially improves correctness or speed.
 - *Artifact discipline*: each phase leaves behind a durable output.
 - *Clear user interaction boundaries*: only the coordinator talks to the user.
 - *Safe autonomy*: once requirements are clear, the system proceeds without repeated human approval checkpoints.
@@ -94,6 +100,7 @@ It is responsible for:
 
 - interpreting the user request as a feature or iteration
 - deciding whether requirements are clear enough to proceed
+- deciding whether repository grounding is required
 - spawning the right specialist for the current phase
 - maintaining `framework/flows/current-status.md`
 - updating `framework/memory/` after completed phases
@@ -112,6 +119,10 @@ Each specialist has a narrow mission and a bounded write scope.
 | Coordinator
 | Orchestration, user communication, phase control, memory updates
 | `framework/flows/current-status.md`, `framework/memory/*`
+
+| Explorer
+| Analyze a target repository and capture reusable repository knowledge
+| `framework/memory/repository-knowledge/*`
 
 | Requirements Engineer
 | Convert a user need into an implementation-ready baseline
@@ -176,6 +187,7 @@ The main artifact classes are:
 - *Review record*: technical findings and recommendation
 - *Definition of Done record*: delivery evidence, regression guidance, gaps, and user feedback needs
 - *Project memory*: durable context that survives iterations
+- *Repository knowledge*: compact repo briefs and facts that support repository-grounded work
 
 === 4. Runtime Contract Layer
 
@@ -190,8 +202,11 @@ It contains:
 - `validators.py`: phase validation logic
 - `orchestrator.py`: CLI entrypoint for runtime state operations
 - `state.json`: machine-readable snapshot of the current runtime state
+- `framework/memory/repository-knowledge/`: durable repository intelligence for support-role use
 
 The runtime contract does not replace the coordinator. It standardizes what the coordinator uses.
+
+The repository exploration capability is intentionally outside the mandatory phase state machine. It is a support path the coordinator can invoke when requirements, architecture, development, or review work must be grounded in another codebase.
 
 == How The Agents Work Together
 
@@ -202,10 +217,11 @@ The system is intentionally asymmetric. Specialists do not collaborate directly 
 Instead:
 
 1. the coordinator determines the active phase
-2. the coordinator builds or requests a bounded task
-3. the specialist updates the owned artifact
-4. the coordinator validates the result
-5. the coordinator either advances or loops back
+2. the coordinator decides whether support exploration is needed
+3. the coordinator builds or requests a bounded task
+4. the specialist updates the owned artifact
+5. the coordinator validates the result
+6. the coordinator either advances or loops back
 
 [plantuml,coordinator-specialist-sequence,svg]
 ----
@@ -217,12 +233,15 @@ skinparam ParticipantPadding 20
 
 actor User
 participant Coordinator
+participant Explorer
 participant "Specialist" as Specialist
 database "Owned Artifact" as Artifact
 collections "Memory / Status" as Memory
 
 User -> Coordinator : request or feedback
 Coordinator -> Coordinator : determine active phase
+Coordinator -> Explorer : optional repo analysis
+Explorer -> Memory : repository brief\nand facts
 Coordinator -> Specialist : bounded task payload
 Specialist -> Artifact : update owned output
 Specialist --> Coordinator : completion summary
@@ -298,6 +317,7 @@ Key properties:
 - separates scope from non-scope
 - produces acceptance criteria
 - defines whether the work is ready for architecture
+- can consume explorer output when requirements must be grounded in a specific repository
 
 === Architecture
 
@@ -309,6 +329,7 @@ Key properties:
 - defines structure and technical boundaries
 - records meaningful tradeoffs
 - prevents the developer from guessing major design intent
+- can consume explorer output for repository structure, conventions, and extension points
 
 === Development
 
@@ -319,6 +340,7 @@ Key properties:
 - writes code in `src/`
 - adds unit tests for changed behavior
 - keeps the implementation aligned with clean-code constraints
+- can use explorer output when adapting or integrating with another codebase
 
 === Review
 
@@ -363,10 +385,22 @@ The coordinator owns:
 - interpretation of user requests
 - phase control
 - specialist delegation
+- conditional repository exploration
 - memory updates
 - user-facing communication
 
 The coordinator must never silently skip an artifact or a phase.
+
+=== Explorer
+
+This role builds reusable understanding of a specific repository.
+
+The explorer should:
+
+- orient quickly using manifests, docs, and entry points
+- trace only the flows relevant to the current task
+- separate evidence from inference
+- store compact findings in `framework/memory/repository-knowledge/`
 
 === Requirements Engineer
 
@@ -431,6 +465,7 @@ Roles and skills are distinct:
 Examples:
 
 - the coordinator uses `coordinator-flow`
+- the explorer uses `repository-exploration` and `repository-knowledge-compaction`
 - the requirements engineer uses `requirements-clarification`
 - the developer uses `implementation-clean-code` and `unit-testing`
 - the tester uses `acceptance-testing`
@@ -446,6 +481,7 @@ left to right direction
 
 rectangle "Roles" {
   rectangle Coordinator
+  rectangle Explorer
   rectangle "Requirements Engineer" as RE
   rectangle Architect
   rectangle Developer
@@ -456,6 +492,8 @@ rectangle "Roles" {
 rectangle "Skills" {
   rectangle "coordinator-flow" as CF
   rectangle "memory-update" as MU
+  rectangle "repository-exploration" as RX
+  rectangle "repo-knowledge-compaction" as RKC
   rectangle "requirements-clarification" as RC
   rectangle "architecture-design" as AD
   rectangle "implementation-clean-code" as ICC
@@ -467,6 +505,8 @@ rectangle "Skills" {
 
 Coordinator --> CF
 Coordinator --> MU
+Explorer --> RX
+Explorer --> RKC
 RE --> RC
 Architect --> AD
 Developer --> ICC
@@ -488,6 +528,7 @@ Tester ..> PW : optional
 - which files they are allowed to write
 - which skills they normally use
 - what spawning rules the coordinator must respect
+- which support roles are conditional rather than phase-owning
 
 This is the team registry.
 
@@ -526,6 +567,7 @@ It can:
 - sync status markdown
 - validate a phase
 - generate the next bounded task
+- generate a bounded support-specialist task such as an explorer task
 - advance to the next phase when validation succeeds
 - manually set a phase for recovery or controlled testing
 
@@ -558,6 +600,9 @@ The memory layer exists to preserve context across iterations.
 
 | `framework/memory/known-context.md`
 | Stable truths and conventions that should persist
+
+| `framework/memory/repository-knowledge/`
+| Compact reusable knowledge about analyzed repositories
 |===
 
 This separation matters. Mixing these concerns would make future runs noisier and less reliable.
@@ -569,6 +614,7 @@ The workflow uses a constrained autonomy model.
 Key rules:
 
 - before requirements are clear, the coordinator may need clarification
+- before or during a phase, the coordinator may invoke the explorer when repository grounding is necessary
 - after requirements are clear, the system should continue through architecture, development, review, and testing without extra approval checkpoints
 - local build, test, and run actions are treated as implicitly approved within the workflow
 - if the environment itself still requires a tool-level elevation prompt, the system should request it directly rather than turning it into a conversational stop
@@ -611,6 +657,7 @@ The system is meant to be reusable and extensible.
 Common extensions include:
 
 - adding new project-local skills
+- adding new support specialists with explicit activation rules
 - tightening validator rules
 - changing role ownership or write scopes
 - adding richer task payload conventions
@@ -659,6 +706,9 @@ The safest way to extend the system is to preserve the core invariants:
 
 | Memory
 | Durable project context stored in `framework/memory/`
+
+| Repository Knowledge
+| Durable compact knowledge about analyzed repositories stored in `framework/memory/repository-knowledge/`
 |===
 
 == Conclusion

@@ -5,6 +5,10 @@ Codex-first skeleton for an AI-driven development team with:
 - project-local skills
 - durable requirements/design/review/DoD artifacts
 - a runtime orchestration layer for specialist subagent work
+- repository exploration and reusable repository knowledge storage
+
+## Version
+- Current release: `0.2`
 
 ## What This Repo Is
 This repo is a reusable project skeleton.
@@ -17,6 +21,8 @@ Copy it for a new project, start Codex in the repo root, and give the coordinato
 5. testing
 6. DoD review
 
+The coordinator can also invoke the Explorer as a conditional support specialist when work must be grounded in an existing repository or application.
+
 The active project artifacts start empty on purpose:
 - `docs/requirements/current.md`
 - `docs/design/current.md`
@@ -26,6 +32,7 @@ The active project artifacts start empty on purpose:
 
 ## Team
 - Coordinator
+- Explorer
 - Requirements Engineer
 - Architect
 - Developer
@@ -112,11 +119,23 @@ python framework/runtime/orchestrator.py next-task
 python framework/runtime/orchestrator.py next-task --phase requirements
 ```
 
+Generate a bounded support-specialist task payload, such as a repository exploration task:
+
+```powershell
+python framework/runtime/orchestrator.py specialist-task --role explorer --objective "Analyze the target repository and produce a reusable repo brief"
+```
+
 Validate the current or a specified phase:
 
 ```powershell
 python framework/runtime/orchestrator.py validate
 python framework/runtime/orchestrator.py validate --phase requirements --check-status
+```
+
+Validate repository knowledge artifacts:
+
+```powershell
+python framework/runtime/orchestrator.py validate-repository-knowledge
 ```
 
 Advance when the current phase is complete:
@@ -137,9 +156,16 @@ Sync markdown status from machine-readable runtime state:
 python framework/runtime/orchestrator.py sync-status
 ```
 
+Run runtime tests:
+
+```powershell
+python -m unittest discover framework/runtime/tests
+```
+
 ## Runtime Behavior
 - The coordinator is the only top-level user-facing agent.
 - Specialist work should be executed through native Codex subagent spawning.
+- Explorer is a conditional support specialist rather than a mandatory workflow phase owner.
 - Runtime specs live in `framework/runtime/`.
 - The runtime maintains:
   - `framework/runtime/state.json`
@@ -148,7 +174,9 @@ python framework/runtime/orchestrator.py sync-status
 The current runtime implementation:
 - loads `team.yaml` and `workflow.yaml`
 - builds bounded task payloads
+- builds support-specialist task payloads
 - validates phase artifacts
+- validates repository knowledge artifacts
 - advances or blocks phase progression
 
 It does not yet fully automate Codex subagent spawning by itself outside the active Codex runtime. The repo and runtime together provide the execution contract the coordinator should follow.
@@ -168,3 +196,6 @@ Useful OpenAI skills have been installed in the current Codex environment:
 - `doc`
 
 Restart Codex after installing skills so they are available in a fresh session.
+
+## Release Notes
+- See [CHANGELOG.md](/C:/github/ai-dev-team-core/CHANGELOG.md) for release history.

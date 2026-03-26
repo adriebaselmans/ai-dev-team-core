@@ -15,6 +15,19 @@ roles:
       - framework/memory/project-log.md
       - framework/memory/decisions.md
       - framework/memory/known-context.md
+      - framework/memory/repository-knowledge/
+  explorer:
+    agent_type: explorer
+    primary_skill: .github/skills/repository-exploration
+    supporting_skills:
+      - .github/skills/repository-knowledge-compaction
+    user_facing: false
+    invocation: conditional_support_role
+    invoke_when:
+      - The user asks to base work on a specific repository or application.
+      - Another role is blocked on missing insight into a specific repository.
+    writes:
+      - framework/memory/repository-knowledge/
   requirements-engineer:
     agent_type: default
     primary_skill: .github/skills/requirements-clarification
@@ -60,6 +73,7 @@ roles:
 spawn_rules:
   - Only the coordinator spawns specialist subagents.
   - Spawn specialists only for bounded tasks with clear artifact ownership.
+  - Explorer is a support role, not a phase owner; spawn it only when repository grounding is required.
   - Do not spawn a specialist for direct user interaction.
   - Prefer one active specialist on the critical path unless multiple specialists can work in parallel without overlapping write ownership.
   - The coordinator remains responsible for validation, routing, and phase transition decisions.

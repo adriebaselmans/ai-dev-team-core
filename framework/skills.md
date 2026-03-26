@@ -7,6 +7,9 @@ This file maps team roles to project-local skills and reusable external skills.
   Primary: `.github/skills/coordinator-flow`
   Supporting: `.github/skills/memory-update`
   Runtime: `framework/runtime/team.yaml`, `framework/runtime/workflow.yaml`, `framework/runtime/task-template.md`
+- Explorer
+  Primary: `.github/skills/repository-exploration`
+  Supporting: `.github/skills/repository-knowledge-compaction`
 - Requirements Engineer
   Primary: `.github/skills/requirements-clarification`
 - Architect

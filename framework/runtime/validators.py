@@ -28,6 +28,28 @@ PLACEHOLDERS = {
 }
 
 
+REPOSITORY_BRIEF_REQUIRED_SECTIONS = [
+    "Repository Identity",
+    "Purpose",
+    "Stack and Tooling",
+    "Top-Level Architecture",
+    "Key Directories and Entry Points",
+    "Important Flows for Current Work",
+    "Conventions and Constraints",
+    "Build, Test, and Run Commands",
+    "Risks and Extension Points",
+    "Open Questions",
+]
+
+
+REPOSITORY_FACTS_REQUIRED_KEYS = [
+    "name",
+    "source",
+    "last_updated",
+    "open_questions",
+]
+
+
 def _read(rel_path: str) -> str:
     return (repo_root() / rel_path).read_text(encoding="utf-8")
 
@@ -156,6 +178,61 @@ def validate_status_sync() -> ValidationResult:
         if needle not in status_body:
             messages.append(f"Status markdown mismatch for {label}.")
     return ValidationResult(not messages, messages or ["Status markdown and runtime state are in sync."])
+
+
+def validate_repository_knowledge_store() -> ValidationResult:
+    base_dir = repo_root() / "framework" / "memory" / "repository-knowledge"
+    messages: list[str] = []
+
+    if not base_dir.exists():
+        return ValidationResult(False, ["Repository knowledge store is missing."])
+
+    required_root_files = ["README.md", "TEMPLATE.md", "index.md"]
+    for file_name in required_root_files:
+        path = base_dir / file_name
+        if not path.exists():
+            messages.append(f"Repository knowledge store is missing {file_name}.")
+
+    index_sections = _sections((base_dir / "index.md").read_text(encoding="utf-8")) if (base_dir / "index.md").exists() else {}
+    if "Entries" not in index_sections:
+        messages.append("Repository knowledge index is missing the Entries section.")
+
+    for repo_dir in sorted(path for path in base_dir.iterdir() if path.is_dir()):
+        brief_path = repo_dir / "brief.md"
+        facts_path = repo_dir / "facts.json"
+
+        if not brief_path.exists():
+            messages.append(f"{repo_dir.name} is missing brief.md.")
+            continue
+        if not facts_path.exists():
+            messages.append(f"{repo_dir.name} is missing facts.json.")
+            continue
+
+        brief_sections = _sections(brief_path.read_text(encoding="utf-8"))
+        missing_sections = [
+            name for name in REPOSITORY_BRIEF_REQUIRED_SECTIONS if not _is_populated(brief_sections.get(name, ""))
+        ]
+        messages.extend(f"{repo_dir.name} brief is missing {name}." for name in missing_sections)
+
+        try:
+            facts = json.loads(facts_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            messages.append(f"{repo_dir.name} facts.json is invalid JSON: {exc.msg}.")
+            continue
+
+        if not isinstance(facts, dict):
+            messages.append(f"{repo_dir.name} facts.json must contain a JSON object.")
+            continue
+
+        for key in REPOSITORY_FACTS_REQUIRED_KEYS:
+            value = facts.get(key)
+            if isinstance(value, str) and value.strip():
+                continue
+            if key == "open_questions" and isinstance(value, list):
+                continue
+            messages.append(f"{repo_dir.name} facts.json is missing '{key}'.")
+
+    return ValidationResult(not messages, messages or ["Repository knowledge store is valid."])
 
 
 def validate_phase(phase: str) -> ValidationResult:

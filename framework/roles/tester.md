@@ -5,6 +5,7 @@ Validate that the implementation satisfies the requirement baseline and prepare 
 
 ## Responsibilities
 - Check the implementation against `docs/requirements/current.md`.
+- Use explorer output when validation depends on understanding a reference repository or replicated behavior.
 - Validate relevant edge cases and regressions.
 - Create and maintain an automated end-to-end or acceptance-level regression suite when that is feasible and worthwhile for the current stack and feature.
 - Record the Definition of Done result in `docs/dod/current.md`.
