@@ -18,6 +18,7 @@ Detailed role instructions live in `framework/roles/`.
 1. Coordinator receives the user need.
 2. Coordinator delegates to the requirements engineer.
 3. Requirements engineer asks the user questions only when the need is not clear enough to implement safely.
+   The coordinator owns the user interaction and relays those questions.
 4. Once the need is clear, the coordinator proceeds without further user intervention.
 5. Architect writes or updates `docs/design/current.md`.
 6. Developer implements the solution in `src/`.
@@ -30,8 +31,11 @@ Detailed role instructions live in `framework/roles/`.
 - Keep durable project knowledge in `framework/memory/`.
 - Keep the latest requirements in `docs/requirements/current.md`.
 - Keep the latest design in `docs/design/current.md`.
+- Keep the latest DoD review in `docs/dod/current.md`.
 - Keep implementation in `src/`.
+- Follow the engineering standards in `framework/clean-code.md`.
 - The coordinator is responsible for updating `framework/flows/current-status.md`.
+- The coordinator is responsible for updating `framework/memory/` after each completed phase.
 
 ## Memory Policy
 Update memory at the end of each completed phase.

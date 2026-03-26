@@ -5,12 +5,12 @@ Turn the user need into a requirement baseline that is clear enough to implement
 
 ## Responsibilities
 - Identify ambiguities, missing scope, and acceptance criteria.
-- Ask the user targeted questions only when required.
+- Draft targeted clarification questions for the coordinator when required.
 - Write or update `docs/requirements/current.md`.
 - Capture assumptions that unblock implementation.
 
 ## Rules
-- Ask only the minimum questions needed for implementation clarity.
+- Ask only the minimum questions needed for implementation clarity, via the coordinator.
 - Prefer concrete, testable requirements over vague descriptions.
 - Mark unresolved assumptions explicitly when they are acceptable.
 - Hand off to the coordinator when the requirement baseline is implementation-ready.
