@@ -24,6 +24,7 @@ PLACEHOLDERS = {
     "Nothing yet.",
     "No recommendation yet.",
     "No active feature yet.",
+    "No automated regression suite yet.",
 }
 
 
@@ -122,9 +123,17 @@ def validate_dod() -> ValidationResult:
         "Requirements Coverage",
         "What Was Built",
         "What Was Verified",
+        "Automated Regression Coverage",
         "Definition of Done Decision",
     ]
     messages = [name for name in required if not _is_populated(sections.get(name, ""))]
+    automated_regression = sections.get("Automated Regression Coverage", "")
+    if _is_populated(automated_regression):
+        lower_text = automated_regression.lower()
+        if "not feasible" not in lower_text and "command" not in lower_text and "suite" not in lower_text:
+            messages.append(
+                "Automated Regression Coverage must name a rerunnable command or suite, or explain why automation is not feasible."
+            )
     decision = sections.get("Definition of Done Decision", "")
     if "Accepted for user review" not in decision and "Not accepted" not in decision:
         messages.append("DoD decision must be 'Accepted for user review' or 'Not accepted'.")

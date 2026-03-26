@@ -20,6 +20,9 @@ TBD
 ## What Was Verified
 - Nothing yet.
 
+## Automated Regression Coverage
+- No automated regression suite yet.
+
 ## Acceptance and End-to-End Test Coverage
 - Not evaluated yet.
 
