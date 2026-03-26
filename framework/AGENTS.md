@@ -101,7 +101,6 @@ Loop rule:
 - Return to architecture if implementation reveals a structural design problem.
 - Return to requirements if implementation reveals a material scope or behavior ambiguity.
 
-### 5. Testing
 ### 5. Review
 Entry condition:
 - Implementation is complete enough for technical review.

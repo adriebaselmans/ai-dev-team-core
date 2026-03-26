@@ -30,3 +30,13 @@ Simple skeleton for an AI-driven development team.
 - Skills define how recurring work is performed.
 - Project-local skills live in `.github/skills/`.
 - Role-to-skill mapping lives in `framework/skills.md`.
+
+## Installed External Skills
+Useful OpenAI skills have been installed in the current Codex environment:
+- `openai-docs`
+- `playwright`
+- `security-best-practices`
+- `security-threat-model`
+- `doc`
+
+Restart Codex after installing skills so they are available in a fresh session.
