@@ -13,8 +13,45 @@ This folder defines the Codex-first runtime orchestration model for this reposit
 - `task-template.md`: standard task payload for spawned specialist subagents.
 - `review-template.md`: standard findings format for reviewer output.
 - `state.json`: machine-readable runtime state snapshot.
+- `orchestrator.py`: CLI entrypoint for runtime execution.
+- `state_manager.py`: runtime state loading, saving, and markdown sync.
+- `spec_loader.py`: YAML spec loading.
+- `task_builder.py`: bounded specialist task payload generation.
+- `validators.py`: phase validators.
+- `result_contract.py`: structured subagent result contract.
+- `requirements.txt`: Python runtime dependencies.
 
 ## Codex-First Rule
 - The coordinator is the only top-level user-facing agent.
 - The coordinator should use native subagent spawning for specialist work when the task is bounded.
 - Each spawned specialist gets one role, one bounded objective, explicit artifact ownership, and explicit completion criteria.
+
+## Prerequisites
+- Python 3.12+
+- `pip`
+- Dependencies from `requirements.txt`
+
+## Quickstart
+Install dependencies:
+
+```powershell
+python -m pip install -r framework/runtime/requirements.txt
+```
+
+Start a feature flow:
+
+```powershell
+python framework/runtime/orchestrator.py start --feature "Describe the feature here"
+```
+
+Check runtime state:
+
+```powershell
+python framework/runtime/orchestrator.py status
+```
+
+Advance when the current phase artifact is ready:
+
+```powershell
+python framework/runtime/orchestrator.py continue
+```

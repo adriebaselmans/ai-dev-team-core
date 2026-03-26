@@ -1,11 +1,15 @@
 {
   "version": 1,
   "runtime": "codex-first",
+  "active_feature": null,
   "phase": "idle",
   "owner": "coordinator",
   "state": "ready for first user need",
   "next_action": "receive a user need and start requirements clarification",
-  "active_feature": null,
+  "last_completed_phase": null,
+  "pending_rollback_target": null,
+  "user_input_required": false,
   "active_subagents": [],
+  "artifacts": {},
   "last_transition": null
 }
