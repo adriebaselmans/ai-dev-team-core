@@ -1,0 +1,670 @@
+= Development Team System Design
+:toc: left
+:toclevels: 3
+:sectanchors:
+:sectnums:
+:source-highlighter: rouge
+
+== Purpose
+
+This document explains how the AI Development Team System in this repository works as an operating model, not just as a collection of files.
+
+It describes:
+
+- the agents and their responsibilities
+- how the coordinator drives work across phases
+- how the runtime contract supports native subagent execution
+- how artifacts move from requirements to delivery
+- how memory, review, and testing keep the system durable and auditable
+
+The intended audience is anyone who needs to understand, extend, or operate the team skeleton.
+
+== System Summary
+
+The Development Team System is a coordinator-led, phase-based delivery model for AI-assisted software work.
+
+At a high level:
+
+- the *Coordinator* is the only user-facing agent
+- specialist agents own bounded work products
+- each major delivery phase has an explicit artifact
+- the runtime contract describes the team, workflow, validation, and task payload shape
+- project memory is updated after each completed phase
+
+This creates a system with explicit handoffs instead of ad hoc agent behavior.
+
+[plantuml,team-system-context,svg]
+----
+@startuml
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam ArrowColor #34495e
+skinparam DefaultTextAlignment center
+
+actor User
+rectangle "Coordinator" as Coordinator
+rectangle "Specialist Agents" as Specialists {
+  rectangle "Requirements Engineer" as RE
+  rectangle "Architect" as Arch
+  rectangle "Developer" as Dev
+  rectangle "Reviewer" as Rev
+  rectangle "Tester" as Test
+}
+database "Project Artifacts\n/docs, /src, /framework/memory" as Artifacts
+rectangle "Runtime Contract\n/framework/runtime" as Runtime
+
+User --> Coordinator : feature request\napproval or feedback
+Coordinator --> RE : requirements task
+Coordinator --> Arch : architecture task
+Coordinator --> Dev : implementation task
+Coordinator --> Rev : technical review task
+Coordinator --> Test : validation task
+
+RE --> Artifacts : requirements baseline
+Arch --> Artifacts : design baseline
+Dev --> Artifacts : code + unit tests
+Rev --> Artifacts : review findings
+Test --> Artifacts : DoD + regression guidance
+
+Coordinator --> Artifacts : status + memory updates
+Coordinator --> Runtime : uses workflow and team specs
+Runtime --> Coordinator : task payloads,\nphase validation rules
+@enduml
+----
+
+== Design Goals
+
+The system is designed around a small set of strong constraints:
+
+- *Controlled delegation*: specialists are used for bounded, role-owned tasks.
+- *Artifact discipline*: each phase leaves behind a durable output.
+- *Clear user interaction boundaries*: only the coordinator talks to the user.
+- *Safe autonomy*: once requirements are clear, the system proceeds without repeated human approval checkpoints.
+- *Recoverable flow*: defects or ambiguity route the work back to the right upstream phase.
+- *Regression-oriented testing*: testing should produce rerunnable acceptance evidence when feasible.
+
+== Core Components
+
+=== 1. Coordinator Layer
+
+The coordinator is the orchestration brain of the system.
+
+It is responsible for:
+
+- interpreting the user request as a feature or iteration
+- deciding whether requirements are clear enough to proceed
+- spawning the right specialist for the current phase
+- maintaining `framework/flows/current-status.md`
+- updating `framework/memory/` after completed phases
+- presenting the final Definition of Done review to the user
+
+The coordinator is not just a dispatcher. It owns phase transitions, loop-backs, integration, and final accountability.
+
+=== 2. Specialist Agent Layer
+
+Each specialist has a narrow mission and a bounded write scope.
+
+[cols="1,2,2",options="header"]
+|===
+| Agent | Primary Responsibility | Primary Outputs
+
+| Coordinator
+| Orchestration, user communication, phase control, memory updates
+| `framework/flows/current-status.md`, `framework/memory/*`
+
+| Requirements Engineer
+| Convert a user need into an implementation-ready baseline
+| `docs/requirements/current.md`
+
+| Architect
+| Produce the simplest safe design that satisfies the requirements
+| `docs/design/current.md`
+
+| Developer
+| Implement the design and add unit-level verification
+| `src/`
+
+| Reviewer
+| Perform technical review for correctness and maintainability risks
+| `docs/review/current.md`
+
+| Tester
+| Validate user-visible behavior and prepare delivery evidence
+| `docs/dod/current.md`
+|===
+
+=== 3. Artifact Layer
+
+The system depends on persistent artifacts rather than conversational memory alone.
+
+[plantuml,artifact-flow,svg]
+----
+@startuml
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam ArrowColor #34495e
+skinparam rectangle {
+  BackgroundColor #f8f9fb
+  BorderColor #5c6b73
+}
+
+rectangle "docs/requirements/current.md" as Req
+rectangle "docs/design/current.md" as Design
+rectangle "src/" as Src
+rectangle "docs/review/current.md" as Review
+rectangle "docs/dod/current.md" as DoD
+rectangle "framework/memory/*" as Memory
+
+Req --> Design : constrains
+Design --> Src : guides
+Src --> Review : reviewed
+Review --> DoD : approved for testing
+DoD --> Memory : accepted learnings
+
+Req --> Memory : requirement history
+Design --> Memory : technical decisions
+Review --> Memory : quality context
+@enduml
+----
+
+The main artifact classes are:
+
+- *Requirements baseline*: what the system must do
+- *Design baseline*: how the system should be built
+- *Implementation*: code and unit tests
+- *Review record*: technical findings and recommendation
+- *Definition of Done record*: delivery evidence, regression guidance, gaps, and user feedback needs
+- *Project memory*: durable context that survives iterations
+
+=== 4. Runtime Contract Layer
+
+The `framework/runtime/` directory is the machine-readable contract for orchestration.
+
+It contains:
+
+- `team.yaml`: role registry, write ownership, user-facing rules, and spawn constraints
+- `workflow.yaml`: phase state machine, inputs, outputs, exit checks, rollback rules
+- `task-template.md`: standard subagent task shape
+- `review-template.md`: standard technical review output shape
+- `validators.py`: phase validation logic
+- `orchestrator.py`: CLI entrypoint for runtime state operations
+- `state.json`: machine-readable snapshot of the current runtime state
+
+The runtime contract does not replace the coordinator. It standardizes what the coordinator uses.
+
+== How The Agents Work Together
+
+=== Coordinator-Centric Collaboration
+
+The system is intentionally asymmetric. Specialists do not collaborate directly with the user, and they do not own phase transitions.
+
+Instead:
+
+1. the coordinator determines the active phase
+2. the coordinator builds or requests a bounded task
+3. the specialist updates the owned artifact
+4. the coordinator validates the result
+5. the coordinator either advances or loops back
+
+[plantuml,coordinator-specialist-sequence,svg]
+----
+@startuml
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam sequenceArrowThickness 1
+skinparam ParticipantPadding 20
+
+actor User
+participant Coordinator
+participant "Specialist" as Specialist
+database "Owned Artifact" as Artifact
+collections "Memory / Status" as Memory
+
+User -> Coordinator : request or feedback
+Coordinator -> Coordinator : determine active phase
+Coordinator -> Specialist : bounded task payload
+Specialist -> Artifact : update owned output
+Specialist --> Coordinator : completion summary
+Coordinator -> Coordinator : validate coherence
+Coordinator -> Memory : update phase state\nand durable memory
+Coordinator --> User : clarification or final DoD only
+@enduml
+----
+
+=== Why This Structure Matters
+
+This pattern prevents several common failure modes:
+
+- specialists expanding scope without coordination
+- implementation proceeding without stable requirements
+- testing happening without review
+- important context disappearing between iterations
+- the user being forced into unnecessary approval loops
+
+== Phase Model
+
+The workflow is defined as an explicit state machine:
+
+- `idle`
+- `requirements`
+- `architecture`
+- `development`
+- `review`
+- `testing`
+- `dod-review`
+- `done`
+
+[plantuml,phase-state-machine,svg]
+----
+@startuml
+skinparam backgroundColor transparent
+skinparam shadowing false
+skinparam ArrowColor #34495e
+
+[*] --> idle
+idle --> requirements
+requirements --> architecture
+requirements --> requirements : blocking ambiguity
+architecture --> development
+architecture --> requirements : functional ambiguity\nor infeasibility
+development --> review
+development --> architecture : structural problem
+development --> requirements : scope ambiguity
+review --> testing
+review --> development : blocking finding
+review --> architecture : design issue
+testing --> dod_review
+testing --> development : defect or gap
+testing --> architecture : upstream issue
+testing --> requirements : requirement problem
+dod_review --> done : user approves
+dod_review --> requirements : user feedback
+done --> idle
+@enduml
+----
+
+=== Idle
+
+The resting state. No active feature is in progress.
+
+=== Requirements
+
+The requirements engineer converts the user request into a testable baseline.
+
+Key properties:
+
+- removes blocking ambiguity
+- separates scope from non-scope
+- produces acceptance criteria
+- defines whether the work is ready for architecture
+
+=== Architecture
+
+The architect creates an implementation-safe design.
+
+Key properties:
+
+- reflects the active requirements baseline
+- defines structure and technical boundaries
+- records meaningful tradeoffs
+- prevents the developer from guessing major design intent
+
+=== Development
+
+The developer implements the approved design.
+
+Key properties:
+
+- writes code in `src/`
+- adds unit tests for changed behavior
+- keeps the implementation aligned with clean-code constraints
+
+=== Review
+
+The reviewer checks the implementation before testing proceeds.
+
+Key properties:
+
+- findings-first assessment
+- emphasis on correctness, regression risk, and maintainability
+- explicit decision: approved for testing or rework required
+
+=== Testing
+
+The tester validates the user-visible result and prepares the delivery decision.
+
+Key properties:
+
+- checks behavior against requirements
+- expects rerunnable automated acceptance or end-to-end coverage when feasible
+- records how the user can rerun that regression coverage later
+- writes the Definition of Done artifact
+
+=== DoD Review
+
+The coordinator presents the delivery summary to the user.
+
+This is one of the only two moments when the user should be re-engaged:
+
+- requirements clarification
+- final DoD review
+
+=== Done
+
+The accepted state for the iteration. After acceptance, the system returns to `idle`.
+
+== Roles and Responsibilities
+
+=== Coordinator
+
+The coordinator owns:
+
+- interpretation of user requests
+- phase control
+- specialist delegation
+- memory updates
+- user-facing communication
+
+The coordinator must never silently skip an artifact or a phase.
+
+=== Requirements Engineer
+
+This role narrows ambiguity without over-designing the solution.
+
+The output should be:
+
+- specific
+- testable
+- implementation-relevant
+
+=== Architect
+
+This role selects the simplest safe technical approach.
+
+The architect should:
+
+- enforce clean boundaries
+- avoid speculative architecture
+- make important tradeoffs explicit
+
+=== Developer
+
+This role owns implementation quality.
+
+The developer should:
+
+- stay within scope
+- leave meaningful unit coverage
+- escalate structural issues instead of quietly redesigning the system
+
+=== Reviewer
+
+This role protects the system from low-quality handoffs into testing.
+
+The reviewer is expected to focus on:
+
+- bugs
+- likely regressions
+- poor abstractions
+- weak tests
+- avoidable quality issues
+
+=== Tester
+
+The tester is not just a manual checker.
+
+The current workflow expects the tester to:
+
+- validate user-visible outcomes
+- map checks back to acceptance criteria
+- create a rerunnable regression path when feasible
+- explain residual risks clearly
+
+== Skills and Execution Guidance
+
+Roles and skills are distinct:
+
+- *roles* define ownership and responsibility boundaries
+- *skills* define repeatable ways of carrying out a role
+
+Examples:
+
+- the coordinator uses `coordinator-flow`
+- the requirements engineer uses `requirements-clarification`
+- the developer uses `implementation-clean-code` and `unit-testing`
+- the tester uses `acceptance-testing`
+
+External skills such as `playwright` or `security-best-practices` are optional helpers, not replacements for the role model.
+
+[plantuml,role-skill-mapping,svg]
+----
+@startuml
+skinparam backgroundColor transparent
+skinparam shadowing false
+left to right direction
+
+rectangle "Roles" {
+  rectangle Coordinator
+  rectangle "Requirements Engineer" as RE
+  rectangle Architect
+  rectangle Developer
+  rectangle Reviewer
+  rectangle Tester
+}
+
+rectangle "Skills" {
+  rectangle "coordinator-flow" as CF
+  rectangle "memory-update" as MU
+  rectangle "requirements-clarification" as RC
+  rectangle "architecture-design" as AD
+  rectangle "implementation-clean-code" as ICC
+  rectangle "unit-testing" as UT
+  rectangle "code-review" as CR
+  rectangle "acceptance-testing" as AT
+  rectangle "playwright" as PW
+}
+
+Coordinator --> CF
+Coordinator --> MU
+RE --> RC
+Architect --> AD
+Developer --> ICC
+Developer --> UT
+Reviewer --> CR
+Tester --> AT
+Tester ..> PW : optional
+@enduml
+----
+
+== Runtime Contract Details
+
+=== team.yaml
+
+`team.yaml` answers:
+
+- which roles exist
+- whether they are user-facing
+- which files they are allowed to write
+- which skills they normally use
+- what spawning rules the coordinator must respect
+
+This is the team registry.
+
+=== workflow.yaml
+
+`workflow.yaml` answers:
+
+- which phases exist
+- required inputs and outputs for each phase
+- exit checks
+- rollback targets
+- the next phase when validation succeeds
+
+This is the workflow state machine.
+
+=== validators.py
+
+The validators provide enforcement for artifact completeness.
+
+Examples of validation logic:
+
+- requirements must show a ready Definition of Ready
+- design must populate critical design sections
+- development must contain implementation and obvious unit tests
+- review must contain a valid decision
+- DoD must contain verification evidence and automated regression coverage or a feasibility explanation
+
+=== orchestrator.py
+
+The orchestrator CLI is a helper around runtime state.
+
+It can:
+
+- start a feature flow
+- show status
+- sync status markdown
+- validate a phase
+- generate the next bounded task
+- advance to the next phase when validation succeeds
+- manually set a phase for recovery or controlled testing
+
+== Status, Memory, and Traceability
+
+=== Current Status
+
+`framework/flows/current-status.md` is the human-readable snapshot of the active phase.
+
+It gives a concise answer to:
+
+- where the system is
+- who currently owns the work
+- what is happening
+- what comes next
+
+=== Project Memory
+
+The memory layer exists to preserve context across iterations.
+
+[cols="1,3",options="header"]
+|===
+| File | Purpose
+
+| `framework/memory/project-log.md`
+| Chronological record of what changed
+
+| `framework/memory/decisions.md`
+| Important design and workflow decisions with rationale
+
+| `framework/memory/known-context.md`
+| Stable truths and conventions that should persist
+|===
+
+This separation matters. Mixing these concerns would make future runs noisier and less reliable.
+
+== Approval and Autonomy Model
+
+The workflow uses a constrained autonomy model.
+
+Key rules:
+
+- before requirements are clear, the coordinator may need clarification
+- after requirements are clear, the system should continue through architecture, development, review, and testing without extra approval checkpoints
+- local build, test, and run actions are treated as implicitly approved within the workflow
+- if the environment itself still requires a tool-level elevation prompt, the system should request it directly rather than turning it into a conversational stop
+
+This keeps the system moving while still respecting execution boundaries imposed by the environment.
+
+== Testing Philosophy
+
+The testing stage is intentionally stronger than a simple “I clicked around” validation.
+
+The expected order of evidence is:
+
+1. unit or module-level verification for changed logic
+2. acceptance or end-to-end verification for user-visible behavior
+3. durable DoD reporting for later reruns and audits
+
+The tester should map automated checks back to the acceptance criteria wherever practical.
+
+[plantuml,testing-pyramid-team,svg]
+----
+@startuml
+skinparam backgroundColor transparent
+skinparam shadowing false
+
+package "Testing Evidence" {
+  rectangle "DoD Delivery Evidence" as Dod
+  rectangle "Acceptance / E2E Regression Suite" as E2E
+  rectangle "Unit Tests" as Unit
+}
+
+Unit --> E2E : supports
+E2E --> Dod : proves delivery quality
+@enduml
+----
+
+== Extension Points
+
+The system is meant to be reusable and extensible.
+
+Common extensions include:
+
+- adding new project-local skills
+- tightening validator rules
+- changing role ownership or write scopes
+- adding richer task payload conventions
+- integrating stronger runtime tooling around the same state machine
+
+The safest way to extend the system is to preserve the core invariants:
+
+- one user-facing coordinator
+- explicit phase ownership
+- durable artifacts
+- validated handoffs
+- memory updates after completed phases
+
+== Practical Operating Notes
+
+- Start from requirements unless the request is already implementation-ready.
+- Keep specialists tightly scoped to owned outputs.
+- Use rollback rules instead of forcing forward motion.
+- Treat review as a gate, not a formality.
+- Treat testing as evidence generation, not only inspection.
+- Keep memory factual and compact.
+
+== Glossary
+
+[cols="1,3",options="header"]
+|===
+| Term | Meaning
+
+| Coordinator
+| The only user-facing orchestration agent
+
+| Specialist
+| A role-specific subagent with bounded ownership
+
+| Phase
+| A state in the delivery workflow
+
+| Artifact
+| A durable output produced by a phase
+
+| DoD
+| Definition of Done delivery review
+
+| Runtime Contract
+| The machine-readable team and workflow specification in `framework/runtime/`
+
+| Memory
+| Durable project context stored in `framework/memory/`
+|===
+
+== Conclusion
+
+The Development Team System is built to make AI-assisted delivery more predictable.
+
+Its main idea is simple: *turn agent collaboration into a governed workflow with clear ownership, durable artifacts, explicit validation, and controlled autonomy*.
+
+That is what allows the system to scale beyond one-off prompts into repeatable engineering work.
