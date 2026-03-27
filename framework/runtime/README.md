@@ -58,11 +58,7 @@ Advance when the current phase artifact is ready:
 python framework/runtime/orchestrator.py continue
 ```
 
-Print a bounded task payload for repository exploration support:
-
-```powershell
-python framework/runtime/orchestrator.py specialist-task --role explorer --objective "Analyze the target repository and produce a reusable repo brief"
-```
+Repository exploration support is invoked by the coordinator when a task needs grounded repository analysis. It is not exposed as a standalone active role command in this runtime contract.
 
 Validate repository knowledge artifacts:
 
