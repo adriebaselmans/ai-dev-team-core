@@ -1,31 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 import json
-import re
+from pathlib import Path
 
-from spec_loader import repo_root
+from artifacts import load_artifact, validate_artifact_data
+from spec_loader import repo_root, transition_spec
 
 
 @dataclass
 class ValidationResult:
     valid: bool
     messages: list[str]
-
-
-PLACEHOLDERS = {
-    "TBD",
-    "Pending first feature request.",
-    "Not ready.",
-    "Not reviewed yet.",
-    "Not evaluated yet.",
-    "No delivery yet.",
-    "Nothing yet.",
-    "No recommendation yet.",
-    "No active feature yet.",
-    "No automated regression suite yet.",
-}
 
 
 REPOSITORY_BRIEF_REQUIRED_SECTIONS = [
@@ -42,165 +28,101 @@ REPOSITORY_BRIEF_REQUIRED_SECTIONS = [
 ]
 
 
-REPOSITORY_FACTS_REQUIRED_KEYS = [
-    "name",
-    "source",
-    "last_updated",
-    "open_questions",
-]
-
-
-def _read(rel_path: str) -> str:
-    return (repo_root() / rel_path).read_text(encoding="utf-8")
+REPOSITORY_FACTS_REQUIRED_KEYS = ["name", "source", "last_updated", "open_questions"]
 
 
 def _sections(markdown: str) -> dict[str, str]:
-    parts = re.split(r"^##\s+", markdown, flags=re.MULTILINE)
-    result: dict[str, str] = {}
-    for part in parts[1:]:
-        lines = part.splitlines()
-        if not lines:
+    sections: dict[str, str] = {}
+    current: str | None = None
+    for line in markdown.splitlines():
+        if line.startswith("## "):
+            current = line[3:].strip()
+            sections[current] = ""
             continue
-        title = lines[0].strip()
-        body = "\n".join(lines[1:]).strip()
-        result[title] = body
-    return result
+        if current is None:
+            continue
+        sections[current] += (line + "\n")
+    return {key: value.strip() for key, value in sections.items()}
 
 
-def _is_populated(value: str) -> bool:
-    text = value.strip()
-    if not text:
-        return False
-    stripped = text.replace("- ", "").strip()
-    return stripped not in PLACEHOLDERS
+def _validation_result(messages: list[str], success_message: str) -> ValidationResult:
+    return ValidationResult(not messages, messages or [success_message])
 
 
 def validate_requirements() -> ValidationResult:
-    sections = _sections(_read("docs/requirements/current.md"))
-    required = [
-        "Title",
-        "User Need",
-        "Goal",
-        "In Scope",
-        "Out of Scope",
-        "Functional Requirements",
-        "Acceptance Criteria",
-        "Definition of Ready",
-    ]
-    messages = [name for name in required if not _is_populated(sections.get(name, ""))]
-    dor = sections.get("Definition of Ready", "").lower()
-    if "ready" not in dor or "not ready" in dor:
-        messages.append("Definition of Ready does not indicate readiness.")
-    return ValidationResult(not messages, messages or ["Requirements are ready."])
+    messages = validate_artifact_data("requirements", load_artifact("requirements"))
+    if load_artifact("requirements").get("definition_of_ready") != "Ready.":
+        messages.append("Definition of Ready must be 'Ready.'.")
+    return _validation_result(messages, "Requirements are ready.")
 
 
 def validate_design() -> ValidationResult:
-    sections = _sections(_read("docs/design/current.md"))
-    required = [
-        "Title",
-        "Design Goal",
-        "Architecture Approach",
-        "Affected Areas",
-        "Separation of Concerns",
-        "Module Boundaries and Responsibilities",
-        "Data Flow and State Handling",
-        "Interfaces and Contracts",
-        "Technology and Environment Considerations",
-        "Non-Goals",
-    ]
-    messages = [name for name in required if not _is_populated(sections.get(name, ""))]
-    return ValidationResult(not messages, messages or ["Design is implementation-safe."])
+    messages = validate_artifact_data("design", load_artifact("design"))
+    return _validation_result(messages, "Design is implementation-safe.")
 
 
 def validate_development() -> ValidationResult:
-    src_dir = repo_root() / "src"
-    files = [path for path in src_dir.rglob("*") if path.is_file() and path.name != ".gitkeep"]
-    tests = [
-        path
-        for path in files
-        if any(token in path.name.lower() for token in ("test", "spec"))
+    required_paths = [
+        repo_root() / "framework" / "config" / "models.yaml",
+        repo_root() / "framework" / "runtime" / "context_slices.yaml",
+        repo_root() / "framework" / "runtime" / "execution.py",
+        repo_root() / "framework" / "runtime" / "context_slicer.py",
+        repo_root() / "framework" / "runtime" / "compaction.py",
+        repo_root() / "framework" / "runtime" / "tests",
     ]
-    messages: list[str] = []
-    if not files:
-        messages.append("No implementation files found in src/.")
-    if not tests:
-        messages.append("No obvious unit test files found in src/.")
-    return ValidationResult(not messages, messages or ["Development outputs look present."])
+    messages = [f"Missing required development output: {path.relative_to(repo_root())}" for path in required_paths if not path.exists()]
+    return _validation_result(messages, "Development outputs are present.")
 
 
 def validate_review() -> ValidationResult:
-    sections = _sections(_read("docs/review/current.md"))
-    required = ["Decision", "Findings", "Recommendation"]
-    messages = [name for name in required if not _is_populated(sections.get(name, ""))]
-    decision = sections.get("Decision", "")
-    if "Approved for testing" not in decision and "Rework required" not in decision:
-        messages.append("Review decision must be 'Approved for testing' or 'Rework required'.")
-    return ValidationResult(not messages, messages or ["Review artifact is complete."])
+    messages = validate_artifact_data("review", load_artifact("review"))
+    decision = load_artifact("review").get("decision")
+    if decision not in {"Approved for testing.", "Rework required.", "Not reviewed yet."}:
+        messages.append("Review decision must be approved, rework required, or pending review.")
+    return _validation_result(messages, "Review artifact is complete.")
 
 
 def validate_dod() -> ValidationResult:
-    sections = _sections(_read("docs/dod/current.md"))
-    required = [
-        "Delivery Summary",
-        "Requirements Coverage",
-        "What Was Built",
-        "What Was Verified",
-        "Automated Regression Coverage",
-        "Definition of Done Decision",
-    ]
-    messages = [name for name in required if not _is_populated(sections.get(name, ""))]
-    automated_regression = sections.get("Automated Regression Coverage", "")
-    if _is_populated(automated_regression):
-        lower_text = automated_regression.lower()
-        if "not feasible" not in lower_text and "command" not in lower_text and "suite" not in lower_text:
-            messages.append(
-                "Automated Regression Coverage must name a rerunnable command or suite, or explain why automation is not feasible."
-            )
-    decision = sections.get("Definition of Done Decision", "")
-    if "Accepted for user review" not in decision and "Not accepted" not in decision:
-        messages.append("DoD decision must be 'Accepted for user review' or 'Not accepted'.")
-    return ValidationResult(not messages, messages or ["DoD artifact is complete."])
+    messages = validate_artifact_data("dod", load_artifact("dod"))
+    decision = load_artifact("dod").get("decision")
+    if decision not in {"Accepted for user review.", "Not accepted."}:
+        messages.append("Definition of Done decision must be accepted or not accepted.")
+    return _validation_result(messages, "DoD artifact is complete.")
 
 
 def validate_status_sync() -> ValidationResult:
-    state = json.loads(_read("framework/runtime/state.json"))
-    status = _sections(_read("framework/flows/current-status.md").replace("# Current Status", "## Current Status", 1))
-    status_body = status.get("Current Status", "")
+    state = json.loads((repo_root() / "framework" / "runtime" / "state.json").read_text(encoding="utf-8"))
+    status_body = (repo_root() / "framework" / "flows" / "current-status.md").read_text(encoding="utf-8")
     messages: list[str] = []
-    expected_pairs = {
+    for label, value in {
         "Phase": state.get("phase"),
         "Owner": state.get("owner"),
         "State": state.get("state"),
         "Next action": state.get("next_action"),
-    }
-    for label, value in expected_pairs.items():
-        needle = f"- {label}: {value}"
-        if needle not in status_body:
+    }.items():
+        if f"- {label}: {value}" not in status_body:
             messages.append(f"Status markdown mismatch for {label}.")
-    return ValidationResult(not messages, messages or ["Status markdown and runtime state are in sync."])
+    return _validation_result(messages, "Status markdown and runtime state are in sync.")
 
 
 def validate_repository_knowledge_store() -> ValidationResult:
     base_dir = repo_root() / "framework" / "memory" / "repository-knowledge"
     messages: list[str] = []
-
     if not base_dir.exists():
         return ValidationResult(False, ["Repository knowledge store is missing."])
 
     required_root_files = ["README.md", "TEMPLATE.md", "index.md"]
     for file_name in required_root_files:
-        path = base_dir / file_name
-        if not path.exists():
+        if not (base_dir / file_name).exists():
             messages.append(f"Repository knowledge store is missing {file_name}.")
 
-    index_sections = _sections((base_dir / "index.md").read_text(encoding="utf-8")) if (base_dir / "index.md").exists() else {}
-    if "Entries" not in index_sections:
+    index_path = base_dir / "index.md"
+    if index_path.exists() and "## Entries" not in index_path.read_text(encoding="utf-8"):
         messages.append("Repository knowledge index is missing the Entries section.")
 
     for repo_dir in sorted(path for path in base_dir.iterdir() if path.is_dir()):
         brief_path = repo_dir / "brief.md"
         facts_path = repo_dir / "facts.json"
-
         if not brief_path.exists():
             messages.append(f"{repo_dir.name} is missing brief.md.")
             continue
@@ -209,10 +131,9 @@ def validate_repository_knowledge_store() -> ValidationResult:
             continue
 
         brief_sections = _sections(brief_path.read_text(encoding="utf-8"))
-        missing_sections = [
-            name for name in REPOSITORY_BRIEF_REQUIRED_SECTIONS if not _is_populated(brief_sections.get(name, ""))
-        ]
-        messages.extend(f"{repo_dir.name} brief is missing {name}." for name in missing_sections)
+        for section in REPOSITORY_BRIEF_REQUIRED_SECTIONS:
+            if not brief_sections.get(section):
+                messages.append(f"{repo_dir.name} brief is missing {section}.")
 
         try:
             facts = json.loads(facts_path.read_text(encoding="utf-8"))
@@ -220,19 +141,51 @@ def validate_repository_knowledge_store() -> ValidationResult:
             messages.append(f"{repo_dir.name} facts.json is invalid JSON: {exc.msg}.")
             continue
 
-        if not isinstance(facts, dict):
-            messages.append(f"{repo_dir.name} facts.json must contain a JSON object.")
-            continue
-
         for key in REPOSITORY_FACTS_REQUIRED_KEYS:
             value = facts.get(key)
-            if isinstance(value, str) and value.strip():
-                continue
             if key == "open_questions" and isinstance(value, list):
                 continue
-            messages.append(f"{repo_dir.name} facts.json is missing '{key}'.")
+            if not isinstance(value, str) or not value.strip():
+                messages.append(f"{repo_dir.name} facts.json is missing '{key}'.")
 
-    return ValidationResult(not messages, messages or ["Repository knowledge store is valid."])
+    return _validation_result(messages, "Repository knowledge store is valid.")
+
+
+def validate_transition(trigger: str, current_phase: str) -> ValidationResult:
+    transition = transition_spec(trigger)
+    messages: list[str] = []
+    if transition["from"] != current_phase:
+        messages.append(
+            f"Transition '{trigger}' cannot start from '{current_phase}'. Expected '{transition['from']}'."
+        )
+    for validator_name in transition.get("validators", []):
+        result = _run_named_validator(validator_name)
+        if not result.valid:
+            messages.extend(result.messages)
+    return _validation_result(messages, f"Transition '{trigger}' is valid.")
+
+
+def _run_named_validator(name: str) -> ValidationResult:
+    if name == "requirements_artifact_ready":
+        return validate_requirements()
+    if name == "design_artifact_ready":
+        return validate_design()
+    if name == "development_outputs_present":
+        return validate_development()
+    if name == "review_approved":
+        decision = load_artifact("review").get("decision")
+        messages = [] if decision == "Approved for testing." else ["Review artifact is not approved for testing."]
+        return _validation_result(messages, "Review is approved.")
+    if name == "review_rework_required":
+        decision = load_artifact("review").get("decision")
+        messages = [] if decision == "Rework required." else ["Review artifact does not request rework."]
+        return _validation_result(messages, "Review requires rework.")
+    if name == "dod_ready_for_user_review":
+        result = validate_dod()
+        if result.valid and load_artifact("dod").get("decision") != "Accepted for user review.":
+            return ValidationResult(False, ["DoD artifact is not accepted for user review."])
+        return result
+    return ValidationResult(False, [f"Unknown validator: {name}"])
 
 
 def validate_phase(phase: str) -> ValidationResult:

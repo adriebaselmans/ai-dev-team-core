@@ -1,0 +1,38 @@
+version: 1
+default_mode: one-shot
+
+providers:
+  mock:
+    backend: mock
+  openai:
+    backend: mock
+  anthropic:
+    backend: mock
+  ollama:
+    backend: mock
+
+roles:
+  coordinator:
+    provider: mock
+    model: gpt-5.4
+    mode: orchestrator
+  requirements-engineer:
+    provider: openai
+    model: gpt-5.4-mini
+    mode: one-shot
+  architect:
+    provider: openai
+    model: gpt-5.4
+    mode: one-shot
+  developer:
+    provider: openai
+    model: gpt-5.4
+    mode: one-shot
+  reviewer:
+    provider: openai
+    model: gpt-5.4-mini
+    mode: one-shot
+  tester:
+    provider: openai
+    model: gpt-5.4-mini
+    mode: one-shot

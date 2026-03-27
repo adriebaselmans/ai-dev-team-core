@@ -3,8 +3,16 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import asdict, is_dataclass
 
-from spec_loader import load_team_spec, load_workflow_spec
+if sys.version_info < (3, 12):
+    raise SystemExit("framework/runtime/orchestrator.py requires Python 3.12+.")
+
+from artifacts import render_all_artifacts
+from compaction import compact_phase
+from execution import dispatch
+from repository_tool import repository_exploration_request
+from spec_loader import default_trigger_for_phase, load_team_spec, load_workflow_spec, transition_spec
 from state_manager import (
     load_state,
     mark_phase_validation,
@@ -12,8 +20,8 @@ from state_manager import (
     sync_status_markdown,
     transition_state,
 )
-from task_builder import build_specialist_task_payload, build_task_payload
-from validators import validate_phase, validate_repository_knowledge_store, validate_status_sync
+from task_builder import build_phase_dispatch_envelope, build_specialist_payload
+from validators import validate_phase, validate_repository_knowledge_store, validate_status_sync, validate_transition
 
 
 PHASE_STATE_TEXT = {
@@ -24,30 +32,36 @@ PHASE_STATE_TEXT = {
     "testing": "validation in progress",
     "dod-review": "awaiting user review",
     "done": "feature approved",
+    "idle": "ready for first user need",
 }
 
 
 PHASE_NEXT_ACTION = {
-    "requirements": "spawn requirements engineer task",
-    "architecture": "spawn architect task",
-    "development": "spawn developer task",
-    "review": "spawn reviewer task",
-    "testing": "spawn tester task",
+    "requirements": "dispatch requirements specialist",
+    "architecture": "dispatch architect",
+    "development": "dispatch developer",
+    "review": "dispatch reviewer",
+    "testing": "dispatch tester",
     "dod-review": "present DoD review to the user",
     "done": "wait for a new user need",
+    "idle": "receive a user need and start requirements clarification",
 }
 
 
-def _owner_for_phase(phase: str, workflow_spec: dict) -> str:
-    return workflow_spec["phase_specs"][phase]["owner"]
+def _print_json(payload: object) -> None:
+    def _default(value: object) -> object:
+        if is_dataclass(value):
+            return asdict(value)
+        return str(value)
+
+    print(json.dumps(payload, indent=2, default=_default))
 
 
 def cmd_status(args: argparse.Namespace) -> int:
     state = load_state()
     if args.json:
-        print(json.dumps(state, indent=2))
+        _print_json(state)
         return 0
-
     print(f"Phase: {state['phase']}")
     print(f"Owner: {state['owner']}")
     print(f"State: {state['state']}")
@@ -58,68 +72,35 @@ def cmd_status(args: argparse.Namespace) -> int:
 
 
 def cmd_sync_status(_: argparse.Namespace) -> int:
-    state = load_state()
-    sync_status_markdown(state)
+    sync_status_markdown(load_state())
     print("Synchronized framework/flows/current-status.md from runtime state.")
     return 0
 
 
-def cmd_start(args: argparse.Namespace) -> int:
-    workflow = load_workflow_spec()
-    state = load_state()
+def cmd_render_artifacts(_: argparse.Namespace) -> int:
+    render_all_artifacts()
+    print("Rendered markdown artifacts from structured YAML sources.")
+    return 0
 
+
+def cmd_start(args: argparse.Namespace) -> int:
+    state = load_state()
     if state["phase"] != "idle" and not args.force:
         print("Runtime is not idle. Use --force to start a new feature anyway.", file=sys.stderr)
         return 1
-
-    phase = "requirements"
-    owner = _owner_for_phase(phase, workflow)
-    state["active_feature"] = args.feature
-    state["active_subagents"] = []
-    state["pending_rollback_target"] = None
-    state["user_input_required"] = False
     transition_state(
         state,
-        phase=phase,
-        owner=owner,
-        state_text=PHASE_STATE_TEXT[phase],
-        next_action=PHASE_NEXT_ACTION[phase],
+        phase="requirements",
+        state_text=PHASE_STATE_TEXT["requirements"],
+        next_action=PHASE_NEXT_ACTION["requirements"],
         last_completed_phase=None,
-        pending_rollback_target=None,
+        pending_trigger="feature_received",
         user_input_required=False,
     )
+    state["active_feature"] = args.feature
     save_and_sync(state)
-    print(build_task_payload(phase, load_team_spec(), workflow, args.feature))
-    return 0
-
-
-def cmd_next_task(args: argparse.Namespace) -> int:
-    state = load_state()
-    workflow = load_workflow_spec()
-    team = load_team_spec()
-    phase = args.phase or state["phase"]
-    print(build_task_payload(phase, team, workflow, state.get("active_feature")))
-    return 0
-
-
-def cmd_specialist_task(args: argparse.Namespace) -> int:
-    team = load_team_spec()
-    state = load_state()
-    role = args.role
-    if role not in team.get("roles", {}):
-        print(f"Unknown role: {role}", file=sys.stderr)
-        return 1
-
-    payload = build_specialist_task_payload(
-        role,
-        team,
-        objective=args.objective,
-        active_feature=args.feature or state.get("active_feature"),
-        inputs=list(args.input or []) or None,
-        owned_outputs=list(args.output or []) or None,
-        completion=args.completion,
-    )
-    print(payload)
+    envelope = build_phase_dispatch_envelope("requirements", load_team_spec(), state)
+    _print_json({"dispatch": envelope})
     return 0
 
 
@@ -131,12 +112,45 @@ def cmd_validate(args: argparse.Namespace) -> int:
     save_and_sync(state)
     for message in result.messages:
         print(message)
+    if args.trigger:
+        transition_result = validate_transition(args.trigger, phase)
+        for message in transition_result.messages:
+            print(message)
+        return 0 if result.valid and transition_result.valid else 1
     if args.check_status:
         sync_result = validate_status_sync()
         for message in sync_result.messages:
             print(message)
         return 0 if result.valid and sync_result.valid else 1
     return 0 if result.valid else 1
+
+
+def cmd_next_task(args: argparse.Namespace) -> int:
+    state = load_state()
+    phase = args.phase or state["phase"]
+    envelope = build_phase_dispatch_envelope(phase, load_team_spec(), state)
+    _print_json({"dispatch": envelope})
+    return 0
+
+
+def cmd_dispatch(args: argparse.Namespace) -> int:
+    state = load_state()
+    phase = args.phase or state["phase"]
+    envelope = build_phase_dispatch_envelope(phase, load_team_spec(), state)
+    receipt = dispatch(envelope)
+    _print_json({"dispatch": envelope, "receipt": receipt.as_dict()})
+    return 0
+
+
+def cmd_specialist_task(args: argparse.Namespace) -> int:
+    payload = build_specialist_payload(args.role, load_team_spec(), load_state(), args.objective)
+    _print_json(payload)
+    return 0
+
+
+def cmd_repository_tool(args: argparse.Namespace) -> int:
+    _print_json(repository_exploration_request(args.target_path, args.objective))
+    return 0
 
 
 def cmd_validate_repository_knowledge(_: argparse.Namespace) -> int:
@@ -146,74 +160,50 @@ def cmd_validate_repository_knowledge(_: argparse.Namespace) -> int:
     return 0 if result.valid else 1
 
 
-def cmd_continue(_: argparse.Namespace) -> int:
+def cmd_continue(args: argparse.Namespace) -> int:
     workflow = load_workflow_spec()
-    team = load_team_spec()
     state = load_state()
     phase = state["phase"]
-
-    if phase == "idle":
-        print("Runtime is idle. Start a feature first with the start command.", file=sys.stderr)
+    if phase in {"idle", "done"}:
+        print("Current phase requires a manual start or reset.", file=sys.stderr)
+        return 1
+    if phase == "dod-review":
+        print("Current phase requires user input; runtime will not auto-advance.", file=sys.stderr)
         return 1
 
-    if phase in {"dod-review", "done"}:
-        print("Current phase requires user input or a new feature; runtime will not auto-advance.", file=sys.stderr)
+    trigger = args.trigger or default_trigger_for_phase(phase)
+    if trigger is None:
+        print(f"No default transition trigger configured for phase '{phase}'.", file=sys.stderr)
         return 1
 
-    result = validate_phase(phase)
-    mark_phase_validation(state, phase, result.valid, result.messages)
-
-    if not result.valid:
+    phase_result = validate_phase(phase)
+    transition_result = validate_transition(trigger, phase)
+    mark_phase_validation(state, phase, phase_result.valid, phase_result.messages)
+    if not phase_result.valid or not transition_result.valid:
         save_and_sync(state)
-        print(f"Phase '{phase}' is not ready to advance.")
-        for message in result.messages:
-            print(f"- {message}")
-        print()
-        print(build_task_payload(phase, team, workflow, state.get("active_feature")))
+        for message in phase_result.messages + transition_result.messages:
+            print(message)
         return 1
 
-    next_phase = workflow["phase_specs"][phase]["next_phase"]
-    owner = _owner_for_phase(next_phase, workflow)
+    current_phase_spec = workflow["phases"][phase]
+    compact_phase(phase, current_phase_spec.get("artifact"), state.get("active_feature"))
+    next_phase = transition_spec(trigger)["to"]
     transition_state(
         state,
         phase=next_phase,
-        owner=owner,
         state_text=PHASE_STATE_TEXT[next_phase],
         next_action=PHASE_NEXT_ACTION[next_phase],
         last_completed_phase=phase,
-        pending_rollback_target=None,
+        pending_trigger=trigger,
         user_input_required=(next_phase == "dod-review"),
     )
     save_and_sync(state)
-
-    print(f"Advanced from '{phase}' to '{next_phase}'.")
-    if next_phase not in {"dod-review", "done"}:
-        print()
-        print(build_task_payload(next_phase, team, workflow, state.get("active_feature")))
-    return 0
-
-
-def cmd_set_phase(args: argparse.Namespace) -> int:
-    workflow = load_workflow_spec()
-    state = load_state()
-    phase = args.phase
-    owner = _owner_for_phase(phase, workflow)
-    transition_state(
-        state,
-        phase=phase,
-        owner=owner,
-        state_text=args.state or PHASE_STATE_TEXT.get(phase, phase),
-        next_action=args.next_action or PHASE_NEXT_ACTION.get(phase, "continue workflow"),
-        pending_rollback_target=args.rollback_target,
-        user_input_required=(phase == "dod-review"),
-    )
-    save_and_sync(state)
-    print(f"Set runtime phase to '{phase}'.")
+    print(f"Advanced from '{phase}' to '{next_phase}' via '{trigger}'.")
     return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Codex-first runtime orchestrator")
+    parser = argparse.ArgumentParser(description="Model-agnostic runtime orchestrator")
     sub = parser.add_subparsers(dest="command", required=True)
 
     start = sub.add_parser("start", help="Start a new feature flow")
@@ -222,6 +212,7 @@ def build_parser() -> argparse.ArgumentParser:
     start.set_defaults(func=cmd_start)
 
     cont = sub.add_parser("continue", help="Validate current phase and advance when ready")
+    cont.add_argument("--trigger", help="Override the transition trigger")
     cont.set_defaults(func=cmd_continue)
 
     status = sub.add_parser("status", help="Show runtime state")
@@ -231,33 +222,35 @@ def build_parser() -> argparse.ArgumentParser:
     sync = sub.add_parser("sync-status", help="Sync markdown status from runtime state")
     sync.set_defaults(func=cmd_sync_status)
 
+    render = sub.add_parser("render-artifacts", help="Render markdown artifacts from YAML")
+    render.set_defaults(func=cmd_render_artifacts)
+
     validate = sub.add_parser("validate", help="Validate the current or specified phase")
     validate.add_argument("--phase", help="Phase to validate")
+    validate.add_argument("--trigger", help="Also validate a transition trigger")
     validate.add_argument("--check-status", action="store_true", help="Also validate markdown/json status sync")
     validate.set_defaults(func=cmd_validate)
 
-    validate_repo = sub.add_parser("validate-repository-knowledge", help="Validate repository knowledge artifacts")
-    validate_repo.set_defaults(func=cmd_validate_repository_knowledge)
-
-    next_task = sub.add_parser("next-task", help="Print the bounded task payload for a phase")
-    next_task.add_argument("--phase", help="Phase to build a task for")
+    next_task = sub.add_parser("next-task", help="Print the bounded dispatch payload for a phase")
+    next_task.add_argument("--phase", help="Phase to build a dispatch for")
     next_task.set_defaults(func=cmd_next_task)
 
-    specialist_task = sub.add_parser("specialist-task", help="Print a bounded task payload for a support specialist role")
+    dispatch_cmd = sub.add_parser("dispatch", help="Build and dispatch the current or specified phase payload")
+    dispatch_cmd.add_argument("--phase", help="Phase to dispatch")
+    dispatch_cmd.set_defaults(func=cmd_dispatch)
+
+    specialist_task = sub.add_parser("specialist-task", help="Print a bounded support-specialist payload")
     specialist_task.add_argument("--role", required=True, help="Role key from framework/runtime/team.yaml")
     specialist_task.add_argument("--objective", required=True, help="Bounded task objective")
-    specialist_task.add_argument("--feature", help="Override active feature text")
-    specialist_task.add_argument("--input", action="append", help="Additional input path or note", default=[])
-    specialist_task.add_argument("--output", action="append", help="Override owned output path", default=[])
-    specialist_task.add_argument("--completion", help="Override completion criteria")
     specialist_task.set_defaults(func=cmd_specialist_task)
 
-    set_phase = sub.add_parser("set-phase", help="Manually set the active phase")
-    set_phase.add_argument("--phase", required=True, help="Phase to set")
-    set_phase.add_argument("--state", help="Override state text")
-    set_phase.add_argument("--next-action", dest="next_action", help="Override next action")
-    set_phase.add_argument("--rollback-target", help="Set pending rollback target")
-    set_phase.set_defaults(func=cmd_set_phase)
+    repo_tool = sub.add_parser("repository-tool", help="Build a shared repository exploration tool request")
+    repo_tool.add_argument("--target-path", required=True, help="Repository path to explore")
+    repo_tool.add_argument("--objective", required=True, help="Exploration objective")
+    repo_tool.set_defaults(func=cmd_repository_tool)
+
+    validate_repo = sub.add_parser("validate-repository-knowledge", help="Validate repository knowledge artifacts")
+    validate_repo.set_defaults(func=cmd_validate_repository_knowledge)
 
     return parser
 

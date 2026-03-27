@@ -1,15 +1,16 @@
 # Runtime Orchestration
 
-This folder defines the Codex-first runtime orchestration model for this repository.
+This folder defines the runtime orchestration contract for this repository.
 
 ## Purpose
 - The repository files define the team and workflow.
-- The coordinator uses native Codex subagent spawning to execute the workflow.
+- The coordinator uses bounded specialist dispatch to execute the workflow.
 - These files provide the machine-readable and template-backed runtime contract.
 
 ## Files
-- `team.yaml`: role registry, ownership, and default subagent model.
-- `workflow.yaml`: phase state machine, exit rules, rollback rules, and required artifacts.
+- `team.yaml`: role registry, ownership, and dispatch defaults.
+- `workflow.yaml`: state machine, transition rules, rollback rules, and required artifacts.
+- `context_slices.yaml`: per-role context slice definitions.
 - `task-template.md`: standard task payload for spawned specialist subagents.
 - `review-template.md`: standard findings format for reviewer output.
 - `framework/memory/repository-knowledge/`: durable repository briefs and machine-readable facts for support exploration work.
@@ -20,24 +21,23 @@ This folder defines the Codex-first runtime orchestration model for this reposit
 - `task_builder.py`: bounded specialist task payload generation.
 - `validators.py`: phase validators.
 - `result_contract.py`: structured subagent result contract.
-- `requirements.txt`: Python runtime dependencies.
+- `requirements.txt`: compatibility dependency list.
 
-## Codex-First Rule
+## Runtime Rule
 - The coordinator is the only top-level user-facing agent.
-- The coordinator should use native subagent spawning for specialist work when the task is bounded.
+- The coordinator should use bounded specialist dispatch for specialist work when the task is clear.
 - Each spawned specialist gets one role, one bounded objective, explicit artifact ownership, and explicit completion criteria.
-- The explorer is a conditional support specialist for repository grounding; it is not part of the mandatory phase state machine.
+- Repository exploration is a shared support capability for grounding work; it is not part of the mandatory phase state machine.
 
 ## Prerequisites
 - Python 3.12+
 - `pip`
-- Dependencies from `requirements.txt`
 
 ## Quickstart
 Install dependencies:
 
 ```powershell
-python -m pip install -r framework/runtime/requirements.txt
+python -m pip install -e .
 ```
 
 Start a feature flow:
@@ -58,7 +58,7 @@ Advance when the current phase artifact is ready:
 python framework/runtime/orchestrator.py continue
 ```
 
-Print a bounded task payload for a support specialist such as the explorer:
+Print a bounded task payload for repository exploration support:
 
 ```powershell
 python framework/runtime/orchestrator.py specialist-task --role explorer --objective "Analyze the target repository and produce a reusable repo brief"

@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+import memory_store
 import validators
 
 
@@ -16,9 +17,6 @@ BRIEF_TEXT = """# Example
 
 ## Repository Identity
 - Name: example
-- Source: C:/tmp/example
-- Revision: abc123
-- Last Updated: 2026-03-26
 
 ## Purpose
 - Example purpose
@@ -49,7 +47,7 @@ BRIEF_TEXT = """# Example
 """
 
 
-class RepositoryKnowledgeValidatorTests(unittest.TestCase):
+class RuntimeValidatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self._sandbox_root = Path(__file__).resolve().parents[3] / ".tmp-runtime-tests"
         shutil.rmtree(self._sandbox_root, ignore_errors=True)
@@ -58,44 +56,49 @@ class RepositoryKnowledgeValidatorTests(unittest.TestCase):
     def tearDown(self) -> None:
         shutil.rmtree(self._sandbox_root, ignore_errors=True)
 
-    def _write_store(self, root: Path, *, include_repo: bool = False, valid_facts: bool = True) -> None:
+    def _write_store(self, root: Path) -> None:
         store = root / "framework" / "memory" / "repository-knowledge"
         store.mkdir(parents=True, exist_ok=True)
         (store / "README.md").write_text("# Store\n", encoding="utf-8")
         (store / "TEMPLATE.md").write_text("# Template\n", encoding="utf-8")
         (store / "index.md").write_text("# Repository Knowledge Index\n\n## Entries\n- example\n", encoding="utf-8")
-        if include_repo:
-            repo_dir = store / "example"
-            repo_dir.mkdir()
-            (repo_dir / "brief.md").write_text(BRIEF_TEXT, encoding="utf-8")
-            facts = {
-                "name": "example",
-                "source": "C:/tmp/example",
-                "last_updated": "2026-03-26",
-                "open_questions": [],
-            }
-            if not valid_facts:
-                facts = {"name": "example"}
-            (repo_dir / "facts.json").write_text(json.dumps(facts), encoding="utf-8")
+        repo_dir = store / "example"
+        repo_dir.mkdir()
+        (repo_dir / "brief.md").write_text(BRIEF_TEXT, encoding="utf-8")
+        facts = {
+            "name": "example",
+            "source": "C:/tmp/example",
+            "last_updated": "2026-03-27",
+            "open_questions": [],
+        }
+        (repo_dir / "facts.json").write_text(json.dumps(facts), encoding="utf-8")
 
-    def test_repository_knowledge_store_accepts_empty_initialized_store(self) -> None:
-        root = self._sandbox_root / "case-empty"
-        self._write_store(root, include_repo=False)
-        with patch.object(validators, "repo_root", return_value=root):
-            result = validators.validate_repository_knowledge_store()
-
-        self.assertTrue(result.valid)
-        self.assertEqual(result.messages, ["Repository knowledge store is valid."])
-
-    def test_repository_knowledge_store_rejects_invalid_facts(self) -> None:
-        root = self._sandbox_root / "case-invalid"
-        self._write_store(root, include_repo=True, valid_facts=False)
-        with patch.object(validators, "repo_root", return_value=root):
-            result = validators.validate_repository_knowledge_store()
-
+    def test_validate_transition_rejects_virgin_requirements(self) -> None:
+        result = validators.validate_transition("requirements_ready", "requirements")
         self.assertFalse(result.valid)
-        self.assertIn("example facts.json is missing 'source'.", result.messages)
-        self.assertIn("example facts.json is missing 'last_updated'.", result.messages)
+        self.assertIn("Definition of Ready must be 'Ready.'.", result.messages)
+
+    def test_repository_knowledge_store_accepts_valid_store(self) -> None:
+        root = self._sandbox_root / "case-valid"
+        self._write_store(root)
+        with patch.object(validators, "repo_root", return_value=root):
+            result = validators.validate_repository_knowledge_store()
+        self.assertTrue(result.valid)
+
+    def test_memory_store_writes_and_reads_briefs(self) -> None:
+        root = self._sandbox_root / "case-memory"
+        with patch.object(memory_store, "repo_root", return_value=root):
+            memory_store.append_memory_record(
+                kind="phase-brief",
+                phase="requirements",
+                summary="Brief",
+                payload={"x": 1},
+                tags=["compact"],
+            )
+            result = memory_store.latest_brief()
+
+        self.assertIsNotNone(result)
+        self.assertEqual(result["phase"], "requirements")
 
 
 if __name__ == "__main__":

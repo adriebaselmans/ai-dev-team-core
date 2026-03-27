@@ -7,9 +7,6 @@ This file maps team roles to project-local skills and reusable external skills.
   Primary: `.github/skills/coordinator-flow`
   Supporting: `.github/skills/memory-update`
   Runtime: `framework/runtime/team.yaml`, `framework/runtime/workflow.yaml`, `framework/runtime/task-template.md`
-- Explorer
-  Primary: `.github/skills/repository-exploration`
-  Supporting: `.github/skills/repository-knowledge-compaction`
 - Requirements Engineer
   Primary: `.github/skills/requirements-clarification`
 - Architect
@@ -25,6 +22,10 @@ This file maps team roles to project-local skills and reusable external skills.
   Primary: `.github/skills/acceptance-testing`
   Optional external: `playwright`, `security-best-practices`
 
+## Shared Support Skills
+- Repository exploration: `.github/skills/repository-exploration`
+- Repository knowledge compaction: `.github/skills/repository-knowledge-compaction`
+
 ## Reusable OpenAI Skills
 Based on the current curated OpenAI skill list, these are the best fits for this repository when installed:
 - `openai-docs`
@@ -36,4 +37,4 @@ Based on the current curated OpenAI skill list, these are the best fits for this
 ## Rule
 - Prefer project-local skills for workflow-specific behavior and artifact conventions.
 - Use reusable external skills only when they fit without fighting the repository's role and artifact model.
-- For Codex-first runtime orchestration, treat `framework/runtime/` as the machine-readable subagent contract.
+- For runtime orchestration, treat `framework/runtime/` as the machine-readable subagent contract.

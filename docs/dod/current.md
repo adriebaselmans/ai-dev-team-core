@@ -1,9 +1,9 @@
 # Current Definition of Done
 
-Use this file as the active delivery review for the current feature or iteration.
+Use this file as the active Definition of Done record for the current feature or iteration.
 
 ## Status
-Pending first feature request.
+Pending implementation validation.
 
 ## Title
 TBD

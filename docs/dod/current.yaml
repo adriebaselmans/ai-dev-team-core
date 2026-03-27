@@ -1,0 +1,19 @@
+status: Pending implementation validation.
+title: TBD
+delivery_summary:
+- No delivery yet.
+requirements_coverage:
+- Not evaluated yet.
+what_was_built:
+- Nothing yet.
+what_was_verified:
+- Nothing yet.
+automated_regression_coverage:
+- No automated regression suite yet.
+acceptance_test_coverage:
+- Not evaluated yet.
+known_gaps_or_risks:
+- None yet.
+decision: Not accepted.
+user_feedback_needed:
+- None yet.

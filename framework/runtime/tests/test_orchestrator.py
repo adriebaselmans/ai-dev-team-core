@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import io
+import json
+import shutil
 import sys
 import unittest
 from contextlib import redirect_stdout
@@ -11,57 +13,33 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import orchestrator
-from validators import ValidationResult
+import state_manager
 
 
-class SpecialistTaskCommandTests(unittest.TestCase):
-    def test_specialist_task_prints_payload_for_explorer(self) -> None:
-        args = argparse.Namespace(
-            role="explorer",
-            objective="Analyze repo",
-            feature=None,
-            input=[],
-            output=[],
-            completion=None,
-        )
-        team = {
-            "roles": {
-                "explorer": {
-                    "writes": ["framework/memory/repository-knowledge/"],
-                    "primary_skill": ".github/skills/repository-exploration",
-                    "supporting_skills": [".github/skills/repository-knowledge-compaction"],
-                }
-            }
-        }
-        state = {"active_feature": "feature-x"}
+class OrchestratorCommandTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._sandbox_root = Path(__file__).resolve().parents[3] / ".tmp-runtime-orchestrator"
+        shutil.rmtree(self._sandbox_root, ignore_errors=True)
+        (self._sandbox_root / "framework" / "runtime").mkdir(parents=True, exist_ok=True)
+        (self._sandbox_root / "framework" / "flows").mkdir(parents=True, exist_ok=True)
+        state_manager.STATE_PATH = self._sandbox_root / "framework" / "runtime" / "state.json"
+        state_manager.STATUS_PATH = self._sandbox_root / "framework" / "flows" / "current-status.md"
+        state_manager.save_and_sync(dict(state_manager.DEFAULT_STATE))
 
-        with patch.object(orchestrator, "load_team_spec", return_value=team), patch.object(
-            orchestrator, "load_state", return_value=state
-        ):
-            buffer = io.StringIO()
-            with redirect_stdout(buffer):
-                exit_code = orchestrator.cmd_specialist_task(args)
+    def tearDown(self) -> None:
+        shutil.rmtree(self._sandbox_root, ignore_errors=True)
 
-        output = buffer.getvalue()
+    def test_start_sets_requirements_phase_and_prints_dispatch(self) -> None:
+        args = argparse.Namespace(feature="framework rework", force=False)
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            exit_code = orchestrator.cmd_start(args)
+
         self.assertEqual(exit_code, 0)
-        self.assertIn("`explorer`", output)
-        self.assertIn("`Analyze repo`", output)
-        self.assertIn("feature-x", output)
-        self.assertNotIn("Phase:", output)
-
-    def test_validate_repository_knowledge_returns_success(self) -> None:
-        with patch.object(orchestrator, "validate_repository_knowledge_store") as validator:
-            validator.return_value = ValidationResult(
-                valid=True,
-                messages=["Repository knowledge store is valid."],
-            )
-            buffer = io.StringIO()
-            with redirect_stdout(buffer):
-                exit_code = orchestrator.cmd_validate_repository_knowledge(argparse.Namespace())
-
-        output = buffer.getvalue()
-        self.assertEqual(exit_code, 0)
-        self.assertIn("Repository knowledge store is valid.", output)
+        state = state_manager.load_state()
+        self.assertEqual(state["phase"], "requirements")
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["dispatch"]["phase"], "requirements")
 
 
 if __name__ == "__main__":

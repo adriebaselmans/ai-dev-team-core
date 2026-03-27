@@ -1,15 +1,14 @@
 {
-  "version": 1,
-  "runtime": "codex-first",
+  "version": 2,
+  "runtime": "model-agnostic",
   "active_feature": null,
   "phase": "idle",
   "owner": "coordinator",
   "state": "ready for first user need",
   "next_action": "receive a user need and start requirements clarification",
   "last_completed_phase": null,
-  "pending_rollback_target": null,
+  "pending_trigger": null,
   "user_input_required": false,
-  "active_subagents": [],
   "artifacts": {},
   "last_transition": null
 }
