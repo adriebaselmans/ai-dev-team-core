@@ -6,34 +6,27 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from task_builder import build_specialist_task_payload
+from task_builder import build_phase_dispatch_envelope
+from spec_loader import load_team_spec
 
 
-class SpecialistTaskPayloadTests(unittest.TestCase):
-    def test_build_specialist_payload_includes_role_skills_and_outputs(self) -> None:
-        team = {
-            "roles": {
-                "explorer": {
-                    "writes": ["framework/memory/repository-knowledge/"],
-                    "primary_skill": ".github/skills/repository-exploration",
-                    "supporting_skills": [".github/skills/repository-knowledge-compaction"],
-                }
-            }
-        }
-
-        payload = build_specialist_task_payload(
-            "explorer",
-            team,
-            objective="Analyze target repository",
-            active_feature="repo-analysis",
+class PhaseDispatchEnvelopeTests(unittest.TestCase):
+    def test_build_phase_dispatch_envelope_uses_model_selection_and_context_slice(self) -> None:
+        envelope = build_phase_dispatch_envelope(
+            "requirements",
+            load_team_spec(),
+            {
+                "phase": "requirements",
+                "owner": "requirements-engineer",
+                "active_feature": "framework rework",
+                "next_action": "dispatch requirements specialist",
+            },
         )
 
-        self.assertIn("Feature: `repo-analysis`", payload)
-        self.assertIn("## Role\n`explorer`", payload)
-        self.assertIn("`.github/skills/repository-exploration/SKILL.md`", payload)
-        self.assertIn("`.github/skills/repository-knowledge-compaction/SKILL.md`", payload)
-        self.assertIn("`framework/memory/repository-knowledge/`", payload)
-        self.assertNotIn("Phase:", payload)
+        self.assertEqual(envelope.role, "requirements-engineer")
+        self.assertEqual(envelope.phase, "requirements")
+        self.assertEqual(envelope.model_selection.provider, "openai")
+        self.assertIn("requirements", envelope.context_slice)
 
 
 if __name__ == "__main__":

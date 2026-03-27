@@ -1,0 +1,18 @@
+name: memory-update
+description: Update project memory after a completed phase using the repository's logging conventions.
+response_mode: one-shot
+required_inputs:
+  - phase outcome
+  - active artifacts in docs/
+  - existing memory files in framework/memory/
+expected_outputs:
+  - framework/memory/project-log.md
+  - framework/memory/decisions.md
+  - framework/memory/known-context.md
+owned_artifacts:
+  - framework/memory/project-log.md
+  - framework/memory/decisions.md
+  - framework/memory/known-context.md
+completion_criteria:
+  - New durable memory entries are short, factual, and phase-scoped.
+  - Decisions and stable truths are separated from the chronological log.

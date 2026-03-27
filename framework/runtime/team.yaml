@@ -1,79 +1,64 @@
-version: 1
-runtime: codex-first
+version: 2
+runtime: model-agnostic
 top_level_role: coordinator
-specialist_spawn_mode: native_subagents
+specialist_dispatch: orchestrator-owned
 
 roles:
   coordinator:
-    agent_type: default
-    primary_skill: .github/skills/coordinator-flow
-    supporting_skills:
-      - .github/skills/memory-update
+    agent_type: orchestrator
     user_facing: true
     writes:
+      - framework/runtime/state.json
       - framework/flows/current-status.md
-      - framework/memory/project-log.md
-      - framework/memory/decisions.md
-      - framework/memory/known-context.md
-      - framework/memory/repository-knowledge/
-  explorer:
-    agent_type: explorer
-    primary_skill: .github/skills/repository-exploration
-    supporting_skills:
-      - .github/skills/repository-knowledge-compaction
-    user_facing: false
-    invocation: conditional_support_role
-    invoke_when:
-      - The user asks to base work on a specific repository or application.
-      - Another role is blocked on missing insight into a specific repository.
-    writes:
-      - framework/memory/repository-knowledge/
+      - framework/memory/logs/
   requirements-engineer:
-    agent_type: default
-    primary_skill: .github/skills/requirements-clarification
+    agent_type: specialist
     user_facing: false
+    primary_skill: .github/skills/requirements-clarification
     writes:
+      - docs/requirements/current.yaml
       - docs/requirements/current.md
   architect:
-    agent_type: default
-    primary_skill: .github/skills/architecture-design
-    optional_external_skills:
-      - openai-docs
-      - security-threat-model
-      - security-best-practices
+    agent_type: specialist
     user_facing: false
+    primary_skill: .github/skills/architecture-design
     writes:
+      - docs/design/current.yaml
       - docs/design/current.md
   developer:
-    agent_type: worker
+    agent_type: specialist
+    user_facing: false
     primary_skill: .github/skills/implementation-clean-code
     supporting_skills:
       - .github/skills/unit-testing
-    user_facing: false
     writes:
       - src/
+      - framework/runtime/
+      - framework/runtime/tests/
   reviewer:
-    agent_type: worker
-    primary_skill: .github/skills/code-review
-    optional_external_skills:
-      - security-best-practices
+    agent_type: specialist
     user_facing: false
+    primary_skill: .github/skills/code-review
     writes:
+      - docs/review/current.yaml
       - docs/review/current.md
   tester:
-    agent_type: worker
-    primary_skill: .github/skills/acceptance-testing
-    optional_external_skills:
-      - playwright
-      - security-best-practices
+    agent_type: specialist
     user_facing: false
+    primary_skill: .github/skills/acceptance-testing
     writes:
+      - docs/dod/current.yaml
       - docs/dod/current.md
 
+shared_tools:
+  repository-exploration:
+    contract_module: framework/runtime/repository_tool.py
+    writes:
+      - framework/memory/repository-knowledge/
+      - framework/memory/logs/
+
 spawn_rules:
-  - Only the coordinator spawns specialist subagents.
-  - Spawn specialists only for bounded tasks with clear artifact ownership.
-  - Explorer is a support role, not a phase owner; spawn it only when repository grounding is required.
-  - Do not spawn a specialist for direct user interaction.
-  - Prefer one active specialist on the critical path unless multiple specialists can work in parallel without overlapping write ownership.
-  - The coordinator remains responsible for validation, routing, and phase transition decisions.
+  - Only the coordinator dispatches specialist work.
+  - Specialist payloads must be one-shot and built from context slices plus skill contracts.
+  - Shared tools may be requested by any phase but are dispatched through the coordinator.
+  - Roles may only write owned outputs or explicit shared-tool outputs.

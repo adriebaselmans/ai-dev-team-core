@@ -1,140 +1,92 @@
-version: 1
-state_machine:
-  phases:
-    - idle
-    - requirements
-    - architecture
-    - development
-    - review
-    - testing
-    - dod-review
-    - done
+version: 2
+runtime: model-agnostic
 
-phase_specs:
+phases:
   idle:
     owner: coordinator
-    required_inputs: []
-    required_outputs:
-      - framework/flows/current-status.md
-    next_phase: requirements
-
+    artifact: null
+    context_slice: coordinator
   requirements:
     owner: requirements-engineer
-    conditional_support_roles:
-      - explorer
-    required_inputs:
-      - user_need
-      - framework/roles/requirements-engineer.md
-      - .github/skills/requirements-clarification/SKILL.md
-      - docs/requirements/current.md
-    required_outputs:
-      - docs/requirements/current.md
-    exit_checks:
-      - Definition of Ready is ready
-      - Open Questions has no blocking ambiguity
-    rollback:
-      on_user_feedback: requirements
-      on_missing_clarity: requirements
-    next_phase: architecture
-
+    artifact: requirements
+    context_slice: requirements-engineer
   architecture:
     owner: architect
-    conditional_support_roles:
-      - explorer
-    required_inputs:
-      - docs/requirements/current.md
-      - framework/clean-code.md
-      - framework/roles/architect.md
-      - .github/skills/architecture-design/SKILL.md
-    required_outputs:
-      - docs/design/current.md
-    exit_checks:
-      - design is implementation-safe
-      - structure and technical direction are clear enough for development
-    rollback:
-      on_functional_ambiguity: requirements
-      on_infeasible_requirement: requirements
-    next_phase: development
-
+    artifact: design
+    context_slice: architect
   development:
     owner: developer
-    conditional_support_roles:
-      - explorer
-    required_inputs:
-      - docs/requirements/current.md
-      - docs/design/current.md
-      - framework/clean-code.md
-      - framework/roles/developer.md
-      - .github/skills/implementation-clean-code/SKILL.md
-      - .github/skills/unit-testing/SKILL.md
-    required_outputs:
-      - src/
-    exit_checks:
-      - intended implementation exists
-      - relevant unit tests exist
-      - avoidable lint errors and actionable warnings are resolved where practical
-    rollback:
-      on_structural_problem: architecture
-      on_scope_ambiguity: requirements
-    next_phase: review
-
+    artifact: null
+    context_slice: developer
   review:
     owner: reviewer
-    conditional_support_roles:
-      - explorer
-    required_inputs:
-      - docs/requirements/current.md
-      - docs/design/current.md
-      - framework/clean-code.md
-      - framework/roles/reviewer.md
-      - .github/skills/code-review/SKILL.md
-      - framework/runtime/review-template.md
-    required_outputs:
-      - docs/review/current.md
-    exit_checks:
-      - review decision is set in docs/review/current.md
-      - blocking findings are resolved or routed back
-    rollback:
-      on_blocking_review_findings: development
-      on_design_issue: architecture
-    next_phase: testing
-
+    artifact: review
+    context_slice: reviewer
   testing:
     owner: tester
-    conditional_support_roles:
-      - explorer
-    required_inputs:
-      - docs/requirements/current.md
-      - docs/design/current.md
-      - docs/review/current.md
-      - framework/roles/tester.md
-      - .github/skills/acceptance-testing/SKILL.md
-    required_outputs:
-      - docs/dod/current.md
-    exit_checks:
-      - Definition of Done Decision is set
-      - What Was Verified is populated
-      - automated acceptance coverage exists or docs/dod/current.md explains why it is not feasible
-    rollback:
-      on_defect: development
-      on_upstream_issue: architecture
-      on_requirement_problem: requirements
-    next_phase: dod-review
-
+    artifact: dod
+    context_slice: tester
   dod-review:
     owner: coordinator
-    required_inputs:
-      - docs/dod/current.md
-    required_outputs:
-      - user_approval_or_feedback
-    rollback:
-      on_user_feedback: requirements
-    next_phase: done
-
+    artifact: dod
+    context_slice: coordinator
   done:
     owner: coordinator
-    required_inputs:
-      - user_approval
-    required_outputs:
-      - framework/memory/project-log.md
-    next_phase: idle
+    artifact: null
+    context_slice: coordinator
+
+transitions:
+  feature_received:
+    from: idle
+    to: requirements
+    validators: []
+  requirements_ready:
+    from: requirements
+    to: architecture
+    validators:
+      - requirements_artifact_ready
+  design_ready:
+    from: architecture
+    to: development
+    validators:
+      - design_artifact_ready
+  implementation_complete:
+    from: development
+    to: review
+    validators:
+      - development_outputs_present
+  review_approved:
+    from: review
+    to: testing
+    validators:
+      - review_approved
+  review_rework:
+    from: review
+    to: development
+    validators:
+      - review_rework_required
+  testing_complete:
+    from: testing
+    to: dod-review
+    validators:
+      - dod_ready_for_user_review
+  user_feedback:
+    from: dod-review
+    to: requirements
+    validators: []
+  user_approved:
+    from: dod-review
+    to: done
+    validators: []
+  reset:
+    from: done
+    to: idle
+    validators: []
+
+default_triggers:
+  idle: feature_received
+  requirements: requirements_ready
+  architecture: design_ready
+  development: implementation_complete
+  review: review_approved
+  testing: testing_complete

@@ -1,0 +1,15 @@
+name: requirements-clarification
+description: Turn a user need into an implementation-ready requirement baseline with minimal but sufficient clarification.
+response_mode: one-shot
+required_inputs:
+  - user need from the coordinator
+  - docs/requirements/current.md
+  - relevant project memory in framework/memory/
+expected_outputs:
+  - docs/requirements/current.md
+  - clarification questions for the coordinator when needed
+owned_artifacts:
+  - docs/requirements/current.md
+completion_criteria:
+  - Scope, acceptance criteria, constraints, and assumptions are explicit.
+  - Definition of Ready is ready or blocking questions are returned.

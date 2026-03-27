@@ -1,0 +1,24 @@
+title: TBD
+design_goal: TBD
+architecture_approach:
+- TBD
+affected_areas:
+- TBD
+separation_of_concerns:
+- TBD
+module_boundaries:
+- TBD
+data_flow:
+- TBD
+interfaces:
+- TBD
+technology_and_environment_considerations:
+- TBD
+clean_code_constraints:
+- Follow `framework/clean-code.md`.
+performance_considerations:
+- No special performance considerations yet.
+risks_and_tradeoffs:
+- None yet.
+non_goals:
+- TBD

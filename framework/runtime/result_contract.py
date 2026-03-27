@@ -10,7 +10,7 @@ class SubagentResult:
     changed_artifacts: list[str] = field(default_factory=list)
     summary: str = ""
     blockers: list[str] = field(default_factory=list)
-    recommended_next_phase: str | None = None
+    recommended_next_trigger: str | None = None
 
     @classmethod
     def from_json_text(cls, text: str) -> "SubagentResult":
@@ -20,5 +20,5 @@ class SubagentResult:
             changed_artifacts=list(data.get("changed_artifacts", [])),
             summary=data.get("summary", ""),
             blockers=list(data.get("blockers", [])),
-            recommended_next_phase=data.get("recommended_next_phase"),
+            recommended_next_trigger=data.get("recommended_next_trigger"),
         )

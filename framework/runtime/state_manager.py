@@ -3,10 +3,9 @@ from __future__ import annotations
 import json
 from copy import deepcopy
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
-from spec_loader import repo_root
+from spec_loader import phase_spec, repo_root
 
 
 STATE_PATH = repo_root() / "framework" / "runtime" / "state.json"
@@ -14,17 +13,16 @@ STATUS_PATH = repo_root() / "framework" / "flows" / "current-status.md"
 
 
 DEFAULT_STATE: dict[str, Any] = {
-    "version": 1,
-    "runtime": "codex-first",
+    "version": 2,
+    "runtime": "model-agnostic",
     "active_feature": None,
     "phase": "idle",
     "owner": "coordinator",
     "state": "ready for first user need",
     "next_action": "receive a user need and start requirements clarification",
     "last_completed_phase": None,
-    "pending_rollback_target": None,
+    "pending_trigger": None,
     "user_input_required": False,
-    "active_subagents": [],
     "artifacts": {},
     "last_transition": None,
 }
@@ -37,10 +35,8 @@ def now_iso() -> str:
 def load_state() -> dict[str, Any]:
     if not STATE_PATH.exists():
         return deepcopy(DEFAULT_STATE)
-
     with STATE_PATH.open("r", encoding="utf-8") as handle:
         raw = json.load(handle)
-
     state = deepcopy(DEFAULT_STATE)
     state.update(raw)
     return state
@@ -54,13 +50,17 @@ def save_state(state: dict[str, Any]) -> dict[str, Any]:
 
 
 def status_markdown(state: dict[str, Any]) -> str:
-    return (
-        "# Current Status\n\n"
-        f"- Phase: {state['phase']}\n"
-        f"- Owner: {state['owner']}\n"
-        f"- State: {state['state']}\n"
-        f"- Next action: {state['next_action']}\n"
-    )
+    lines = [
+        "# Current Status",
+        "",
+        f"- Phase: {state['phase']}",
+        f"- Owner: {state['owner']}",
+        f"- State: {state['state']}",
+        f"- Next action: {state['next_action']}",
+    ]
+    if state.get("active_feature"):
+        lines.append(f"- Active feature: {state['active_feature']}")
+    return "\n".join(lines) + "\n"
 
 
 def sync_status_markdown(state: dict[str, Any]) -> None:
@@ -88,19 +88,18 @@ def transition_state(
     state: dict[str, Any],
     *,
     phase: str,
-    owner: str,
     state_text: str,
     next_action: str,
     last_completed_phase: str | None = None,
-    pending_rollback_target: str | None = None,
+    pending_trigger: str | None = None,
     user_input_required: bool | None = None,
 ) -> dict[str, Any]:
     state["phase"] = phase
-    state["owner"] = owner
+    state["owner"] = phase_spec(phase)["owner"]
     state["state"] = state_text
     state["next_action"] = next_action
     state["last_transition"] = now_iso()
-    state["pending_rollback_target"] = pending_rollback_target
+    state["pending_trigger"] = pending_trigger
     if last_completed_phase is not None:
         state["last_completed_phase"] = last_completed_phase
     if user_input_required is not None:

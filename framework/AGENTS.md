@@ -7,16 +7,16 @@ Take a user need or feature description and deliver an end-to-end implementation
 
 ## Team Roles
 - Coordinator: owns intake, delegation, phase transitions, integration, and final reporting.
-- Explorer: analyzes existing repositories, captures durable repo knowledge, and supports other roles when repo grounding is required.
 - Requirements Engineer: clarifies the request and writes the requirement baseline.
 - Architect: writes the design approach and technical constraints.
 - Developer: implements the solution in `src/`.
 - Reviewer: reviews the implementation for quality and technical risk before testing.
 - Tester: validates the implementation against the requirement baseline and prepares the DoD review.
+- Repository exploration support: shared grounding capability used when repo context is needed.
 
 Detailed role instructions live in `framework/roles/`.
 Role-to-skill mapping lives in `framework/skills.md`.
-Codex-first runtime specs live in `framework/runtime/`.
+Runtime specs live in `framework/runtime/`.
 
 ## Skills
 - Project-local skills live in `.github/skills/`.
@@ -24,12 +24,13 @@ Codex-first runtime specs live in `framework/runtime/`.
 - Skills define repeatable execution patterns.
 - Prefer project-local skills for this repository's workflow and artifacts.
 - Use reusable external skills when they are available and fit cleanly.
+- Repository exploration is a shared support capability with its own skill contract, not a standalone active team role.
 
 ## Runtime Orchestration
-- This repository is Codex-first for runtime orchestration.
-- The coordinator should use native subagent spawning for bounded specialist work.
+- This repository is moving to a model-agnostic runtime orchestration layer.
+- The coordinator should use bounded specialist dispatch for specialist work.
 - `framework/runtime/team.yaml` defines role registry and spawn rules.
-- `framework/runtime/workflow.yaml` defines the phase state machine and rollback rules.
+- `framework/runtime/workflow.yaml` defines the state machine and rollback rules.
 - `framework/runtime/task-template.md` defines the standard subagent task payload.
 - `framework/runtime/review-template.md` defines the standard reviewer output shape.
 - `framework/memory/repository-knowledge/` defines the durable store for analyzed repository knowledge.
@@ -67,7 +68,7 @@ Entry condition:
 
 Coordinator actions:
 - Delegate to the requirements engineer.
-- Delegate to the explorer first when the request must be grounded in a specific repository and the baseline cannot be written safely without that context.
+- Use repository exploration support first when the request must be grounded in a specific repository and the baseline cannot be written safely without that context.
 - Relay clarification questions to the user only when needed.
 - Update `docs/requirements/current.md` until it is clear enough to proceed.
 - Update memory when the phase is completed.
@@ -85,7 +86,7 @@ Entry condition:
 
 Coordinator actions:
 - Delegate to the architect.
-- Use explorer output when the design depends on an existing repository's architecture, conventions, or extension points.
+- Use repository exploration support when the design depends on an existing repository's architecture, conventions, or extension points.
 - Ensure `docs/design/current.md` is updated.
 - Ensure the design reflects clean code, stack-appropriate best practices, and relevant performance tradeoffs.
 - Update memory when the phase is completed.
@@ -103,7 +104,7 @@ Entry condition:
 
 Coordinator actions:
 - Delegate implementation to the developer.
-- Delegate to the explorer when the developer needs grounded understanding of a target repository before making or proposing changes.
+- Delegate to repository exploration support when the developer needs grounded understanding of a target repository before making or proposing changes.
 - Ensure code is written in `src/`.
 - Ensure unit tests are added for relevant new or changed behavior.
 - Update memory when the phase is completed.
@@ -123,7 +124,7 @@ Entry condition:
 
 Coordinator actions:
 - Delegate review to the reviewer.
-- Use explorer output when review findings depend on understanding upstream repository architecture or conventions.
+- Use repository exploration support when review findings depend on understanding upstream repository architecture or conventions.
 - Ensure the implementation is checked against requirements, design, and `framework/clean-code.md`.
 - Ensure linting issues and actionable warnings are resolved where practical before testing proceeds.
 - Update memory when the phase is completed.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3 - 2026-03-27
+- Reworked the repo-facing documentation toward a model-agnostic, structured-artifact framework.
+- Added skill contract files for the project-local skill set.
+- Added a guided `init.py` bootstrap script and `pyproject.toml` packaging metadata.
+- Updated the root entrypoint guidance, runtime docs, role docs, and release metadata for the new framework direction.
+
 ## 0.2 - 2026-03-26
 - Added the Explorer role for repository-grounded analysis.
 - Added repository exploration and repository knowledge compaction skills.

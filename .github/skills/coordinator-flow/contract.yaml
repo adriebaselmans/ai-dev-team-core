@@ -1,0 +1,28 @@
+name: coordinator-flow
+description: Run the coordinator phase flow, manage transitions, update memory, and present the final DoD review.
+response_mode: one-shot
+required_inputs:
+  - user request
+  - framework/AGENTS.md
+  - framework/runtime/team.yaml
+  - framework/runtime/workflow.yaml
+  - framework/runtime/task-template.md
+  - framework/flows/current-status.md
+  - docs/requirements/current.md
+  - docs/design/current.md
+  - docs/review/current.md
+  - docs/dod/current.md
+expected_outputs:
+  - framework/flows/current-status.md
+  - framework/memory/project-log.md
+  - framework/memory/decisions.md
+  - framework/memory/known-context.md
+  - final user-facing DoD review
+owned_artifacts:
+  - framework/flows/current-status.md
+  - framework/memory/project-log.md
+  - framework/memory/decisions.md
+  - framework/memory/known-context.md
+completion_criteria:
+  - Each completed phase is reflected in the status file and memory.
+  - The user-facing DoD review is ready when the workflow reaches DoD review.
