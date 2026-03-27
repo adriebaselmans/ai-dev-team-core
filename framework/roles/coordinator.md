@@ -27,6 +27,7 @@ Own the end-to-end delivery flow for each user request.
 ## Skills
 - Primary: `.github/skills/coordinator-flow`
 - Supporting: `.github/skills/memory-update`
+- Supporting: `.github/skills/compaction`
 - Reference mapping: `framework/skills.md`
 
 ## Required Outputs
