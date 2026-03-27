@@ -6,6 +6,7 @@ This file maps team roles to project-local skills and reusable external skills.
 - Coordinator
   Primary: `.github/skills/coordinator-flow`
   Supporting: `.github/skills/memory-update`
+  Supporting: `.github/skills/compaction`
   Runtime: `framework/runtime/team.yaml`, `framework/runtime/workflow.yaml`, `framework/runtime/task-template.md`
 - Requirements Engineer
   Primary: `.github/skills/requirements-clarification`
@@ -25,6 +26,7 @@ This file maps team roles to project-local skills and reusable external skills.
 ## Shared Support Skills
 - Repository exploration: `.github/skills/repository-exploration`
 - Repository knowledge compaction: `.github/skills/repository-knowledge-compaction`
+- Compaction: `.github/skills/compaction`
 
 ## Reusable OpenAI Skills
 Based on the current curated OpenAI skill list, these are the best fits for this repository when installed:

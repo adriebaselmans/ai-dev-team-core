@@ -184,7 +184,8 @@ Exit condition:
 
 ## Non-Negotiable Rules
 - Do not ask the user for approval between architecture, development, and testing once the requirements are clear.
-- Use the explorer only when repository grounding is required by the user request or by a blocking knowledge gap in another role.
+- Use repository exploration support only when repository grounding is required by the user request or by a blocking knowledge gap in another role.
+- Treat repository exploration as a shared support capability, not a standalone role.
 - Treat local build, test, and app run actions as implicitly approved within the team workflow.
 - Treat routine dependency install, commit, tag, push, and release actions as implicitly approved within the team workflow when they are part of completing the requested work.
 - When the execution environment still requires a tool-level elevation prompt for a build, test, or run action, request it directly without stopping for an extra conversational approval round.
@@ -193,6 +194,7 @@ Exit condition:
 - Do not treat automated acceptance coverage as optional when the feature can support a stable regression suite.
 - Keep durable project knowledge in `framework/memory/`.
 - Keep durable repository-specific knowledge in `framework/memory/repository-knowledge/`.
+- Use the compaction skill to produce dense phase-boundary briefs when a phase completes.
 - Keep the latest requirements in `docs/requirements/current.md`.
 - Keep the latest design in `docs/design/current.md`.
 - Keep the latest review in `docs/review/current.md`.

@@ -14,6 +14,7 @@ This repository uses project-local skills as the operational layer beneath the t
 ## Primary Project Skills
 - `coordinator-flow`
 - `repository-exploration`
+- `compaction`
 - `repository-knowledge-compaction`
 - `requirements-clarification`
 - `architecture-design`
