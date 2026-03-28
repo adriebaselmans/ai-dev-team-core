@@ -60,20 +60,6 @@ python framework/runtime/orchestrator.py continue
 
 Repository exploration support is invoked by the coordinator when a task needs grounded repository analysis. It is not exposed as a standalone active role command in this runtime contract.
 
-Release-only user docs are generated from the YAML templates with:
-
-```powershell
-python framework/runtime/orchestrator.py export-docs
-```
-
-or the wrapper script:
-
-```powershell
-pwsh -File framework/scripts/export-release-docs.ps1
-```
-
-Run that only on a release branch. The generated `docs/` output is intended for release check-in, not as an active source of truth.
-
 Validate repository knowledge artifacts:
 
 ```powershell
@@ -91,6 +77,8 @@ Or use the release wrapper:
 ```powershell
 pwsh -File framework/scripts/export-release-docs.ps1
 ```
+
+Run that only on a release branch. The generated `docs/` output is intended for release check-in, not as an active source of truth.
 
 Run runtime tests:
 
