@@ -121,6 +121,3 @@ Repository exploration support is invoked internally by the coordinator when a t
 - The runtime maintains:
   - `framework/runtime/state.json`
   - `framework/flows/current-status.md`
-
-## Release Notes
-- See [CHANGELOG.md](CHANGELOG.md) for release history.
