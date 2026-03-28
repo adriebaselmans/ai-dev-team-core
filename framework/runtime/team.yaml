@@ -9,7 +9,6 @@ roles:
     user_facing: true
     writes:
       - framework/runtime/state.json
-      - framework/flows/current-status.md
       - framework/memory/logs/
   requirements-engineer:
     agent_type: specialist

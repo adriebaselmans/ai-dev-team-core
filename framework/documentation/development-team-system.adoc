@@ -96,7 +96,7 @@ Each specialist has a narrow mission and a bounded write scope.
 
 | Coordinator
 | Orchestration, user communication, phase control, memory updates
-| `framework/flows/current-status.md`, `framework/memory/*`
+| `framework/runtime/state.json`, `framework/memory/*`
 
 | Repository exploration support
 | Analyze a target repository and capture reusable repository knowledge

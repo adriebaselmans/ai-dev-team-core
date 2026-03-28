@@ -47,8 +47,6 @@ The coordinator owns the full feature flow and moves the team through these phas
 - `dod-review`
 - `done`
 
-Update `framework/flows/current-status.md` at each phase transition.
-
 ## Phase Flow
 ### 1. Idle
 Entry condition:
@@ -203,7 +201,7 @@ Exit condition:
 - Follow the engineering standards in `framework/clean-code.md`.
 - Use the role-aligned skills in `.github/skills/` and `framework/skills.md` where applicable.
 - Use `framework/runtime/` as the machine-readable contract for native subagent orchestration.
-- The coordinator is responsible for updating `framework/flows/current-status.md`.
+- The coordinator is responsible for updating `framework/runtime/state.json`.
 - The coordinator is responsible for updating `framework/memory/` after each completed phase.
 - Specialists do not communicate with the user directly; the coordinator owns all user-facing interaction.
 - Return to the user only during requirements clarification and final DoD review.

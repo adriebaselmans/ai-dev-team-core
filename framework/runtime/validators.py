@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
-from pathlib import Path
 
 from artifacts import load_artifact, validate_artifact_data
 from spec_loader import repo_root, transition_spec
@@ -88,21 +87,6 @@ def validate_dod() -> ValidationResult:
     if decision not in {"Accepted for user review.", "Not accepted."}:
         messages.append("Definition of Done decision must be accepted or not accepted.")
     return _validation_result(messages, "DoD artifact is complete.")
-
-
-def validate_status_sync() -> ValidationResult:
-    state = json.loads((repo_root() / "framework" / "runtime" / "state.json").read_text(encoding="utf-8"))
-    status_body = (repo_root() / "framework" / "flows" / "current-status.md").read_text(encoding="utf-8")
-    messages: list[str] = []
-    for label, value in {
-        "Phase": state.get("phase"),
-        "Owner": state.get("owner"),
-        "State": state.get("state"),
-        "Next action": state.get("next_action"),
-    }.items():
-        if f"- {label}: {value}" not in status_body:
-            messages.append(f"Status markdown mismatch for {label}.")
-    return _validation_result(messages, "Status markdown and runtime state are in sync.")
 
 
 def validate_repository_knowledge_store() -> ValidationResult:

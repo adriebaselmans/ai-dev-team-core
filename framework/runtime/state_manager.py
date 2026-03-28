@@ -9,7 +9,6 @@ from spec_loader import phase_spec, repo_root
 
 
 STATE_PATH = repo_root() / "framework" / "runtime" / "state.json"
-STATUS_PATH = repo_root() / "framework" / "flows" / "current-status.md"
 
 
 DEFAULT_STATE: dict[str, Any] = {
@@ -47,30 +46,6 @@ def save_state(state: dict[str, Any]) -> dict[str, Any]:
     state_to_save.update(state)
     STATE_PATH.write_text(json.dumps(state_to_save, indent=2) + "\n", encoding="utf-8")
     return state_to_save
-
-
-def status_markdown(state: dict[str, Any]) -> str:
-    lines = [
-        "# Current Status",
-        "",
-        f"- Phase: {state['phase']}",
-        f"- Owner: {state['owner']}",
-        f"- State: {state['state']}",
-        f"- Next action: {state['next_action']}",
-    ]
-    if state.get("active_feature"):
-        lines.append(f"- Active feature: {state['active_feature']}")
-    return "\n".join(lines) + "\n"
-
-
-def sync_status_markdown(state: dict[str, Any]) -> None:
-    STATUS_PATH.write_text(status_markdown(state), encoding="utf-8")
-
-
-def save_and_sync(state: dict[str, Any]) -> dict[str, Any]:
-    saved = save_state(state)
-    sync_status_markdown(saved)
-    return saved
 
 
 def mark_phase_validation(state: dict[str, Any], phase: str, valid: bool, messages: list[str]) -> dict[str, Any]:

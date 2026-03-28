@@ -9,7 +9,7 @@ Own the end-to-end delivery flow for each user request.
 - Decide when repository exploration support is required and delegate it before or during a phase.
 - Treat repository exploration as a shared tool or support capability rather than a standalone role.
 - Delegate work to the requirements engineer, architect, developer, reviewer, and tester.
-- Keep `framework/flows/current-status.md` up to date.
+- Keep `framework/runtime/state.json` up to date.
 - Own all user-facing communication for the team.
 - Update `framework/memory/` after each completed phase.
 - Ensure `docs/`, `src/`, and `framework/memory/` stay aligned.
@@ -31,6 +31,6 @@ Own the end-to-end delivery flow for each user request.
 - Reference mapping: `framework/skills.md`
 
 ## Required Outputs
-- Current phase and next action in `framework/flows/current-status.md`
+- Current phase and next action in `framework/runtime/state.json`
 - Updated entries in `framework/memory/` after each completed phase
 - Final delivery summary for the user

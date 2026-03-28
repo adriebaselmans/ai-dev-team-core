@@ -16,7 +16,7 @@ This folder defines the runtime orchestration contract for this repository.
 - `framework/memory/repository-knowledge/`: durable repository briefs and machine-readable facts for support exploration work.
 - `state.json`: machine-readable runtime state snapshot.
 - `orchestrator.py`: CLI entrypoint for runtime execution.
-- `state_manager.py`: runtime state loading, saving, and markdown sync.
+- `state_manager.py`: runtime state loading and saving.
 - `spec_loader.py`: YAML spec loading.
 - `task_builder.py`: bounded specialist task payload generation.
 - `validators.py`: phase validators.

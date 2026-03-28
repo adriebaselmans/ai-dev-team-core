@@ -100,7 +100,6 @@ python framework/runtime/orchestrator.py status
 python framework/runtime/orchestrator.py next-task
 python framework/runtime/orchestrator.py validate
 python framework/runtime/orchestrator.py continue
-python framework/runtime/orchestrator.py sync-status
 python -m unittest discover framework/runtime/tests
 ```
 
@@ -118,6 +117,4 @@ Repository exploration support is invoked internally by the coordinator when a t
 - Specialist work is executed through bounded dispatch payloads.
 - Repository exploration is a shared support capability rather than a mandatory workflow phase owner.
 - Runtime specs live in `framework/runtime/`.
-- The runtime maintains:
-  - `framework/runtime/state.json`
-  - `framework/flows/current-status.md`
+- The runtime maintains `framework/runtime/state.json` as the sole runtime state source.

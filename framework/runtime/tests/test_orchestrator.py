@@ -21,10 +21,8 @@ class OrchestratorCommandTests(unittest.TestCase):
         self._sandbox_root = Path(__file__).resolve().parents[3] / ".tmp-runtime-orchestrator"
         shutil.rmtree(self._sandbox_root, ignore_errors=True)
         (self._sandbox_root / "framework" / "runtime").mkdir(parents=True, exist_ok=True)
-        (self._sandbox_root / "framework" / "flows").mkdir(parents=True, exist_ok=True)
         state_manager.STATE_PATH = self._sandbox_root / "framework" / "runtime" / "state.json"
-        state_manager.STATUS_PATH = self._sandbox_root / "framework" / "flows" / "current-status.md"
-        state_manager.save_and_sync(dict(state_manager.DEFAULT_STATE))
+        state_manager.save_state(dict(state_manager.DEFAULT_STATE))
 
     def tearDown(self) -> None:
         shutil.rmtree(self._sandbox_root, ignore_errors=True)

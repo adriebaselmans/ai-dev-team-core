@@ -16,12 +16,11 @@ from spec_loader import default_trigger_for_phase, load_team_spec, load_workflow
 from state_manager import (
     load_state,
     mark_phase_validation,
-    save_and_sync,
-    sync_status_markdown,
+    save_state,
     transition_state,
 )
 from task_builder import build_phase_dispatch_envelope, build_specialist_payload
-from validators import validate_phase, validate_repository_knowledge_store, validate_status_sync, validate_transition
+from validators import validate_phase, validate_repository_knowledge_store, validate_transition
 
 
 PHASE_STATE_TEXT = {
@@ -71,12 +70,6 @@ def cmd_status(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_sync_status(_: argparse.Namespace) -> int:
-    sync_status_markdown(load_state())
-    print("Synchronized framework/flows/current-status.md from runtime state.")
-    return 0
-
-
 def cmd_start(args: argparse.Namespace) -> int:
     state = load_state()
     if state["phase"] != "idle" and not args.force:
@@ -92,7 +85,7 @@ def cmd_start(args: argparse.Namespace) -> int:
         user_input_required=False,
     )
     state["active_feature"] = args.feature
-    save_and_sync(state)
+    save_state(state)
     envelope = build_phase_dispatch_envelope("requirements", load_team_spec(), state)
     _print_json({"dispatch": envelope})
     return 0
@@ -103,7 +96,7 @@ def cmd_validate(args: argparse.Namespace) -> int:
     phase = args.phase or state["phase"]
     result = validate_phase(phase)
     mark_phase_validation(state, phase, result.valid, result.messages)
-    save_and_sync(state)
+    save_state(state)
     for message in result.messages:
         print(message)
     if args.trigger:
@@ -111,11 +104,6 @@ def cmd_validate(args: argparse.Namespace) -> int:
         for message in transition_result.messages:
             print(message)
         return 0 if result.valid and transition_result.valid else 1
-    if args.check_status:
-        sync_result = validate_status_sync()
-        for message in sync_result.messages:
-            print(message)
-        return 0 if result.valid and sync_result.valid else 1
     return 0 if result.valid else 1
 
 
@@ -184,7 +172,7 @@ def cmd_continue(args: argparse.Namespace) -> int:
     transition_result = validate_transition(trigger, phase)
     mark_phase_validation(state, phase, phase_result.valid, phase_result.messages)
     if not phase_result.valid or not transition_result.valid:
-        save_and_sync(state)
+        save_state(state)
         for message in phase_result.messages + transition_result.messages:
             print(message)
         return 1
@@ -201,7 +189,7 @@ def cmd_continue(args: argparse.Namespace) -> int:
         pending_trigger=trigger,
         user_input_required=(next_phase == "dod-review"),
     )
-    save_and_sync(state)
+    save_state(state)
     print(f"Advanced from '{phase}' to '{next_phase}' via '{trigger}'.")
     return 0
 
@@ -223,13 +211,9 @@ def build_parser() -> argparse.ArgumentParser:
     status.add_argument("--json", action="store_true", help="Print raw JSON state")
     status.set_defaults(func=cmd_status)
 
-    sync = sub.add_parser("sync-status", help="Sync markdown status from runtime state")
-    sync.set_defaults(func=cmd_sync_status)
-
     validate = sub.add_parser("validate", help="Validate the current or specified phase")
     validate.add_argument("--phase", help="Phase to validate")
     validate.add_argument("--trigger", help="Also validate a transition trigger")
-    validate.add_argument("--check-status", action="store_true", help="Also validate status markdown/runtime sync")
     validate.set_defaults(func=cmd_validate)
 
     next_task = sub.add_parser("next-task", help="Print the bounded dispatch payload for a phase")
