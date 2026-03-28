@@ -1,12 +1,12 @@
 # Current Review
 
-Use this file as the active technical review record for the current feature or iteration.
+Generated from `doc_templates/review/current.yaml`.
 
 ## Status
-Pending first feature request.
+- Pending implementation review.
 
 ## Title
-TBD
+- TBD
 
 ## Decision
 - Not reviewed yet.

@@ -8,9 +8,9 @@ from dataclasses import asdict, is_dataclass
 if sys.version_info < (3, 12):
     raise SystemExit("framework/runtime/orchestrator.py requires Python 3.12+.")
 
-from artifacts import render_all_artifacts
 from compaction import compact_phase
 from execution import dispatch
+from export_docs import export_all_docs
 from repository_tool import repository_exploration_request
 from spec_loader import default_trigger_for_phase, load_team_spec, load_workflow_spec, transition_spec
 from state_manager import (
@@ -74,12 +74,6 @@ def cmd_status(args: argparse.Namespace) -> int:
 def cmd_sync_status(_: argparse.Namespace) -> int:
     sync_status_markdown(load_state())
     print("Synchronized framework/flows/current-status.md from runtime state.")
-    return 0
-
-
-def cmd_render_artifacts(_: argparse.Namespace) -> int:
-    render_all_artifacts()
-    print("Rendered markdown artifacts from structured YAML sources.")
     return 0
 
 
@@ -160,6 +154,16 @@ def cmd_validate_repository_knowledge(_: argparse.Namespace) -> int:
     return 0 if result.valid else 1
 
 
+def cmd_export_docs(_: argparse.Namespace) -> int:
+    try:
+        written = export_all_docs(release_only=True)
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+    _print_json({"written": [str(path) for path in written]})
+    return 0
+
+
 def cmd_continue(args: argparse.Namespace) -> int:
     workflow = load_workflow_spec()
     state = load_state()
@@ -222,13 +226,10 @@ def build_parser() -> argparse.ArgumentParser:
     sync = sub.add_parser("sync-status", help="Sync markdown status from runtime state")
     sync.set_defaults(func=cmd_sync_status)
 
-    render = sub.add_parser("render-artifacts", help="Render markdown artifacts from YAML")
-    render.set_defaults(func=cmd_render_artifacts)
-
     validate = sub.add_parser("validate", help="Validate the current or specified phase")
     validate.add_argument("--phase", help="Phase to validate")
     validate.add_argument("--trigger", help="Also validate a transition trigger")
-    validate.add_argument("--check-status", action="store_true", help="Also validate markdown/json status sync")
+    validate.add_argument("--check-status", action="store_true", help="Also validate status markdown/runtime sync")
     validate.set_defaults(func=cmd_validate)
 
     next_task = sub.add_parser("next-task", help="Print the bounded dispatch payload for a phase")
@@ -251,6 +252,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     validate_repo = sub.add_parser("validate-repository-knowledge", help="Validate repository knowledge artifacts")
     validate_repo.set_defaults(func=cmd_validate_repository_knowledge)
+
+    export_docs = sub.add_parser("export-docs", help="Generate release-only user-facing docs from doc_templates YAML")
+    export_docs.set_defaults(func=cmd_export_docs)
 
     return parser
 

@@ -8,6 +8,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import yaml
+
 
 REPO_ROOT = Path(__file__).resolve().parent
 
@@ -25,6 +27,7 @@ def required_paths() -> list[Path]:
         REPO_ROOT / "framework" / "runtime",
         REPO_ROOT / "framework" / "roles",
         REPO_ROOT / ".github" / "skills",
+        REPO_ROOT / "doc_templates",
         REPO_ROOT / "docs",
         REPO_ROOT / "src",
     ]
@@ -33,20 +36,16 @@ def required_paths() -> list[Path]:
 def active_artifact_paths() -> dict[str, dict[str, Path]]:
     return {
         "requirements": {
-            "yaml": REPO_ROOT / "docs" / "requirements" / "current.yaml",
-            "markdown": REPO_ROOT / "docs" / "requirements" / "current.md",
+            "yaml": REPO_ROOT / "doc_templates" / "requirements" / "current.yaml",
         },
         "design": {
-            "yaml": REPO_ROOT / "docs" / "design" / "current.yaml",
-            "markdown": REPO_ROOT / "docs" / "design" / "current.md",
+            "yaml": REPO_ROOT / "doc_templates" / "design" / "current.yaml",
         },
         "review": {
-            "yaml": REPO_ROOT / "docs" / "review" / "current.yaml",
-            "markdown": REPO_ROOT / "docs" / "review" / "current.md",
+            "yaml": REPO_ROOT / "doc_templates" / "review" / "current.yaml",
         },
         "dod": {
-            "yaml": REPO_ROOT / "docs" / "dod" / "current.yaml",
-            "markdown": REPO_ROOT / "docs" / "dod" / "current.md",
+            "yaml": REPO_ROOT / "doc_templates" / "dod" / "current.yaml",
         },
     }
 
@@ -99,41 +98,6 @@ def _seed_if_blank(path: Path, content: str) -> bool:
         return False
     path.write_text(content, encoding="utf-8")
     return True
-
-
-def _render_scalar(value: Any) -> str:
-    if value in ("", None):
-        return "- None"
-    if isinstance(value, bool):
-        return f"- {'true' if value else 'false'}"
-    return f"- {value}"
-
-
-def _render_markdown(title: str, payload: dict[str, Any]) -> str:
-    lines = [f"# {title}", "", "Seeded from bootstrap metadata.", ""]
-    for key, value in payload.items():
-        heading = key.replace("_", " ").title()
-        lines.append(f"## {heading}")
-        if isinstance(value, list):
-            if not value:
-                lines.append("- None")
-            else:
-                for item in value:
-                    lines.append(f"- {item}")
-        else:
-            lines.append(_render_scalar(value))
-        lines.append("")
-    return "\n".join(lines).rstrip() + "\n"
-
-
-def _artifact_title(name: str) -> str:
-    titles = {
-        "requirements": "Current Requirements",
-        "design": "Current Design",
-        "review": "Current Review",
-        "dod": "Current Definition of Done",
-    }
-    return titles[name]
 
 
 def _seed_artifacts(metadata: dict[str, str]) -> list[str]:
@@ -193,12 +157,9 @@ def _seed_artifacts(metadata: dict[str, str]) -> list[str]:
     seeded: list[str] = []
     for name, payload in seeds.items():
         artifact_paths = active_artifact_paths()[name]
-        yaml_content = json.dumps(payload, indent=2) + "\n"
-        markdown_content = _render_markdown(_artifact_title(name), payload)
+        yaml_content = yaml.safe_dump(payload, sort_keys=False)
         if _seed_if_blank(artifact_paths["yaml"], yaml_content):
             seeded.append(str(artifact_paths["yaml"].relative_to(REPO_ROOT)))
-        if _seed_if_blank(artifact_paths["markdown"], markdown_content):
-            seeded.append(str(artifact_paths["markdown"].relative_to(REPO_ROOT)))
     return seeded
 
 

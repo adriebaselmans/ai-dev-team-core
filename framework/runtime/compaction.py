@@ -28,5 +28,5 @@ def compact_phase(phase: str, artifact_name: str | None, active_feature: str | N
         summary=f"Compact brief for {phase}",
         payload=payload,
         tags=["compact", artifact_name],
-        artifact_refs=[f"docs/{artifact_name}/current.yaml"],
+        artifact_refs=[f"doc_templates/{artifact_name}/current.yaml"],
     )

@@ -16,15 +16,13 @@ roles:
     user_facing: false
     primary_skill: .github/skills/requirements-clarification
     writes:
-      - docs/requirements/current.yaml
-      - docs/requirements/current.md
+      - doc_templates/requirements/current.yaml
   architect:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/architecture-design
     writes:
-      - docs/design/current.yaml
-      - docs/design/current.md
+      - doc_templates/design/current.yaml
   developer:
     agent_type: specialist
     user_facing: false
@@ -40,15 +38,13 @@ roles:
     user_facing: false
     primary_skill: .github/skills/code-review
     writes:
-      - docs/review/current.yaml
-      - docs/review/current.md
+      - doc_templates/review/current.yaml
   tester:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/acceptance-testing
     writes:
-      - docs/dod/current.yaml
-      - docs/dod/current.md
+      - doc_templates/dod/current.yaml
 
 shared_tools:
   repository-exploration:

@@ -22,8 +22,7 @@ def _owned_outputs(phase: str, role_spec: dict[str, Any]) -> list[str]:
     phase_outputs = phase_spec(phase).get("artifact")
     outputs = list(role_spec.get("writes", []))
     if isinstance(phase_outputs, str):
-        outputs.append(f"docs/{phase_outputs}/current.yaml")
-        outputs.append(f"docs/{phase_outputs}/current.md")
+        outputs.append(f"doc_templates/{phase_outputs}/current.yaml")
     return list(dict.fromkeys(outputs))
 
 
@@ -70,14 +69,10 @@ def build_specialist_payload(role: str, team_spec: dict[str, Any], state: dict[s
 def _available_inputs_for_role(role: str, phase: str) -> set[str]:
     inputs = {
         "user need from the coordinator",
-        "docs/requirements/current.md",
-        "docs/requirements/current.yaml",
-        "docs/design/current.md",
-        "docs/design/current.yaml",
-        "docs/review/current.md",
-        "docs/review/current.yaml",
-        "docs/dod/current.md",
-        "docs/dod/current.yaml",
+        "doc_templates/requirements/current.yaml",
+        "doc_templates/design/current.yaml",
+        "doc_templates/review/current.yaml",
+        "doc_templates/dod/current.yaml",
         "relevant project memory in framework/memory/",
         "project memory in framework/memory/",
         "framework/clean-code.md",

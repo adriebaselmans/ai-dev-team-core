@@ -7,7 +7,7 @@ Turn the user need into a requirement baseline that is clear enough to implement
 - Identify ambiguities, missing scope, and acceptance criteria.
 - Use repository exploration support when the request must be grounded in an existing repository.
 - Draft targeted clarification questions for the coordinator when required.
-- Write or update `docs/requirements/current.md`.
+- Write or update `doc_templates/requirements/current.yaml`.
 - Capture assumptions that unblock implementation.
 
 ## Rules
@@ -21,4 +21,4 @@ Turn the user need into a requirement baseline that is clear enough to implement
 - Reference mapping: `framework/skills.md`
 
 ## Required Output
-- `docs/requirements/current.md`
+- `doc_templates/requirements/current.yaml`

@@ -16,9 +16,10 @@ When Codex starts in this repo, use the coordinator workflow defined in [framewo
 - Return to the user only for requirements clarification and for the final Definition of Done review.
 
 ## Output Locations
-- Requirements: [docs/requirements/current.md](docs/requirements/current.md)
-- Design: [docs/design/current.md](docs/design/current.md)
-- Review: [docs/review/current.md](docs/review/current.md)
+- Requirements: [doc_templates/requirements/current.yaml](doc_templates/requirements/current.yaml)
+- Design: [doc_templates/design/current.yaml](doc_templates/design/current.yaml)
+- Review: [doc_templates/review/current.yaml](doc_templates/review/current.yaml)
+- User-facing generated docs: [docs](docs)
 - Source code: [src](src)
 - Team memory: [framework/memory](framework/memory)
 

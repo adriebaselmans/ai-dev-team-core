@@ -104,11 +104,11 @@ Each specialist has a narrow mission and a bounded write scope.
 
 | Requirements Engineer
 | Convert a user need into an implementation-ready baseline
-| `docs/requirements/current.md`
+| `doc_templates/requirements/current.yaml`
 
 | Architect
 | Produce the simplest safe design that satisfies the requirements
-| `docs/design/current.md`
+| `doc_templates/design/current.yaml`
 
 | Developer
 | Implement the design and add unit-level verification
@@ -116,11 +116,11 @@ Each specialist has a narrow mission and a bounded write scope.
 
 | Reviewer
 | Perform technical review for correctness and maintainability risks
-| `docs/review/current.md`
+| `doc_templates/review/current.yaml`
 
 | Tester
 | Validate user-visible behavior and prepare delivery evidence
-| `docs/dod/current.md`
+| `doc_templates/dod/current.yaml`
 |===
 
 === Runtime Contract Layer

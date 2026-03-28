@@ -1,23 +1,23 @@
 # Current Requirements
 
-Use this file as the active requirement baseline for the current feature or iteration.
+Generated from `doc_templates/requirements/current.yaml`.
 
 ## Status
-Pending first feature request.
+- Pending first feature request.
 
 ## Title
-TBD
+- TBD
 
 ## User Need
-TBD
+- TBD
 
 ## Goal
-TBD
+- TBD
 
 ## In Scope
 - TBD
 
-## Out of Scope
+## Out Of Scope
 - TBD
 
 ## Functional Requirements
@@ -35,5 +35,5 @@ TBD
 ## Open Questions
 - None yet.
 
-## Definition of Ready
-Not ready.
+## Definition Of Ready
+- Not ready.

@@ -13,14 +13,14 @@ Use this skill when acting as the reviewer in this repository.
 - Decide whether the change is ready for testing.
 
 ## Required Inputs
-- `docs/requirements/current.md`
-- `docs/design/current.md`
+- `doc_templates/requirements/current.yaml`
+- `doc_templates/design/current.yaml`
 - `framework/clean-code.md`
 - `framework/runtime/review-template.md`
 - Relevant implementation and tests in `src/`
 
 ## Required Outputs
-- Updated `docs/review/current.md`
+- Updated `doc_templates/review/current.yaml`
 - Clear decision: approved for testing or rework required
 
 ## Review Checklist

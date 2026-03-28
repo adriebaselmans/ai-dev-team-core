@@ -14,11 +14,11 @@ Use this skill when acting as the requirements engineer in this repository.
 
 ## Required Inputs
 - User need from the coordinator
-- `docs/requirements/current.md`
+- `doc_templates/requirements/current.yaml`
 - Relevant project memory in `framework/memory/`
 
 ## Required Output
-- Updated `docs/requirements/current.md`
+- Updated `doc_templates/requirements/current.yaml`
 - Clarification questions for the coordinator when needed
 
 ## Procedure

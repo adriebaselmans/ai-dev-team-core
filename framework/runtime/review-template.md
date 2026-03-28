@@ -2,7 +2,7 @@
 
 Use this format for reviewer output.
 
-Write the active review to `docs/review/current.md`.
+Write the active review to `doc_templates/review/current.yaml`.
 
 ## Decision
 - `Approved for testing` or `Rework required`

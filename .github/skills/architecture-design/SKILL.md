@@ -13,14 +13,14 @@ Use this skill when acting as the architect in this repository.
 - Make relevant CPU and memory tradeoffs explicit.
 
 ## Required Inputs
-- `docs/requirements/current.md`
-- `docs/design/current.md`
+- `doc_templates/requirements/current.yaml`
+- `doc_templates/design/current.yaml`
 - `framework/clean-code.md`
 - Relevant code in `src/`
 - Project memory in `framework/memory/`
 
 ## Required Output
-- Updated `docs/design/current.md`
+- Updated `doc_templates/design/current.yaml`
 
 ## Procedure
 1. Read the active requirements and current codebase.

@@ -3,13 +3,13 @@ description: Turn a user need into an implementation-ready requirement baseline 
 response_mode: one-shot
 required_inputs:
   - user need from the coordinator
-  - docs/requirements/current.md
+  - doc_templates/requirements/current.yaml
   - relevant project memory in framework/memory/
 expected_outputs:
-  - docs/requirements/current.md
+  - doc_templates/requirements/current.yaml
   - clarification questions for the coordinator when needed
 owned_artifacts:
-  - docs/requirements/current.md
+  - doc_templates/requirements/current.yaml
 completion_criteria:
   - Scope, acceptance criteria, constraints, and assumptions are explicit.
   - Definition of Ready is ready or blocking questions are returned.

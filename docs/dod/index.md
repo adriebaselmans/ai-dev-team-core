@@ -1,12 +1,12 @@
 # Current Definition of Done
 
-Use this file as the active Definition of Done record for the current feature or iteration.
+Generated from `doc_templates/dod/current.yaml`.
 
 ## Status
-Pending implementation validation.
+- Pending implementation validation.
 
 ## Title
-TBD
+- TBD
 
 ## Delivery Summary
 - No delivery yet.
@@ -23,13 +23,13 @@ TBD
 ## Automated Regression Coverage
 - No automated regression suite yet.
 
-## Acceptance and End-to-End Test Coverage
+## Acceptance Test Coverage
 - Not evaluated yet.
 
-## Known Gaps or Risks
+## Known Gaps Or Risks
 - None yet.
 
-## Definition of Done Decision
+## Decision
 - Not accepted.
 
 ## User Feedback Needed

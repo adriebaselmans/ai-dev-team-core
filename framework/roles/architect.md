@@ -12,7 +12,7 @@ Define the simplest technically sound design that satisfies the current requirem
 - Weigh design choices on simplicity, maintainability, CPU time, and memory usage.
 - Note interfaces, risks, and validation expectations.
 - Apply the engineering principles in `framework/clean-code.md` and justify meaningful deviations.
-- Write or update `docs/design/current.md`.
+- Write or update `doc_templates/design/current.yaml`.
 
 ## Rules
 - Keep the design as small as possible while remaining implementation-safe.
@@ -31,4 +31,4 @@ Define the simplest technically sound design that satisfies the current requirem
 - Reference mapping: `framework/skills.md`
 
 ## Required Output
-- `docs/design/current.md`
+- `doc_templates/design/current.yaml`

@@ -8,7 +8,7 @@ Model-agnostic AI dev team framework with:
 - repository exploration support and reusable repository knowledge storage
 
 ## Version
-- Current release: `0.4`
+- Current release: `0.5`
 
 ## What This Repo Is
 This repo is a reusable project skeleton.
@@ -26,12 +26,26 @@ Copy it for a new project, run `python init.py`, and then give the coordinator a
 
 The coordinator can invoke repository exploration support when work must be grounded in an existing repository or application.
 
-The active project artifacts start empty on purpose:
-- `docs/requirements/current.md`
-- `docs/design/current.md`
-- `docs/review/current.md`
-- `docs/dod/current.md`
+The active AI-owned project artifacts start empty on purpose:
+- `doc_templates/requirements/current.yaml`
+- `doc_templates/design/current.yaml`
+- `doc_templates/review/current.yaml`
+- `doc_templates/dod/current.yaml`
 - `framework/memory/*`
+
+Generate user-facing docs only on a release branch with:
+
+```powershell
+python framework/runtime/orchestrator.py export-docs
+```
+
+or:
+
+```powershell
+pwsh -File framework/scripts/export-release-docs.ps1
+```
+
+That writes generated output under `docs/` and is intended to be checked in only when releasing.
 
 ## Team
 - Coordinator
@@ -47,7 +61,8 @@ The active project artifacts start empty on purpose:
 - `.github/skills/`: project-local skills for repeatable role behavior.
 - `framework/`: team rules, roles, flow state, memory, and helper scripts.
 - `framework/runtime/`: runtime orchestration contract and Python runtime modules.
-- `docs/`: active project artifacts.
+- `doc_templates/`: active AI-owned project artifacts.
+- `docs/`: user-facing generated documentation output.
 - `src/`: implementation code.
 
 ## Prerequisites
@@ -87,6 +102,13 @@ python framework/runtime/orchestrator.py validate
 python framework/runtime/orchestrator.py continue
 python framework/runtime/orchestrator.py sync-status
 python -m unittest discover framework/runtime/tests
+```
+
+Generate release-only user-facing docs from `doc_templates/`:
+
+```powershell
+python framework/runtime/orchestrator.py export-docs
+pwsh -File framework/scripts/export-release-docs.ps1
 ```
 
 Repository exploration support is invoked internally by the coordinator when a task needs repository grounding; it is not exposed as a standalone active role command.

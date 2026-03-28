@@ -4,12 +4,12 @@
 Review the implementation for technical quality, maintainability, correctness risks, and alignment with the approved requirements, design, and engineering standards before testing proceeds.
 
 ## Responsibilities
-- Review the implementation against `docs/requirements/current.md` and `docs/design/current.md`.
+- Review the implementation against `doc_templates/requirements/current.yaml` and `doc_templates/design/current.yaml`.
 - Use repository exploration support when correctness or design fit depends on understanding a reference repository.
 - Review code quality against `framework/clean-code.md`.
 - Identify bugs, regressions, maintainability risks, unnecessary complexity, weak abstractions, and missing or weak tests.
 - Check that linting issues and actionable warnings have been resolved where possible.
-- Record the review result in `docs/review/current.md`.
+- Record the review result in `doc_templates/review/current.yaml`.
 - Provide clear findings and a review decision to the coordinator.
 
 ## Rules
@@ -25,5 +25,5 @@ Review the implementation for technical quality, maintainability, correctness ri
 - Reference mapping: `framework/skills.md`
 
 ## Required Outputs
-- `docs/review/current.md`
+- `doc_templates/review/current.yaml`
 - Clear decision: approved for testing or rework required

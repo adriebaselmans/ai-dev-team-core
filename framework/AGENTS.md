@@ -70,11 +70,11 @@ Coordinator actions:
 - Delegate to the requirements engineer.
 - Use repository exploration support first when the request must be grounded in a specific repository and the baseline cannot be written safely without that context.
 - Relay clarification questions to the user only when needed.
-- Update `docs/requirements/current.md` until it is clear enough to proceed.
+- Update `doc_templates/requirements/current.yaml` until it is clear enough to proceed.
 - Update memory when the phase is completed.
 
 Exit condition:
-- `docs/requirements/current.md` is complete enough for autonomous architecture and implementation.
+- `doc_templates/requirements/current.yaml` is complete enough for autonomous architecture and implementation.
 - `Definition of Ready` in the requirements file is effectively `ready`.
 
 Loop rule:
@@ -87,7 +87,7 @@ Entry condition:
 Coordinator actions:
 - Delegate to the architect.
 - Use repository exploration support when the design depends on an existing repository's architecture, conventions, or extension points.
-- Ensure `docs/design/current.md` is updated.
+- Ensure `doc_templates/design/current.yaml` is updated.
 - Ensure the design reflects clean code, stack-appropriate best practices, and relevant performance tradeoffs.
 - Update memory when the phase is completed.
 
@@ -143,14 +143,14 @@ Entry condition:
 
 Coordinator actions:
 - Delegate validation to the tester.
-- Ensure `docs/dod/current.md` is updated.
+- Ensure `doc_templates/dod/current.yaml` is updated.
 - Ensure an automated acceptance or end-to-end regression suite is added when feasible and worthwhile.
 - Ensure the tester records how that regression suite should be rerun later.
 - Update memory when the phase is completed.
 
 Exit condition:
 - The tester has issued a clear DoD decision.
-- A rerunnable automated acceptance or end-to-end suite exists, or `docs/dod/current.md` explicitly explains why it was not feasible.
+- A rerunnable automated acceptance or end-to-end suite exists, or `doc_templates/dod/current.yaml` explicitly explains why it was not feasible.
 
 Loop rule:
 - Return to development if defects or coverage gaps must be fixed.
@@ -158,7 +158,7 @@ Loop rule:
 
 ### 7. DoD Review
 Entry condition:
-- The tester has produced `docs/dod/current.md`.
+- The tester has produced `doc_templates/dod/current.yaml`.
 
 Coordinator actions:
 - Present the DoD review to the user.
@@ -195,10 +195,10 @@ Exit condition:
 - Keep durable project knowledge in `framework/memory/`.
 - Keep durable repository-specific knowledge in `framework/memory/repository-knowledge/`.
 - Use the compaction skill to produce dense phase-boundary briefs when a phase completes.
-- Keep the latest requirements in `docs/requirements/current.md`.
-- Keep the latest design in `docs/design/current.md`.
-- Keep the latest review in `docs/review/current.md`.
-- Keep the latest DoD review in `docs/dod/current.md`.
+- Keep the latest requirements in `doc_templates/requirements/current.yaml`.
+- Keep the latest design in `doc_templates/design/current.yaml`.
+- Keep the latest review in `doc_templates/review/current.yaml`.
+- Keep the latest DoD review in `doc_templates/dod/current.yaml`.
 - Keep implementation in `src/`.
 - Follow the engineering standards in `framework/clean-code.md`.
 - Use the role-aligned skills in `.github/skills/` and `framework/skills.md` where applicable.

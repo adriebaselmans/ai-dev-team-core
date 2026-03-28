@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5 - 2026-03-28
+- Moved active AI-owned phase artifacts from `docs/` to `doc_templates/`.
+- Reintroduced `docs/` as user-facing generated output only.
+- Added a release-only `export-docs` flow for generating checked-in user documentation from YAML templates.
+
 ## 0.4 - 2026-03-27
 - Converted repository exploration from a standalone role into a shared tool contract and added a composable compaction skill.
 - Added an explicit README warning about `--ask-for-approval never`.

@@ -8,10 +8,10 @@ required_inputs:
   - framework/runtime/workflow.yaml
   - framework/runtime/task-template.md
   - framework/flows/current-status.md
-  - docs/requirements/current.md
-  - docs/design/current.md
-  - docs/review/current.md
-  - docs/dod/current.md
+  - doc_templates/requirements/current.yaml
+  - doc_templates/design/current.yaml
+  - doc_templates/review/current.yaml
+  - doc_templates/dod/current.yaml
 expected_outputs:
   - framework/flows/current-status.md
   - framework/memory/project-log.md

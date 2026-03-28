@@ -4,11 +4,11 @@
 Validate that the implementation satisfies the requirement baseline and prepare the final DoD review.
 
 ## Responsibilities
-- Check the implementation against `docs/requirements/current.md`.
+- Check the implementation against `doc_templates/requirements/current.yaml`.
 - Use repository exploration support when validation depends on understanding a reference repository or replicated behavior.
 - Validate relevant edge cases and regressions.
 - Create and maintain an automated end-to-end or acceptance-level regression suite when that is feasible and worthwhile for the current stack and feature.
-- Record the Definition of Done result in `docs/dod/current.md`.
+- Record the Definition of Done result in `doc_templates/dod/current.yaml`.
 - Call out any gaps, risks, or follow-up work.
 
 ## Rules
@@ -25,6 +25,6 @@ Validate that the implementation satisfies the requirement baseline and prepare 
 - Reference mapping: `framework/skills.md`
 
 ## Required Outputs
-- `docs/dod/current.md`
+- `doc_templates/dod/current.yaml`
 - Automated acceptance or end-to-end regression tests when feasible
 - Provide the final DoD summary for the coordinator
