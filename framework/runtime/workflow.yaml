@@ -12,6 +12,10 @@ phases:
     artifact: requirements
     context_slice: requirements-engineer
     canonical_source: artifacts
+    collaboration:
+      optional_partners:
+        - role: ux-ui-designer
+          purpose: clarify user flows, interaction expectations, accessibility constraints, and visual priorities when UI scope is material
   architecture:
     owner: architect
     artifact: design

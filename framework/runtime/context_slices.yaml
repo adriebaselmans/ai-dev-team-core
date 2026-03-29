@@ -28,6 +28,28 @@ slices:
       - definition_of_ready
     memory:
       - latest_brief
+  ux-ui-designer:
+    state:
+      - active_feature
+      - phase
+    requirements:
+      - title
+      - user_need
+      - goal
+      - in_scope
+      - functional_requirements
+      - acceptance_criteria
+      - constraints
+      - assumptions
+      - open_questions
+    design:
+      - title
+      - design_goal
+      - affected_areas
+      - interfaces
+      - non_goals
+    memory:
+      - latest_brief
   architect:
     state:
       - active_feature

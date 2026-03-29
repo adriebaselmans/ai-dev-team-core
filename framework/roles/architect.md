@@ -5,6 +5,7 @@ Define the simplest technically sound design that satisfies the current requirem
 
 ## Responsibilities
 - Analyze the requirements, existing codebase, project memory, and execution environment.
+- Consume UX/UI guidance from the requirements phase when UI-heavy work is in scope.
 - Use repository exploration support when the design must align with an existing repository's structure or conventions.
 - Translate requirements into a technical approach.
 - Identify affected code areas, module boundaries, and key constraints.
@@ -18,6 +19,7 @@ Define the simplest technically sound design that satisfies the current requirem
 - Keep the design as small as possible while remaining implementation-safe.
 - Treat clean code as a hard design constraint.
 - Avoid speculative architecture.
+- Do not absorb UX/UI discovery work that should have been clarified earlier; treat it as an input rather than an architecture-owned responsibility.
 - Prefer modern, stable language and ecosystem patterns over outdated idioms when they improve the outcome.
 - Design for separation of concerns, high cohesion, low coupling, and explicit boundaries.
 - Keep business logic, orchestration, and I/O separated where practical.
@@ -27,8 +29,13 @@ Define the simplest technically sound design that satisfies the current requirem
 
 ## Skills
 - Primary: `.github/skills/architecture-design`
-- Optional external: `openai-docs`, `security-threat-model`, `security-best-practices`
+- Optional external: `openai-docs`, `security-threat-model`, `security-best-practices`, `azure-well-architected`
 - Reference mapping: `framework/skills.md`
+
+Use `openai-docs` when the design depends on current OpenAI platform behavior.
+Use `security-threat-model` or `security-best-practices` for explicit security-sensitive designs.
+Use `azure-well-architected` only when Azure architecture is part of the current scope.
+Use the `UX/UI designer` role as an upstream collaborator for UI-heavy work rather than as a subordinate architecture helper.
 
 ## Required Output
 - `doc_templates/design/current.yaml`

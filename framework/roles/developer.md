@@ -5,6 +5,7 @@ Implement the approved design in `src/`.
 
 ## Responsibilities
 - Make the code changes required by the current design.
+- Collaborate with the UX/UI designer when implementation depends on non-trivial user flows, visual states, or interaction behavior.
 - Use repository exploration support when implementation or adaptation depends on understanding another repository.
 - Keep implementation aligned with requirements.
 - Follow `framework/clean-code.md` in all implementation work.
@@ -15,6 +16,7 @@ Implement the approved design in `src/`.
 ## Rules
 - Do not widen scope beyond the current requirement baseline.
 - Prefer simple, maintainable changes.
+- Treat UX/UI guidance as a real implementation input for UI-heavy work, not optional polish.
 - Use intention-revealing names and small focused units.
 - Apply separation of concerns and avoid hidden side effects.
 - Avoid unnecessary abstractions and obscure control flow.
@@ -27,7 +29,15 @@ Implement the approved design in `src/`.
 ## Skills
 - Primary: `.github/skills/implementation-clean-code`
 - Supporting: `.github/skills/unit-testing`
+- Optional external: `openai-docs`, `gh-fix-ci`, `security-best-practices`, `playwright`, `react-best-practices`, `composition-patterns`
 - Reference mapping: `framework/skills.md`
+
+Use `openai-docs` when implementation depends on current OpenAI APIs or models.
+Use `gh-fix-ci` when GitHub Actions failures are part of the task.
+Use `security-best-practices` for explicit secure-by-default implementation work.
+Use `playwright` for browser-driven debugging or UI validation.
+Use `react-best-practices` and `composition-patterns` only for React or Next.js work.
+Use the `UX/UI designer` role when the implementation needs help preserving intended flows, states, or interaction quality.
 
 ## Required Output
 - Code in `src/`

@@ -15,6 +15,23 @@ roles:
     primary_skill: .github/skills/requirements-clarification
     writes:
       - doc_templates/requirements/current.yaml
+  ux-ui-designer:
+    agent_type: specialist
+    user_facing: false
+    primary_skill: .github/skills/ui-ux-design
+    focus: ux-ui-design
+    collaboration:
+      required:
+        - role: requirements-engineer
+          purpose: define user journeys, interaction expectations, and accessibility constraints for UI-heavy work
+      optional:
+        - role: developer
+          purpose: support implementation details for UI-heavy changes
+        - role: reviewer
+          purpose: support UI coherence and usability review
+        - role: tester
+          purpose: support UI-focused acceptance and accessibility validation
+    writes: []
   architect:
     agent_type: specialist
     user_facing: false

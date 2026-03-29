@@ -8,6 +8,7 @@ Take a user need or feature description and deliver an end-to-end implementation
 ## Team Roles
 - Coordinator: owns intake, delegation, phase transitions, integration, and final reporting; it is read-only with respect to implementation work.
 - Requirements Engineer: clarifies the request and writes the requirement baseline.
+- UX/UI Designer: optionally collaborates during requirements and implementation for user flows, interaction design, accessibility expectations, and visual coherence when the task has meaningful UI scope.
 - Architect: writes the design approach and technical constraints.
 - Developer: implements the solution in `src/`.
 - Reviewer: reviews the implementation for quality and technical risk before testing.
@@ -66,6 +67,7 @@ Entry condition:
 
 Coordinator actions:
 - Delegate to the requirements engineer.
+- Delegate to the UX/UI designer as an optional specialist when the request has meaningful UX, interaction, accessibility, or visual design scope.
 - Use repository exploration support first when the request must be grounded in a specific repository and the baseline cannot be written safely without that context.
 - Relay clarification questions to the user only when needed.
 - Update `doc_templates/requirements/current.yaml` until it is clear enough to proceed.
