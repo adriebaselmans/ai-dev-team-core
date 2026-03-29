@@ -18,6 +18,11 @@ Use this file as the chronological project history.
 ## Entries
 - No project history yet.
 - 2026-03-29
+  Phase: cleanup
+  Change summary: Removed obsolete framework/flows scaffolding, stale coordinator-flow references to current-status.md, generated placeholder docs under docs/, and committed bytecode residue; updated the root README version to match the current release.
+  Why it changed: Keep the skeleton pure, remove residual generated files, and align the coordinator flow with the actual runtime state source.
+  Resulting project state: The repository now keeps active runtime state in framework/runtime/state.json, and the generated docs tree no longer carries placeholder index files.
+- 2026-03-29
   Phase: requirements
   Change summary: Defined a bounded iteration for runtime contract hardening, startup integrity, stronger development validation, and explicit source-of-truth boundaries.
   Why it changed: Review findings exposed drift-prone assumptions in task input validation, skill lookup, start-state commit order, development gating, and artifact-versus-memory authority.

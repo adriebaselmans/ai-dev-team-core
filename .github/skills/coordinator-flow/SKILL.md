@@ -22,20 +22,20 @@ Use this skill when acting as the coordinator in this repository.
 - `framework/runtime/team.yaml`
 - `framework/runtime/workflow.yaml`
 - `framework/runtime/task-template.md`
-- `framework/flows/current-status.md`
+- `framework/runtime/state.json`
 - Active artifacts in `docs/`
 - Current project memory in `framework/memory/`
 - Current repository briefs in `framework/memory/repository-knowledge/`
 
 ## Required Outputs
-- Updated `framework/flows/current-status.md`
+- Updated `framework/runtime/state.json`
 - Updated `framework/memory/` entries after each completed phase
 - Final user-facing DoD review
 
 ## Procedure
 1. Read `framework/AGENTS.md` and identify the current phase.
 2. Read `framework/runtime/team.yaml` and `framework/runtime/workflow.yaml`.
-3. Update `framework/flows/current-status.md` before and after each phase transition.
+3. Update `framework/runtime/state.json` before and after each phase transition.
 4. Spawn the correct specialist subagent for the active phase when the task is bounded and specialist-owned.
 5. Spawn the explorer with a bounded repository-analysis task when the current phase needs repo grounding.
 6. Use `framework/runtime/task-template.md` to structure the spawned task.

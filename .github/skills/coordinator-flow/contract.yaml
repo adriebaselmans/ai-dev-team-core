@@ -10,20 +10,20 @@ required_inputs:
   - framework/runtime/team.yaml
   - framework/runtime/workflow.yaml
   - framework/runtime/task-template.md
-  - framework/flows/current-status.md
+  - framework/runtime/state.json
   - doc_templates/requirements/current.yaml
   - doc_templates/design/current.yaml
   - doc_templates/review/current.yaml
   - doc_templates/dod/current.yaml
 expected_outputs:
-  - framework/flows/current-status.md
+  - framework/runtime/state.json
   - framework/memory/project-log.md
   - framework/memory/decisions.md
   - framework/memory/known-context.md
   - final user-facing DoD review
 owned_artifacts: []
 delegated_artifacts:
-  - framework/flows/current-status.md
+  - framework/runtime/state.json
   - framework/memory/project-log.md
   - framework/memory/decisions.md
   - framework/memory/known-context.md
