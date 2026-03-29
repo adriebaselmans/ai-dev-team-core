@@ -1,24 +1,68 @@
-title: TBD
-design_goal: TBD
+title: Harden runtime contracts and automation safeguards
+design_goal: Remove drift-prone assumptions in the runtime orchestration layer and make the remaining phase boundaries machine-checkable.
 architecture_approach:
-- TBD
+- Derive task-builder inputs from real repository sources only: artifacts.ARTIFACT_FILES, declared role writes, and explicit skill contract requirements. Do not feed a contract's own required_inputs back into the availability set.
+- Resolve skill contracts by the full declared path and fail fast when a requested contract file does not exist. Basename-only lookup is too weak for an automation skeleton that may grow reusable or external skills.
+- Stage cmd_start so envelope construction happens before the runtime state is committed. If envelope construction fails, the runtime must remain idle or roll back to the pre-start state.
+- Strengthen development validation to assert the concrete test and runtime outputs that matter for this iteration, not only the existence of a tests directory.
+- Keep artifact-vs-memory drift explicit by declaring the canonical per-phase source of truth in the runtime boundary code. This iteration narrows the mitigation to enforcing that boundary in consumers rather than redesigning the coordination model.
+- Test implications:
+  - A deliberately missing skill input must fail validation without being masked by the derived availability set.
+  - Two distinct skill paths must not alias to the same contract file unless the alias is explicitly declared.
+  - A failing start-envelope build must not leave the runtime in a started state.
+  - Development validation must fail if the expected runtime test outputs are absent.
 affected_areas:
-- TBD
+- framework/runtime/task_builder.py
+- framework/runtime/skill_loader.py
+- framework/runtime/orchestrator.py
+- framework/runtime/validators.py
+- framework/runtime/context_slicer.py
+- framework/runtime/tests/
+- directly related skill contract files under .github/skills/ only if the lookup contract requires a test fixture
 separation_of_concerns:
-- TBD
+- task_builder should compute dispatch payloads and validation inputs, not own contract semantics.
+- skill_loader should resolve and load contracts, not infer fallback aliases.
+- orchestrator should coordinate state transitions, not persist a started state before validation succeeds.
+- validators should enforce phase readiness, not merely confirm that directories exist.
+- context_slicer should consume the declared phase boundary and avoid implicit assumptions about which store is canonical.
 module_boundaries:
-- TBD
+- Add a small contract-resolution boundary in skill_loader that makes the declared path the authoritative lookup key.
+- Keep input derivation in task_builder deterministic and source-based, with a helper that can be unit-tested without broad orchestration setup.
+- Add a start-flow guard in orchestrator that builds and validates the first dispatch envelope before state commit, with rollback or no-op semantics on failure.
+- Expand validate_development so it checks the concrete expected test files or outputs for this iteration.
+- Add a narrow phase-source contract in the runtime context boundary so the consumer code explicitly chooses the canonical source for phase data.
 data_flow:
-- TBD
+- cmd_start loads state, builds the first requirements envelope, and only then commits the started runtime state.
+- task_builder gathers candidate inputs from real artifact paths and role writes, then validates skill contracts against that derived set.
+- skill_loader resolves the contract file from the declared skill path and fails on missing or ambiguous lookup.
+- validators.validate_development inspects the actual expected runtime outputs for this iteration before allowing phase transition.
+- context_slicer continues to feed role-specific state and artifact slices, but it should do so through an explicit canonical-boundary rule rather than implicit drift-prone assumptions.
 interfaces:
-- TBD
+- Keep build_phase_dispatch_envelope as the primary dispatch constructor, but tighten its preconditions so validation happens before any side effects.
+- Keep load_skill_contract as the contract-loading entry point, but make its path semantics explicit and error messages precise.
+- Keep cmd_start as the user-facing startup entry point, but require it to be failure-safe.
+- Extend validate_development to check named expected files or outputs, not directory existence.
+- Preserve build_context_slice as the phase-context constructor, but make its canonical source rule explicit in the data it emits or consumes.
 technology_and_environment_considerations:
-- TBD
+- Python 3.12 remains the runtime baseline.
+- The runtime should remain model-agnostic and unit-test friendly.
+- Tests should stay local and deterministic; no network or live-provider assumptions are needed for these safeguards.
+- The explicit canonical-source rule should not depend on runtime-specific external state.
 clean_code_constraints:
-- Follow `framework/clean-code.md`.
+- Follow framework/clean-code.md.
+- Prefer explicit contracts over implicit fallback behavior.
+- Keep the new helpers small and focused.
+- Fail fast with clear error messages that name the missing input, missing contract, or failed start condition.
 performance_considerations:
-- No special performance considerations yet.
+- The added validation work is small and local, so correctness is more important than micro-optimization.
+- Deriving inputs from existing specs and contracts is cheap enough for per-dispatch validation.
 risks_and_tradeoffs:
-- None yet.
+- Tightening skill resolution may surface previously hidden aliasing and missing-contract issues immediately; that is intentional.
+- Moving start validation ahead of state commit may require a small rollback path or a staged state transition helper.
+- Strengthening development validation can fail existing assumptions quickly if the expected test files are not aligned with the runtime layout.
+- The artifact-vs-memory boundary is only narrowed, not redesigned, so some drift risk remains outside the explicit phase contract.
 non_goals:
-- TBD
+- Redesign the coordinator or role model.
+- Change phase ownership or skill semantics beyond what is needed to enforce the runtime contracts.
+- Rework the entire memory architecture or generated documentation workflow.
+

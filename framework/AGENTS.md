@@ -6,7 +6,7 @@ This file defines the canonical team workflow for this repository.
 Take a user need or feature description and deliver an end-to-end implementation with minimal human intervention.
 
 ## Team Roles
-- Coordinator: owns intake, delegation, phase transitions, integration, and final reporting.
+- Coordinator: owns intake, delegation, phase transitions, integration, and final reporting; it is read-only with respect to implementation work.
 - Requirements Engineer: clarifies the request and writes the requirement baseline.
 - Architect: writes the design approach and technical constraints.
 - Developer: implements the solution in `src/`.
@@ -201,11 +201,11 @@ Exit condition:
 - Follow the engineering standards in `framework/clean-code.md`.
 - Use the role-aligned skills in `.github/skills/` and `framework/skills.md` where applicable.
 - Use `framework/runtime/` as the machine-readable contract for native subagent orchestration.
-- The coordinator is responsible for updating `framework/runtime/state.json`.
-- The coordinator is responsible for updating `framework/memory/` after each completed phase.
+- The runtime workflow is responsible for persisting `framework/runtime/state.json` and `framework/memory/` updates on behalf of the coordinator.
 - Specialists do not communicate with the user directly; the coordinator owns all user-facing interaction.
 - Return to the user only during requirements clarification and final DoD review.
 - Do not silently skip a phase artifact.
+- Do not assign direct implementation or file-writing work to the coordinator; route such work through specialist roles or shared tools.
 
 ## Memory Policy
 Update memory at the end of each completed phase.
@@ -222,7 +222,7 @@ Memory update rules:
 - `known-context.md` records stable truths that future agents should treat as current baseline context.
 - `repository-knowledge/` records reusable repository intelligence that other roles can consult instead of rescanning the same repo.
 - Each entry should be short, factual, and useful for future agents.
-- The coordinator updates memory after each completed phase, not only at the end of the full feature flow.
+- The runtime workflow updates memory after each completed phase on behalf of the coordinator, not only at the end of the full feature flow.
 
 ## Final Review
 The tester must prepare a Definition of Done result that covers:

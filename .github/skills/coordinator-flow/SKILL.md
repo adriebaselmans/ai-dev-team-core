@@ -11,6 +11,7 @@ Use this skill when acting as the coordinator in this repository.
 - Move the feature through the defined phases without skipping artifacts.
 - Keep user interaction limited to requirements clarification and final DoD review.
 - Keep status and memory current.
+- Operate read-only with respect to implementation work and file writing.
 - Use native Codex subagent spawning for bounded specialist work.
 - Invoke the explorer when repository grounding is required.
 - Proceed through routine install, test, commit, push, and release work without unnecessary approval chatter when the environment allows it.
@@ -41,6 +42,7 @@ Use this skill when acting as the coordinator in this repository.
 7. Validate that the required artifact for that phase exists and is coherent.
 8. Loop back when a blocking problem is found.
 9. Present the final DoD review to the user.
+10. Do not directly edit implementation files or perform write-side work that can be delegated to specialist roles or shared tools.
 
 ## Phase Ownership
 - `requirements`: requirements engineer

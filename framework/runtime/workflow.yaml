@@ -6,34 +6,53 @@ phases:
     owner: coordinator
     artifact: null
     context_slice: coordinator
+    canonical_source: state
   requirements:
     owner: requirements-engineer
     artifact: requirements
     context_slice: requirements-engineer
+    canonical_source: artifacts
   architecture:
     owner: architect
     artifact: design
     context_slice: architect
+    canonical_source: artifacts
   development:
     owner: developer
     artifact: null
     context_slice: developer
+    canonical_source: artifacts
   review:
     owner: reviewer
     artifact: review
     context_slice: reviewer
+    canonical_source: artifacts
+    collaboration:
+      primary_partner:
+        role: developer
+        purpose: findings handling and rework coordination
   testing:
     owner: tester
     artifact: dod
     context_slice: tester
+    canonical_source: artifacts
+    collaboration:
+      validates_with:
+        - role: requirements-engineer
+          purpose: acceptance criteria understanding and satisfaction
+      consults_when_needed:
+        - role: architect
+          purpose: non-functional requirement validation or clarification
   dod-review:
     owner: coordinator
     artifact: dod
     context_slice: coordinator
+    canonical_source: state
   done:
     owner: coordinator
     artifact: null
     context_slice: coordinator
+    canonical_source: state
 
 transitions:
   feature_received:

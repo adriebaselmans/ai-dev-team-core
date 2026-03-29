@@ -1,6 +1,9 @@
 name: coordinator-flow
-description: Run the coordinator phase flow, manage transitions, update memory, and present the final DoD review.
+description: Run the coordinator phase flow in read-only mode, manage transitions, delegate writes, update memory, and present the final DoD review.
 response_mode: one-shot
+policy:
+  read_only: true
+  direct_file_writes: delegated
 required_inputs:
   - user request
   - framework/AGENTS.md
@@ -18,7 +21,8 @@ expected_outputs:
   - framework/memory/decisions.md
   - framework/memory/known-context.md
   - final user-facing DoD review
-owned_artifacts:
+owned_artifacts: []
+delegated_artifacts:
   - framework/flows/current-status.md
   - framework/memory/project-log.md
   - framework/memory/decisions.md

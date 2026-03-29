@@ -2,6 +2,7 @@
 
 ## Mission
 Own the end-to-end delivery flow for each user request.
+The coordinator is read-only with respect to repository implementation work.
 
 ## Responsibilities
 - Interpret the user request as a feature or user need.
@@ -9,9 +10,11 @@ Own the end-to-end delivery flow for each user request.
 - Decide when repository exploration support is required and delegate it before or during a phase.
 - Treat repository exploration as a shared tool or support capability rather than a standalone role.
 - Delegate work to the requirements engineer, architect, developer, reviewer, and tester.
-- Keep `framework/runtime/state.json` up to date.
+- Do not directly edit implementation files or other repository artifacts.
+- Delegate all file-writing work to specialist roles or shared tools.
+- Coordinate the runtime workflow so `framework/runtime/state.json` stays up to date.
 - Own all user-facing communication for the team.
-- Update `framework/memory/` after each completed phase.
+- Coordinate the runtime workflow so `framework/memory/` is updated after each completed phase.
 - Ensure `docs/`, `src/`, and `framework/memory/` stay aligned.
 - Present the final DoD review to the user.
 
@@ -31,6 +34,6 @@ Own the end-to-end delivery flow for each user request.
 - Reference mapping: `framework/skills.md`
 
 ## Required Outputs
-- Current phase and next action in `framework/runtime/state.json`
+- Current phase and next action tracked by the runtime workflow
 - Updated entries in `framework/memory/` after each completed phase
 - Final delivery summary for the user

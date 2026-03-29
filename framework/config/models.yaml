@@ -12,27 +12,35 @@ providers:
     backend: mock
 
 roles:
+  # Set placeholder: true only for mock-only model identifiers. Remove the flag
+  # and replace the model value with a real provider model when wiring execution.
   coordinator:
     provider: mock
     model: gpt-5.4
     mode: orchestrator
+    placeholder: true
   requirements-engineer:
     provider: openai
     model: gpt-5.4-mini
     mode: one-shot
+    placeholder: true
   architect:
     provider: openai
     model: gpt-5.4
     mode: one-shot
+    placeholder: true
   developer:
     provider: openai
     model: gpt-5.4
     mode: one-shot
+    placeholder: true
   reviewer:
     provider: openai
     model: gpt-5.4-mini
     mode: one-shot
+    placeholder: true
   tester:
     provider: openai
     model: gpt-5.4-mini
     mode: one-shot
+    placeholder: true

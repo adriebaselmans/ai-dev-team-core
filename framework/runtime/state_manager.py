@@ -44,6 +44,7 @@ def load_state() -> dict[str, Any]:
 def save_state(state: dict[str, Any]) -> dict[str, Any]:
     state_to_save = deepcopy(DEFAULT_STATE)
     state_to_save.update(state)
+    STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
     STATE_PATH.write_text(json.dumps(state_to_save, indent=2) + "\n", encoding="utf-8")
     return state_to_save
 

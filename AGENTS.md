@@ -9,6 +9,7 @@ When Codex starts in this repo, use the coordinator workflow defined in [framewo
 - Move through the coordinator phases defined in `framework/AGENTS.md`.
 - Use the project-local skills in `.github/skills/` and the role mapping in `framework/skills.md` where applicable.
 - Use the model-agnostic runtime contract in `framework/runtime/` for bounded specialist dispatch.
+- Treat the coordinator as read-only with respect to implementation work and delegate file-writing work to specialist roles or shared tools.
 - Use repository exploration support when work must be grounded in a specific repository or application.
 - Start with the requirements engineer if the request is not fully clear.
 - Once the requirements are clear enough, continue autonomously through architecture, development, review, and testing.

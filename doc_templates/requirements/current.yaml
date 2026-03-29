@@ -1,19 +1,37 @@
-status: Pending first feature request.
-title: TBD
-user_need: TBD
-goal: TBD
+status: Ready.
+title: Harden runtime contracts and automation safeguards
+user_need: Improve the runtime skeleton so contract validation, skill loading, startup flow, development gating, and source-of-truth boundaries fail fast and stay explicit.
+goal: Remove drift-prone assumptions in the runtime orchestration layer and make the remaining phase boundaries machine-checkable.
 in_scope:
-- TBD
+- Derive task_builder available inputs from real repository sources without self-satisfying validation.
+- Resolve skill contracts using the full declared path or an explicit, unambiguous contract lookup rule.
+- Make orchestrator startup validate the first dispatch envelope before committing runtime state.
+- Strengthen development validation so it checks the actual expected test and runtime outputs rather than only directory presence.
+- Clarify the canonical source of truth for phase data as an explicit per-phase contract boundary, with the implementation limited to making that boundary enforceable rather than redesigning the entire artifact/memory architecture.
 out_of_scope:
-- TBD
+- Any redesign of the developer role model, coordinator permissions, or phase ownership map.
+- Any changes to .github/skills/ role behavior beyond what is needed to enforce the runtime contracts above.
+- Any broad redesign of the repository memory system or generated documentation workflow.
 functional_requirements:
-- TBD
+- task_builder validation must fail when a required skill input is not truly available from the declared artifact paths, role write targets, or other real inputs.
+- Missing skill contracts must produce a clear error that names the missing contract path and the requesting skill.
+- cmd_start must not leave the runtime in a started state if the first dispatch envelope cannot be built successfully.
+- development validation must verify the presence of the expected runtime test files or equivalent concrete outputs, not only the existence of a tests directory.
+- The runtime must declare, per phase, which source is canonical for that phase's data so artifact-vs-memory drift is explicit instead of implicit.
 acceptance_criteria:
-- TBD
+- A broken skill contract or missing required input causes a deterministic validation failure that names the skill and missing input.
+- Two distinct skill contract paths do not alias to the same contract file unless that aliasing is explicitly declared by the lookup contract.
+- A failed cmd_start envelope build leaves the runtime state unchanged or rolled back to the pre-start state.
+- Development validation fails when the expected test coverage artifacts are missing.
+- The source-of-truth rule for phase data is documented and enforced by code paths that consume phase context.
 constraints:
-- None yet.
+- Prefer explicit contracts and fail-fast behavior over silent fallback.
+- Keep the scope bounded to the five review findings above.
+- Treat the artifact-vs-memory issue as an explicit scope limitation: clarify and enforce the canonical boundary, but do not redesign the entire coordination architecture in this iteration.
 assumptions:
-- None yet.
+- The runtime is intended to remain model-agnostic and testable with local unit tests.
+- The existing phase workflow and role ownership map remain unchanged.
 open_questions:
 - None yet.
-definition_of_ready: Not ready.
+definition_of_ready: Ready.
+

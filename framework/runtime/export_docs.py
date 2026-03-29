@@ -72,14 +72,32 @@ def _render_value(value: Any, level: int = 0) -> list[str]:
     return [f"{indent}- {value}"]
 
 
+def _markdown_sections(schema: dict[str, Any], artifact_name: str) -> list[dict[str, str]]:
+    sections = schema.get("markdown_sections")
+    if not isinstance(sections, list) or not sections:
+        raise ValueError(f"Schema '{artifact_name}' is missing markdown_sections.")
+    normalized: list[dict[str, str]] = []
+    for section in sections:
+        if not isinstance(section, dict):
+            raise ValueError(f"Schema '{artifact_name}' has an invalid markdown section entry.")
+        heading = section.get("heading")
+        field = section.get("field")
+        if not isinstance(heading, str) or not heading.strip():
+            raise ValueError(f"Schema '{artifact_name}' has a markdown section with no heading.")
+        if not isinstance(field, str) or not field.strip():
+            raise ValueError(f"Schema '{artifact_name}' has a markdown section with no field.")
+        normalized.append({"heading": heading.strip(), "field": field.strip()})
+    return normalized
+
+
 def render_artifact_doc(name: str) -> str:
     schema = load_artifact_schema(name)
     payload = load_artifact(name)
     title = schema.get("title", name.title())
     lines = [f"# {title}", "", f"Generated from `{ARTIFACT_FILES[name]}`.", ""]
-    for key, value in payload.items():
-        lines.append(f"## {key.replace('_', ' ').title()}")
-        lines.extend(_render_value(value))
+    for section in _markdown_sections(schema, name):
+        lines.append(f"## {section['heading']}")
+        lines.extend(_render_value(payload.get(section["field"])))
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 

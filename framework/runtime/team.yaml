@@ -6,10 +6,9 @@ specialist_dispatch: orchestrator-owned
 roles:
   coordinator:
     agent_type: orchestrator
+    read_only: true
+    writes: []
     user_facing: true
-    writes:
-      - framework/runtime/state.json
-      - framework/memory/logs/
   requirements-engineer:
     agent_type: specialist
     user_facing: false
@@ -36,12 +35,25 @@ roles:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/code-review
+    focus: code-review-only
+    collaboration:
+      required:
+        - role: developer
+          purpose: findings handling and rework coordination
     writes:
       - doc_templates/review/current.yaml
   tester:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/acceptance-testing
+    focus: acceptance-validation
+    collaboration:
+      required:
+        - role: requirements-engineer
+          purpose: acceptance criteria understanding and satisfaction
+      optional:
+        - role: architect
+          purpose: non-functional requirement validation or clarification
     writes:
       - doc_templates/dod/current.yaml
 

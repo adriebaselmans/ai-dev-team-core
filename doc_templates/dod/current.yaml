@@ -1,19 +1,26 @@
-status: Pending implementation validation.
-title: TBD
+status: Complete.
+title: Harden runtime contracts and automation safeguards
 delivery_summary:
-- No delivery yet.
+- Hardened runtime contract enforcement for task input validation, skill loading, startup state commit, development validation, and explicit phase data sources.
 requirements_coverage:
-- Not evaluated yet.
+- All five bounded findings were addressed in runtime code, workflow spec, and tests.
 what_was_built:
-- Nothing yet.
+- task_builder now validates against repo-backed and semantic inputs instead of a self-satisfying input set.
+- skill_loader now resolves contracts from the declared path and reports the full missing-contract location.
+- cmd_start now builds the first dispatch envelope before saving runtime state.
+- development validation now checks concrete runtime outputs and test files.
+- workflow phases now declare canonical_source and context_slicer enforces the state-vs-artifact boundary.
 what_was_verified:
-- Nothing yet.
+- Focused runtime tests for task_builder, orchestrator, and validators passed.
+- Canonical runtime test discovery passed.
+- Full runtime discovery passed.
 automated_regression_coverage:
-- No automated regression suite yet.
+- python -m unittest discover framework/runtime/tests
+- python -m unittest discover framework/runtime
 acceptance_test_coverage:
-- Not evaluated yet.
+- Unit-level runtime contract and validator coverage only; no higher-level acceptance suite was required for this bounded iteration.
 known_gaps_or_risks:
-- None yet.
-decision: Not accepted.
+- Semantic skill-input availability still depends on explicit runtime rules, so new non-path contract phrases may require adding corresponding predicates.
+decision: Accepted for user review.
 user_feedback_needed:
-- None yet.
+- Confirm whether to keep iterating on broader automation issues beyond these five bounded findings.
