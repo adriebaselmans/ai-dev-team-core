@@ -75,17 +75,17 @@ Legacy or exported chronological project history derived from structured memory 
   Resulting project state: Architecture can now design a structured memory layer, retrieval helpers, and supersession metadata without redesigning the entire workflow or adding an external service dependency.
 - 2026-03-29
   Phase: architecture
-  Change summary: Designed a first-class local memory subsystem built around structured records, deterministic role-scoped retrieval, and markdown projections.
+  Change summary: Designed a first-class local memory subsystem built around structured records, deterministic role-scoped retrieval, and on-demand readable exports.
   Why it changed: Memory needs to behave like a core runtime capability instead of an append-only helper, while staying local-first and inspectable in git.
-  Resulting project state: Development can implement a shared memory store, projection refreshes, and role-specific memory recipes without introducing an external memory server.
+  Resulting project state: Development can implement a shared memory store, explicit export rendering, and role-specific memory recipes without introducing an external memory server.
 - 2026-03-29
   Phase: architecture
-  Change summary: Refined the memory design into explicit capture, retrieval, and projection boundaries with record taxonomy, supersession rules, migration constraints, and runtime integration points.
+  Change summary: Refined the memory design into explicit capture, retrieval, and export boundaries with record taxonomy, supersession rules, migration constraints, and runtime integration points.
   Why it changed: The architecture needed to be implementation-safe and fully integrated with orchestration, context slicing, and phase compaction rather than remaining a high-level concept.
-  Resulting project state: The repo now has a concrete design target for a first-class local memory subsystem that stays repository-owned, keeps markdown memory useful, and can be implemented with bounded runtime and test changes.
+  Resulting project state: The repo now has a concrete design target for a first-class local memory subsystem that stays repository-owned and can be implemented with bounded runtime and test changes.
 - 2026-03-29
   Phase: development
-  Change summary: Implemented structured local memory records, deterministic memory queries, markdown projection helpers, role-scoped memory recipes, and focused runtime tests.
+  Change summary: Implemented structured local memory records, deterministic memory queries, on-demand memory export, role-scoped memory recipes, and focused runtime tests.
   Why it changed: The design needed concrete runtime code so the dev-team framework can capture and retrieve memory as part of the normal workflow.
   Resulting project state: The runtime now stores first-class local memory records, slices memory per role through declarative recipes, and validates the new memory outputs in the development gate.
 - 2026-03-29

@@ -284,8 +284,22 @@ def _build_record(
     )
 
 
-def _record_sort_key(entry: dict[str, Any]) -> tuple[str, str]:
-    return (str(entry.get("timestamp_utc", "")), str(entry.get("entry_id", "")))
+def _record_sort_key(entry: dict[str, Any]) -> tuple[datetime, str]:
+    return (_parse_timestamp(entry.get("timestamp_utc")), str(entry.get("entry_id", "")))
+
+
+def _parse_timestamp(value: Any) -> datetime:
+    cleaned = _clean_optional_text(value)
+    if cleaned is None:
+        return datetime.min.replace(tzinfo=timezone.utc)
+    normalized = f"{cleaned[:-1]}+00:00" if cleaned.endswith("Z") else cleaned
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        return datetime.min.replace(tzinfo=timezone.utc)
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
 
 
 def _normalize_filter(value: str | Iterable[str] | None) -> set[str] | None:

@@ -105,6 +105,53 @@ class MemoryStoreTests(unittest.TestCase):
         self.assertEqual(entries[0]['entry_id'], 'legacy-1')
         self.assertEqual(entries[0]['summary'], 'Keep local structured memory')
 
+    def test_query_memory_orders_mixed_timestamp_formats_by_actual_time(self) -> None:
+        root = self._sandbox_root / 'case-mixed-ordering'
+        legacy_root = root / 'framework' / 'memory' / 'logs'
+        legacy_root.mkdir(parents=True, exist_ok=True)
+        legacy_record = {
+            'entry_id': 'legacy-newer',
+            'timestamp_utc': '2026-03-29T09:00:00Z',
+            'version': 1,
+            'kind': 'phase-brief',
+            'phase': 'requirements',
+            'scope': 'phase',
+            'subject': 'feature-a',
+            'source': 'compaction',
+            'confidence': 'high',
+            'status': 'active',
+            'tags': ['compact'],
+            'summary': 'Legacy brief',
+            'artifact_refs': [],
+            'payload': {},
+        }
+        (legacy_root / 'legacy-newer.json').write_text(json.dumps(legacy_record), encoding='utf-8')
+
+        with patch.object(memory_store, 'repo_root', return_value=root):
+            records_root = memory_store.records_root()
+            structured_record = {
+                'entry_id': 'new-older',
+                'timestamp_utc': '2026-03-29T08:59:59.999999Z',
+                'version': memory_store.MEMORY_SCHEMA_VERSION,
+                'kind': 'phase-brief',
+                'phase': 'requirements',
+                'scope': 'phase',
+                'subject': 'feature-a',
+                'source': 'compaction',
+                'confidence': 'high',
+                'status': 'active',
+                'tags': ['compact'],
+                'summary': 'Structured brief',
+                'artifact_refs': [],
+                'payload': {},
+            }
+            (records_root / 'new-older.json').write_text(json.dumps(structured_record), encoding='utf-8')
+
+            latest = memory_store.latest_brief(phase='requirements', subject='feature-a', scope='phase')
+
+        self.assertIsNotNone(latest)
+        self.assertEqual(latest['entry_id'], 'legacy-newer')
+
     def test_append_memory_record_requires_known_supersedes_target(self) -> None:
         root = self._sandbox_root / 'case-supersedes'
         with patch.object(memory_store, 'repo_root', return_value=root):

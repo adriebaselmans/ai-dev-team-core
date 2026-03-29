@@ -26,7 +26,8 @@ automated_regression_coverage:
 acceptance_test_coverage:
 - Unit coverage exists for structured record queries, role-scoped memory slices, compaction behavior, memory export rendering, orchestrator export wiring, and the runtime validation gate.
 known_gaps_or_risks:
-- Legacy markdown snapshot files can become stale if someone reads them without rerunning the explicit export command.
+- The runtime still reads legacy framework/memory/logs/ records during migration, so mixed-store behavior remains supported until old records are retired.
+- The test suite does not yet include an end-to-end CLI export-memory round trip against real files.
 decision: Accepted for user review.
 user_feedback_needed:
 - None.
