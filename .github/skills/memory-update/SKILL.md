@@ -9,20 +9,19 @@ Use this skill when acting as the coordinator and a phase has been completed.
 
 ## Goals
 - Preserve useful project knowledge for future iterations.
-- Keep change history, decisions, and stable truths separated.
+- Keep durable memory structured and retrievable.
 
 ## Required Inputs
 - Phase outcome
 - Active artifacts in `docs/`
-- Existing memory files in `framework/memory/`
+- Existing structured memory in `framework/memory/records/`
 
 ## Required Outputs
-- Updated `framework/memory/project-log.md`
-- Updated `framework/memory/decisions.md` when needed
-- Updated `framework/memory/known-context.md` when needed
+- Updated structured records in `framework/memory/records/`
+- Optional human-readable exports only when explicitly requested
 
 ## Rules
-- `project-log.md` gets factual chronological updates.
-- `decisions.md` gets only meaningful decisions with rationale and consequence.
-- `known-context.md` gets only stable truths that should persist.
-- Keep entries short and useful.
+- Structured records are the source of truth for project memory.
+- Use bounded record kinds such as facts, decisions, questions, contradictions, and phase briefs.
+- Keep durable entries short, factual, and useful.
+- Generate markdown snapshots only as explicit exports, not as the normal phase-update path.

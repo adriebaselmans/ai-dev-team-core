@@ -1,37 +1,38 @@
 status: Ready.
-title: Harden runtime contracts and automation safeguards
-user_need: Improve the runtime skeleton so contract validation, skill loading, startup flow, development gating, and source-of-truth boundaries fail fast and stay explicit.
-goal: Remove drift-prone assumptions in the runtime orchestration layer and make the remaining phase boundaries machine-checkable.
+title: Build a first-class local memory subsystem for the dev-team framework
+user_need: Improve the framework's memory handling so memory is a first-class, local-first subsystem that is fully integrated into the dev-team workflow without depending on an external memory server.
+goal: Make memory capture, retrieval, scope, and contradiction handling deterministic, inspectable, and usable by coordinator and specialists as part of the normal team system.
 in_scope:
-- Derive task_builder available inputs from real repository sources without self-satisfying validation.
-- Resolve skill contracts using the full declared path or an explicit, unambiguous contract lookup rule.
-- Make orchestrator startup validate the first dispatch envelope before committing runtime state.
-- Strengthen development validation so it checks the actual expected test and runtime outputs rather than only directory presence.
-- Clarify the canonical source of truth for phase data as an explicit per-phase contract boundary, with the implementation limited to making that boundary enforceable rather than redesigning the entire artifact/memory architecture.
+- Add a structured local memory layer as the durable project memory source of truth.
+- Define explicit memory record metadata such as type, scope, source, confidence, updated time, and supersession.
+- Add deterministic retrieval helpers that build compact context slices from structured memory.
+- Make phase/context consumers use the structured memory layer where relevant while keeping the system local-first.
+- Allow human-readable memory snapshots only as optional exports instead of canonical synchronized artifacts.
 out_of_scope:
-- Any redesign of the developer role model, coordinator permissions, or phase ownership map.
-- Any changes to .github/skills/ role behavior beyond what is needed to enforce the runtime contracts above.
-- Any broad redesign of the repository memory system or generated documentation workflow.
+- Any dependency on an external memory server or hosted service.
+- Any redesign of the role model, coordinator permissions, or phase ownership map.
+- Any broad rewrite of the repository documentation workflow.
+- Any vector database, embedding service, or other heavyweight memory infrastructure unless explicitly justified by implementation needs later.
 functional_requirements:
-- task_builder validation must fail when a required skill input is not truly available from the declared artifact paths, role write targets, or other real inputs.
-- Missing skill contracts must produce a clear error that names the missing contract path and the requesting skill.
-- cmd_start must not leave the runtime in a started state if the first dispatch envelope cannot be built successfully.
-- development validation must verify the presence of the expected runtime test files or equivalent concrete outputs, not only the existence of a tests directory.
-- The runtime must declare, per phase, which source is canonical for that phase's data so artifact-vs-memory drift is explicit instead of implicit.
+- The framework must store memory records locally in a structured form that can be inspected and versioned in git.
+- Memory records must support scope and lifecycle metadata so older facts can be superseded instead of silently accumulated.
+- Retrieval helpers must be able to assemble compact, role-appropriate context from structured memory without requiring an external backend.
+- The coordinator and specialists must be able to consume the structured memory layer through the existing runtime contracts.
+- Structured local records must be the canonical durable memory layer.
 acceptance_criteria:
-- A broken skill contract or missing required input causes a deterministic validation failure that names the skill and missing input.
-- Two distinct skill contract paths do not alias to the same contract file unless that aliasing is explicitly declared by the lookup contract.
-- A failed cmd_start envelope build leaves the runtime state unchanged or rolled back to the pre-start state.
-- Development validation fails when the expected test coverage artifacts are missing.
-- The source-of-truth rule for phase data is documented and enforced by code paths that consume phase context.
+- A new structured memory record can be created, retrieved, and superseded using only local repository files and unit tests.
+- Memory retrieval returns compact, scoped context rather than dumping unrelated history.
+- Conflicting or superseded facts are represented explicitly rather than hidden.
+- The runtime can continue to operate without any external memory dependency.
+- Human-readable memory snapshots remain optional and, if produced, are derived from the structured memory layer.
 constraints:
-- Prefer explicit contracts and fail-fast behavior over silent fallback.
-- Keep the scope bounded to the five review findings above.
-- Treat the artifact-vs-memory issue as an explicit scope limitation: clarify and enforce the canonical boundary, but do not redesign the entire coordination architecture in this iteration.
+- Prefer local-first, inspectable, deterministic behavior over opaque automation.
+- Keep the memory subsystem integrated into the dev-team framework instead of treating it as a standalone helper.
+- Preserve the current role model and phase workflow unless a memory-specific integration point requires a small, explicit change.
 assumptions:
-- The runtime is intended to remain model-agnostic and testable with local unit tests.
-- The existing phase workflow and role ownership map remain unchanged.
+- The repo should remain self-contained and runnable offline.
+- Existing human-readable memory files may remain as legacy snapshots or explicit exports, but the runtime should not depend on keeping them synchronized.
 open_questions:
-- None yet.
+- What minimum set of structured memory record types is sufficient for v1?
+- Should contradiction handling be limited to explicit supersession metadata in v1, or also include separate conflict records?
 definition_of_ready: Ready.
-

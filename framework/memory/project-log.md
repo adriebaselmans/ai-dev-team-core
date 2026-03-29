@@ -1,6 +1,6 @@
 # Project Log
 
-Use this file as the chronological project history.
+Legacy or exported chronological project history derived from structured memory when needed.
 
 ## Entry Format
 - Date
@@ -10,7 +10,8 @@ Use this file as the chronological project history.
 - Resulting project state
 
 ## Rules
-- Append entries in chronological order.
+- Treat this file as optional readable output, not the canonical write path.
+- Append entries in chronological order when generating or curating a readable snapshot.
 - Keep entries short and factual.
 - Focus on what changed and why it matters.
 - Do not repeat stable context that belongs in `known-context.md`.
@@ -67,3 +68,38 @@ Use this file as the chronological project history.
   Change summary: Validated the hardened runtime contracts and startup safeguards with focused and full runtime discovery test runs.
   Why it changed: The bounded iteration required proof that the new contract enforcement and validator behavior is stable under the canonical runtime suite.
   Resulting project state: The runtime tests pass in both framework/runtime/tests and full framework/runtime discovery, and the iteration is accepted for user review.
+- 2026-03-29
+  Phase: requirements
+  Change summary: Defined a new bounded iteration for a first-class local memory subsystem that stays integrated into the dev-team framework without an external server dependency.
+  Why it changed: The user asked to use supermemory-style ideas as design input while keeping memory local-first, inspectable, deterministic, and part of the core team system.
+  Resulting project state: Architecture can now design a structured memory layer, retrieval helpers, and supersession metadata without redesigning the entire workflow or adding an external service dependency.
+- 2026-03-29
+  Phase: architecture
+  Change summary: Designed a first-class local memory subsystem built around structured records, deterministic role-scoped retrieval, and markdown projections.
+  Why it changed: Memory needs to behave like a core runtime capability instead of an append-only helper, while staying local-first and inspectable in git.
+  Resulting project state: Development can implement a shared memory store, projection refreshes, and role-specific memory recipes without introducing an external memory server.
+- 2026-03-29
+  Phase: architecture
+  Change summary: Refined the memory design into explicit capture, retrieval, and projection boundaries with record taxonomy, supersession rules, migration constraints, and runtime integration points.
+  Why it changed: The architecture needed to be implementation-safe and fully integrated with orchestration, context slicing, and phase compaction rather than remaining a high-level concept.
+  Resulting project state: The repo now has a concrete design target for a first-class local memory subsystem that stays repository-owned, keeps markdown memory useful, and can be implemented with bounded runtime and test changes.
+- 2026-03-29
+  Phase: development
+  Change summary: Implemented structured local memory records, deterministic memory queries, markdown projection helpers, role-scoped memory recipes, and focused runtime tests.
+  Why it changed: The design needed concrete runtime code so the dev-team framework can capture and retrieve memory as part of the normal workflow.
+  Resulting project state: The runtime now stores first-class local memory records, slices memory per role through declarative recipes, and validates the new memory outputs in the development gate.
+- 2026-03-29
+  Phase: review
+  Change summary: Reviewed the first-class memory subsystem implementation after validation tightening.
+  Why it changed: The iteration required code review before acceptance, and the diff needed a quick structural pass for drift or coupling issues.
+  Resulting project state: No blocking review findings were identified; the memory subsystem design remains local-first, deterministic, and integrated through the runtime contract.
+- 2026-03-29
+  Phase: testing
+  Change summary: Verified the memory subsystem with focused and full runtime discovery test runs.
+  Why it changed: The new structured memory store, context slicing, and compaction flow needed automated proof before the iteration could be closed out.
+  Resulting project state: The runtime suite passes with the new memory tests in place, and the memory subsystem is ready for DoD review.
+- 2026-03-29
+  Phase: architecture
+  Change summary: Corrected the memory redesign to remove synchronized markdown projections and make structured local records the sole durable memory source of truth.
+  Why it changed: The user rejected keeping markdown as a synchronized canonical layer and required any human-readable summaries to be generated on demand only.
+  Resulting project state: project-log.md, decisions.md, and known-context.md are now treated as optional human-readable exports or legacy snapshots rather than canonical memory stores.

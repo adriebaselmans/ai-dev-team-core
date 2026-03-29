@@ -11,7 +11,7 @@ expected_outputs:
   - preserved decisions and outcomes
   - remaining risks or follow-ups
 owned_artifacts:
-  - framework/memory/logs/
+  - framework/memory/records/
 completion_criteria:
   - The brief is materially smaller than the source material.
   - The brief preserves the decisions and next-step context needed downstream.

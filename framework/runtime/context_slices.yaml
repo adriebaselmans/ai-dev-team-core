@@ -8,7 +8,19 @@ slices:
       - active_feature
       - next_action
     memory:
-      - latest_brief
+      latest_brief:
+        kind: phase-brief
+        scope: phase
+        limit: 1
+        single: true
+      project_decisions:
+        kind: decision
+        scope: project
+        limit: 3
+      open_questions:
+        kind: question
+        scope: project
+        limit: 2
   requirements-engineer:
     state:
       - active_feature
@@ -27,7 +39,19 @@ slices:
       - open_questions
       - definition_of_ready
     memory:
-      - latest_brief
+      latest_brief:
+        kind: phase-brief
+        scope: phase
+        limit: 1
+        single: true
+      project_decisions:
+        kind: decision
+        scope: project
+        limit: 3
+      project_facts:
+        kind: fact
+        scope: project
+        limit: 3
   ux-ui-designer:
     state:
       - active_feature
@@ -49,7 +73,19 @@ slices:
       - interfaces
       - non_goals
     memory:
-      - latest_brief
+      latest_brief:
+        kind: phase-brief
+        scope: phase
+        limit: 1
+        single: true
+      project_decisions:
+        kind: decision
+        scope: project
+        limit: 3
+      project_facts:
+        kind: fact
+        scope: project
+        limit: 3
   architect:
     state:
       - active_feature
@@ -76,7 +112,19 @@ slices:
       - risks_and_tradeoffs
       - non_goals
     memory:
-      - latest_brief
+      latest_brief:
+        kind: phase-brief
+        scope: phase
+        limit: 1
+        single: true
+      project_decisions:
+        kind: decision
+        scope: project
+        limit: 3
+      project_facts:
+        kind: fact
+        scope: project
+        limit: 3
   developer:
     state:
       - active_feature
@@ -98,7 +146,19 @@ slices:
       - performance_considerations
       - risks_and_tradeoffs
     memory:
-      - latest_brief
+      latest_brief:
+        kind: phase-brief
+        scope: phase
+        limit: 1
+        single: true
+      project_decisions:
+        kind: decision
+        scope: project
+        limit: 3
+      project_facts:
+        kind: fact
+        scope: project
+        limit: 3
   reviewer:
     state:
       - active_feature
@@ -120,7 +180,19 @@ slices:
       - residual_risks
       - recommendation
     memory:
-      - latest_brief
+      latest_brief:
+        kind: phase-brief
+        scope: phase
+        limit: 1
+        single: true
+      project_decisions:
+        kind: decision
+        scope: project
+        limit: 3
+      contradictions:
+        kind: contradiction
+        scope: project
+        limit: 2
   tester:
     state:
       - active_feature
@@ -146,4 +218,16 @@ slices:
       - automated_regression_coverage
       - decision
     memory:
-      - latest_brief
+      latest_brief:
+        kind: phase-brief
+        scope: phase
+        limit: 1
+        single: true
+      project_decisions:
+        kind: decision
+        scope: project
+        limit: 3
+      open_questions:
+        kind: question
+        scope: project
+        limit: 2

@@ -9,6 +9,21 @@
   "last_completed_phase": null,
   "pending_trigger": null,
   "user_input_required": false,
-  "artifacts": {},
+  "artifacts": {
+    "architecture": {
+      "valid": true,
+      "messages": [
+        "Design is implementation-safe."
+      ],
+      "validated_at": "2026-03-29T17:41:37.168000+00:00"
+    },
+    "development": {
+      "valid": true,
+      "messages": [
+        "Development outputs are present."
+      ],
+      "validated_at": "2026-03-29T18:00:43.648577+00:00"
+    }
+  },
   "last_transition": null
 }

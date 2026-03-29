@@ -10,7 +10,7 @@ Use this skill when acting as the coordinator in this repository.
 ## Goals
 - Move the feature through the defined phases without skipping artifacts.
 - Keep user interaction limited to requirements clarification and final DoD review.
-- Keep status and memory current.
+- Keep status and structured memory current.
 - Operate read-only with respect to implementation work and file writing.
 - Use native Codex subagent spawning for bounded specialist work.
 - Invoke the explorer when repository grounding is required.
@@ -29,7 +29,7 @@ Use this skill when acting as the coordinator in this repository.
 
 ## Required Outputs
 - Updated `framework/runtime/state.json`
-- Updated `framework/memory/` entries after each completed phase
+- Updated durable memory entries after each completed phase
 - Final user-facing DoD review
 
 ## Procedure
@@ -67,9 +67,9 @@ Use this skill when acting as the coordinator in this repository.
 - Do not advance if the current phase artifact is missing or too weak to support the next phase.
 
 ## Memory Rules
-- Update `project-log.md` with what changed and why.
-- Update `decisions.md` when a meaningful decision was made or changed.
-- Update `known-context.md` only for stable truths that should persist across iterations.
+- Capture durable project memory in `framework/memory/records/`.
+- Keep `framework/memory/repository-knowledge/` current when repository exploration produces reusable intelligence.
+- Treat `project-log.md`, `decisions.md`, and `known-context.md` as optional exports or legacy snapshots, not the primary write path.
 
 ## Interaction Rules
 - Specialists do not talk to the user directly.

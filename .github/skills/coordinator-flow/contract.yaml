@@ -17,16 +17,12 @@ required_inputs:
   - doc_templates/dod/current.yaml
 expected_outputs:
   - framework/runtime/state.json
-  - framework/memory/project-log.md
-  - framework/memory/decisions.md
-  - framework/memory/known-context.md
+  - framework/memory/records/
   - final user-facing DoD review
 owned_artifacts: []
 delegated_artifacts:
   - framework/runtime/state.json
-  - framework/memory/project-log.md
-  - framework/memory/decisions.md
-  - framework/memory/known-context.md
+  - framework/memory/records/
 completion_criteria:
-  - Each completed phase is reflected in the status file and memory.
+  - Each completed phase is reflected in the status file and structured memory.
   - The user-facing DoD review is ready when the workflow reaches DoD review.

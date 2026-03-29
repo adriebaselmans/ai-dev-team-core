@@ -1,6 +1,6 @@
 # Decisions
 
-Use this file for important project decisions that future agents must understand.
+Legacy or exported readable decision summary derived from structured memory when needed.
 
 ## Entry Format
 - Date
@@ -10,6 +10,7 @@ Use this file for important project decisions that future agents must understand
 - Consequence
 
 ## Rules
+- Treat this file as optional readable output, not the canonical write path.
 - Record only meaningful decisions.
 - Prefer one clear decision entry per topic.
 - Include why the decision was made, not only what was chosen.
@@ -57,3 +58,28 @@ Use this file for important project decisions that future agents must understand
   Context: The runtime still uses artifacts for phase artifacts and memory for coordination support.
   Reason: The review finding called for an explicit guardrail, not a full architecture rewrite.
   Consequence: Consumers should document and enforce the canonical source for phase data without redesigning the entire memory model.
+- 2026-03-29
+  Decision: Make the structured local memory store the machine-readable source of truth and keep the markdown memory files as human-readable projections.
+  Context: The memory redesign needs a first-class local subsystem that stays inspectable, deterministic, and integrated into the dev-team workflow.
+  Reason: A structured store enables deterministic querying, supersession, and role-scoped retrieval while preserving the readable narrative layer in markdown.
+  Consequence: Development should add record, query, and projection helpers and keep `project-log.md`, `decisions.md`, and `known-context.md` synchronized with the structured records.
+- 2026-03-29
+  Decision: Use a small v1 record taxonomy of fact, decision, brief, question, and contradiction.
+  Context: The memory subsystem needs enough structure to support stable facts, phase summaries, open issues, and explicit conflict handling without growing into a general-purpose platform.
+  Reason: A narrow taxonomy keeps the implementation bounded and deterministic while still covering the dev-team workflow needs.
+  Consequence: Query and projection helpers should understand these record kinds explicitly, and future record kinds should be added only when a concrete use case appears.
+- 2026-03-29
+  Decision: Drive role memory through named context-slice recipes instead of a single hardcoded brief lookup.
+  Context: The runtime now needs role-specific memory bundles that can combine phase briefs, decisions, facts, questions, and contradictions.
+  Reason: Named recipes keep memory retrieval declarative, deterministic, and easy to extend without scattering selection logic across the runtime.
+  Consequence: Future memory changes should update `context_slices.yaml` and the query helper, not embed ad hoc memory selection in specialist code.
+- 2026-03-29
+  Decision: Separate memory capture, retrieval, and markdown projection as distinct runtime responsibilities.
+  Context: The memory subsystem must become first-class without turning the runtime into a tightly coupled monolith or reintroducing markdown scraping as the operational API.
+  Reason: Explicit boundaries keep the subsystem local-first and deterministic while making orchestration, phase compaction, and context slicing integrate through stable interfaces.
+  Consequence: Phase flow should capture through the structured store first, context slicing should retrieve through query helpers, and human-readable memory files should be refreshed through projection helpers instead of being edited as the primary source.
+- 2026-03-29
+  Decision: Retire synchronized markdown projections and treat human-readable memory files as optional on-demand exports only.
+  Context: The architecture correction removed the requirement to keep markdown outputs synchronized with the structured memory store.
+  Reason: A single durable memory source avoids dual-write drift and keeps the runtime contract simpler and more deterministic.
+  Consequence: `project-log.md`, `decisions.md`, and `known-context.md` are no longer part of the canonical memory write path; if a readable snapshot is needed, a separate export path may generate it from structured records.

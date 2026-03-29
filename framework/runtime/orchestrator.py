@@ -12,6 +12,7 @@ if sys.version_info < (3, 12):
 from compaction import compact_phase
 from execution import dispatch
 from export_docs import export_all_docs
+from memory_export import render_memory_snapshot
 from repository_tool import repository_exploration_request
 from spec_loader import default_trigger_for_phase, load_team_spec, load_workflow_spec, transition_spec
 from state_manager import (
@@ -155,6 +156,15 @@ def cmd_export_docs(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_export_memory(args: argparse.Namespace) -> int:
+    try:
+        print(render_memory_snapshot(args.view, limit=args.limit), end='')
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+    return 0
+
+
 def cmd_continue(args: argparse.Namespace) -> int:
     workflow = load_workflow_spec()
     state = load_state()
@@ -242,6 +252,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     export_docs = sub.add_parser('export-docs', help='Generate release-only user-facing docs from doc_templates YAML')
     export_docs.set_defaults(func=cmd_export_docs)
+
+    export_memory = sub.add_parser('export-memory', help='Render an on-demand human-readable memory snapshot')
+    export_memory.add_argument('--view', required=True, choices=['project-log', 'decisions', 'known-context'])
+    export_memory.add_argument('--limit', type=int, default=20, help='Maximum number of records to include')
+    export_memory.set_defaults(func=cmd_export_memory)
 
     return parser
 

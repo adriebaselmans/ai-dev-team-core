@@ -1,68 +1,92 @@
-title: Harden runtime contracts and automation safeguards
-design_goal: Remove drift-prone assumptions in the runtime orchestration layer and make the remaining phase boundaries machine-checkable.
+title: First-class local memory subsystem for the dev-team framework
+design_goal: Make memory a first-class runtime subsystem that captures durable project knowledge and recent phase context in structured local records, retrieves compact role-scoped bundles deterministically, and generates human-readable summaries on demand instead of maintaining synchronized markdown projections.
 architecture_approach:
-- Derive task-builder inputs from real repository sources only: artifacts.ARTIFACT_FILES, declared role writes, and explicit skill contract requirements. Do not feed a contract's own required_inputs back into the availability set.
-- Resolve skill contracts by the full declared path and fail fast when a requested contract file does not exist. Basename-only lookup is too weak for an automation skeleton that may grow reusable or external skills.
-- Stage cmd_start so envelope construction happens before the runtime state is committed. If envelope construction fails, the runtime must remain idle or roll back to the pre-start state.
-- Strengthen development validation to assert the concrete test and runtime outputs that matter for this iteration, not only the existence of a tests directory.
-- Keep artifact-vs-memory drift explicit by declaring the canonical per-phase source of truth in the runtime boundary code. This iteration narrows the mitigation to enforcing that boundary in consumers rather than redesigning the coordination model.
-- Test implications:
-  - A deliberately missing skill input must fail validation without being masked by the derived availability set.
-  - Two distinct skill paths must not alias to the same contract file unless the alias is explicitly declared.
-  - A failing start-envelope build must not leave the runtime in a started state.
-  - Development validation must fail if the expected runtime test outputs are absent.
+  - Keep `framework/memory/` as the single repository-owned memory root, but split the subsystem into three explicit responsibilities: structured capture, deterministic retrieval, and on-demand reporting.
+  - Use structured local records as the machine-readable source of truth for project memory so the runtime can query facts, decisions, questions, contradictions, and phase briefs without scraping markdown.
+  - Treat `project-log.md`, `decisions.md`, and `known-context.md` as legacy human-readable snapshots, not canonical memory stores; they are not updated automatically during normal phase flow and may be generated on demand from structured records when a readable export is useful.
+  - Keep `repository-knowledge/` as a scoped structured namespace for explored repositories rather than a markdown projection layer.
+  - Extend the runtime so phase completion writes memory through the structured store only; any human-readable export happens through a separate explicit reporting path.
+  - Make context slicing consume declarative memory recipes from `framework/runtime/context_slices.yaml` so each role receives only the memory kinds and scopes it needs.
+  - Treat supersession and contradiction as explicit record semantics instead of silent overwrite behavior, so old facts remain inspectable while inactive records stop polluting active context.
+  - Keep the implementation bounded to local files, predictable sorting, and small helper modules; do not introduce embeddings, vector search, or any external memory service in v1.
 affected_areas:
-- framework/runtime/task_builder.py
-- framework/runtime/skill_loader.py
-- framework/runtime/orchestrator.py
-- framework/runtime/validators.py
-- framework/runtime/context_slicer.py
-- framework/runtime/tests/
-- directly related skill contract files under .github/skills/ only if the lookup contract requires a test fixture
+  - framework/runtime/memory_store.py
+  - framework/runtime/memory_export.py
+  - framework/runtime/compaction.py
+  - framework/runtime/context_slicer.py
+  - framework/runtime/context_slices.yaml
+  - framework/runtime/task_builder.py
+  - framework/runtime/orchestrator.py
+  - framework/runtime/validators.py
+  - framework/runtime/tests/test_memory_store.py
+  - framework/runtime/tests/test_context_slicer.py
+  - framework/runtime/tests/test_compaction.py
+  - framework/runtime/tests/test_validators.py
+  - framework/memory/project-log.md
+  - framework/memory/decisions.md
+  - framework/memory/known-context.md
+  - framework/memory/repository-knowledge/
 separation_of_concerns:
-- task_builder should compute dispatch payloads and validation inputs, not own contract semantics.
-- skill_loader should resolve and load contracts, not infer fallback aliases.
-- orchestrator should coordinate state transitions, not persist a started state before validation succeeds.
-- validators should enforce phase readiness, not merely confirm that directories exist.
-- context_slicer should consume the declared phase boundary and avoid implicit assumptions about which store is canonical.
+  - "`memory_store` owns record schema validation, local persistence, supersession rules, and deterministic query helpers."
+  - "`memory_export` owns on-demand human-readable rendering from structured records and never participates in normal capture or retrieval flow."
+  - "`compaction` owns phase-boundary memory capture and emits structured brief records instead of writing ad hoc summaries directly into markdown files."
+  - "`context_slicer` owns role-specific assembly of memory slices from declarative recipes and must not embed hardcoded per-role memory logic."
+  - "`orchestrator` owns when phase capture happens and keeps runtime state transient; it should consume memory as input but not become the storage layer."
+  - "`repository-knowledge` remains a scoped namespace for explored repositories and shares storage/query principles without collapsing into project-global memory."
 module_boundaries:
-- Add a small contract-resolution boundary in skill_loader that makes the declared path the authoritative lookup key.
-- Keep input derivation in task_builder deterministic and source-based, with a helper that can be unit-tested without broad orchestration setup.
-- Add a start-flow guard in orchestrator that builds and validates the first dispatch envelope before state commit, with rollback or no-op semantics on failure.
-- Expand validate_development so it checks the concrete expected test files or outputs for this iteration.
-- Add a narrow phase-source contract in the runtime context boundary so the consumer code explicitly chooses the canonical source for phase data.
+  - "`framework/runtime/memory_store.py` should expose a narrow record API built around explicit fields such as `entry_id`, `kind`, `phase`, `scope`, `subject`, `source`, `confidence`, `status`, `tags`, `summary`, `artifact_refs`, `payload`, and optional `supersedes`."
+  - "The initial record taxonomy should stay small: `fact`, `decision`, `question`, `contradiction`, and `phase-brief`. Additional kinds should require a concrete runtime use case."
+  - "Query helpers should support stable filters for `kind`, `scope`, `phase`, `subject`, `tags`, `active_only`, and `limit`, with deterministic ordering and explicit inclusion or exclusion of superseded records."
+  - "On-demand export helpers should provide focused operations such as `render_project_log_snapshot`, `render_decisions_snapshot`, and `render_known_context_snapshot` so human-readable outputs can be generated without becoming part of the normal runtime contract."
+  - "`context_slices.yaml` should remain the declarative contract for role memory retrieval by naming recipes such as recent phase briefs, active project decisions, stable project facts, open questions, or contradictions."
+  - "`task_builder` should continue to include memory only through the context slice contract, so role dispatch remains bounded and memory selection does not leak into dispatch assembly code."
+  - "`orchestrator` should continue to treat runtime state as short-lived execution control in `state.json`, while structured memory remains the durable cross-phase knowledge layer in `framework/memory/`."
 data_flow:
-- cmd_start loads state, builds the first requirements envelope, and only then commits the started runtime state.
-- task_builder gathers candidate inputs from real artifact paths and role writes, then validates skill contracts against that derived set.
-- skill_loader resolves the contract file from the declared skill path and fails on missing or ambiguous lookup.
-- validators.validate_development inspects the actual expected runtime outputs for this iteration before allowing phase transition.
-- context_slicer continues to feed role-specific state and artifact slices, but it should do so through an explicit canonical-boundary rule rather than implicit drift-prone assumptions.
+  - A phase completes or an explicit runtime memory event occurs.
+  - The runtime writes a structured record to the local memory store, including metadata, scope, and any supersession link.
+  - If a human-readable snapshot is needed, an explicit export path reads the structured records and renders a point-in-time markdown view; this is separate from normal phase completion and does not update canonical state.
+  - "`context_slicer` resolves the current role's memory recipes and queries only the matching active records."
+  - "`task_builder` includes the resulting memory bundle in the specialist payload together with the phase artifact slices and state slice."
+  - Specialists and the coordinator consume memory as a normal runtime input, and new durable insights are written back through the same capture path instead of editing markdown directly.
+  - "Repository exploration continues to write repository-scoped facts and briefs into `repository-knowledge/`, which stays queryable through the same local storage model without becoming a separate backend."
 interfaces:
-- Keep build_phase_dispatch_envelope as the primary dispatch constructor, but tighten its preconditions so validation happens before any side effects.
-- Keep load_skill_contract as the contract-loading entry point, but make its path semantics explicit and error messages precise.
-- Keep cmd_start as the user-facing startup entry point, but require it to be failure-safe.
-- Extend validate_development to check named expected files or outputs, not directory existence.
-- Preserve build_context_slice as the phase-context constructor, but make its canonical source rule explicit in the data it emits or consumes.
+  - "Keep `append_memory_record(...)` as the low-level write entry point, but make it validate structured metadata instead of treating payload as the only meaningful content."
+  - "Add or preserve `query_memory(...)` as the single retrieval surface for runtime consumers, with filters for scope, status, and supersession behavior."
+  - "Keep convenience helpers such as `latest_brief()` only as thin wrappers around the general query API, not as the primary retrieval model."
+  - "Add export helpers that can render `project-log.md`, `decisions.md`, and `known-context.md` snapshots from structured records on demand without requiring callers to know markdown formatting rules."
+  - "Keep `compact_phase(...)` as the default architecture hook for phase memory capture so phase flow integration stays centralized; any human-readable export must be an explicit separate action."
+  - "Extend memory recipe handling in `build_context_slice(...)` so recipes remain declarative and role-specific while still using the same underlying query interface."
 technology_and_environment_considerations:
-- Python 3.12 remains the runtime baseline.
-- The runtime should remain model-agnostic and unit-test friendly.
-- Tests should stay local and deterministic; no network or live-provider assumptions are needed for these safeguards.
-- The explicit canonical-source rule should not depend on runtime-specific external state.
+  - The subsystem must remain local-first, offline-capable, inspectable in git, and runnable with the repository alone.
+  - JSON files remain the preferred on-disk substrate for structured memory because they are easy to diff, validate, and load without a database service.
+  - The design should fit the current Python 3.12 runtime and existing file-based orchestration model.
+  - The subsystem should not depend on network access, hosted APIs, embedding services, or vector databases.
+  - Structured memory should be small enough that full-file scans remain acceptable in v1, with optimization deferred until a real record-volume problem exists.
+  - Human-readable summaries are optional derived outputs only; they are not part of the durable memory contract and do not require synchronized canonical markdown files.
 clean_code_constraints:
-- Follow framework/clean-code.md.
-- Prefer explicit contracts over implicit fallback behavior.
-- Keep the new helpers small and focused.
-- Fail fast with clear error messages that name the missing input, missing contract, or failed start condition.
+  - Keep capture, retrieval, and on-demand export as separate helpers so memory logic does not collapse into one opaque manager.
+  - Use explicit names and schemas for record semantics; avoid generic untyped blobs and hidden side effects.
+  - Fail fast on invalid record structure, invalid supersession targets, or export rendering errors so drift is visible immediately.
+  - Keep role memory retrieval declarative in configuration and avoid per-role conditionals in Python code where a recipe can express the same policy.
+  - Preserve deterministic ordering and filtering so the same repo state yields the same memory slice for the same role.
+  - Prefer additive compatibility over rewrite: existing markdown files may remain available as optional generated snapshots while structured memory becomes the authoritative machine-readable layer.
 performance_considerations:
-- The added validation work is small and local, so correctness is more important than micro-optimization.
-- Deriving inputs from existing specs and contracts is cheap enough for per-dispatch validation.
+  - The expected v1 memory volume is low enough that scanning local JSON record files on dispatch is acceptable.
+  - Export rendering work is bounded and should run only when a human-readable snapshot is explicitly requested.
+  - Role memory bundles should stay compact through narrow recipe limits so dispatch payloads do not balloon with unrelated history.
+  - Deterministic query helpers should reuse the same file format and sorting rules across capture, retrieval, and validation paths to avoid duplicate parsing logic.
+  - Test coverage should focus on query correctness, supersession behavior, export rendering, and context-slice compactness rather than micro-optimizing I/O prematurely.
 risks_and_tradeoffs:
-- Tightening skill resolution may surface previously hidden aliasing and missing-contract issues immediately; that is intentional.
-- Moving start validation ahead of state commit may require a small rollback path or a staged state transition helper.
-- Strengthening development validation can fail existing assumptions quickly if the expected test files are not aligned with the runtime layout.
-- The artifact-vs-memory boundary is only narrowed, not redesigned, so some drift risk remains outside the explicit phase contract.
+  - The main risk is stale human-readable snapshots if users mistake generated markdown exports for live canonical state.
+  - Another risk is over-modeling the taxonomy too early; keeping a small fixed set of record kinds is simpler than trying to capture every possible memory nuance in v1.
+  - Full local scans are simpler and more deterministic than indexed retrieval, but they may need revisit later if memory volume grows materially.
+  - Explicit supersession is safer than silent overwrite, but it requires disciplined callers and tests so inactive records do not leak back into active slices.
+  - Moving markdown to on-demand exports removes synchronization drift, but it means those views can lag the structured store unless regenerated explicitly.
+  - Migration from the current append-only store must preserve existing records and tolerate mixed history long enough to avoid breaking ongoing work.
 non_goals:
-- Redesign the coordinator or role model.
-- Change phase ownership or skill semantics beyond what is needed to enforce the runtime contracts.
-- Rework the entire memory architecture or generated documentation workflow.
-
+  - Introduce any external memory server, hosted context API, or other network-backed dependency.
+  - Replace the current role model, phase machine, or coordinator permissions.
+  - Add embeddings, vector search, semantic ranking, or other heavyweight retrieval infrastructure in v1.
+  - Turn repository knowledge into a hidden side database outside the repository tree.
+  - Require direct manual editing of markdown memory files as the primary way to update durable memory.
+  - Maintain synchronized markdown projections as canonical memory artifacts.

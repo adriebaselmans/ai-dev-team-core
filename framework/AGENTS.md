@@ -210,21 +210,24 @@ Exit condition:
 - Do not assign direct implementation or file-writing work to the coordinator; route such work through specialist roles or shared tools.
 
 ## Memory Policy
-Update memory at the end of each completed phase.
+Update durable memory at the end of each completed phase.
 
-Required memory files:
-- `framework/memory/project-log.md`: chronological log of what was built.
-- `framework/memory/decisions.md`: important decisions and why they were made.
-- `framework/memory/known-context.md`: stable context, conventions, and assumptions.
+Canonical durable memory:
+- `framework/memory/records/`: structured project memory records and phase briefs.
 - `framework/memory/repository-knowledge/`: compact repository briefs, machine-readable metadata, and an index for analyzed repositories.
 
+Optional human-readable exports:
+- `framework/memory/project-log.md`
+- `framework/memory/decisions.md`
+- `framework/memory/known-context.md`
+
 Memory update rules:
-- `project-log.md` records what changed in chronological order.
-- `decisions.md` records meaningful project decisions, their context, and consequences.
-- `known-context.md` records stable truths that future agents should treat as current baseline context.
+- Structured records in `framework/memory/records/` are the source of truth for project memory.
+- Use bounded record kinds and explicit metadata so retrieval remains deterministic.
 - `repository-knowledge/` records reusable repository intelligence that other roles can consult instead of rescanning the same repo.
-- Each entry should be short, factual, and useful for future agents.
-- The runtime workflow updates memory after each completed phase on behalf of the coordinator, not only at the end of the full feature flow.
+- Human-readable markdown memory files are optional exports or legacy snapshots, not the canonical write path.
+- Each durable memory entry should be short, factual, and useful for future agents.
+- The runtime workflow updates structured memory after each completed phase on behalf of the coordinator, not only at the end of the full feature flow.
 
 ## Final Review
 The tester must prepare a Definition of Done result that covers:

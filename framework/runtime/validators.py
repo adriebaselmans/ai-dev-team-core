@@ -34,11 +34,17 @@ DEVELOPMENT_REQUIRED_PATHS = [
     'framework/runtime/execution.py',
     'framework/runtime/context_slicer.py',
     'framework/runtime/compaction.py',
+    'framework/runtime/memory_export.py',
+    'framework/runtime/memory_store.py',
     'framework/runtime/tests/test_export_docs.py',
     'framework/runtime/tests/test_task_builder.py',
     'framework/runtime/tests/test_execution_policy.py',
     'framework/runtime/tests/test_orchestrator.py',
     'framework/runtime/tests/test_validators.py',
+    'framework/runtime/tests/test_memory_export.py',
+    'framework/runtime/tests/test_memory_store.py',
+    'framework/runtime/tests/test_context_slicer.py',
+    'framework/runtime/tests/test_compaction.py',
 ]
 
 

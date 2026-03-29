@@ -79,7 +79,7 @@ shared_tools:
     contract_module: framework/runtime/repository_tool.py
     writes:
       - framework/memory/repository-knowledge/
-      - framework/memory/logs/
+      - framework/memory/records/
 
 spawn_rules:
   - Only the coordinator dispatches specialist work.

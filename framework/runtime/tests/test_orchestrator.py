@@ -53,6 +53,20 @@ class OrchestratorCommandTests(unittest.TestCase):
         save_state_mock.assert_not_called()
         self.assertEqual(state_manager.load_state(), starting_state)
 
+    def test_export_memory_renders_requested_snapshot(self) -> None:
+        args = argparse.Namespace(view='project-log', limit=5)
+        buffer = io.StringIO()
+
+        with (
+            patch.object(orchestrator, 'render_memory_snapshot', return_value='# Project Log Snapshot\n') as render_mock,
+            redirect_stdout(buffer),
+        ):
+            exit_code = orchestrator.cmd_export_memory(args)
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(buffer.getvalue(), '# Project Log Snapshot\n')
+        render_mock.assert_called_once_with('project-log', limit=5)
+
 
 if __name__ == '__main__':
     unittest.main()
