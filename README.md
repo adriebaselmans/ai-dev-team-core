@@ -8,7 +8,7 @@ Model-agnostic AI dev team framework with:
 - repository exploration support and reusable repository knowledge storage
 
 ## Version
-- Current release: `0.7`
+- Current release: `0.8`
 
 ## What This Repo Is
 This repo is a reusable project skeleton.

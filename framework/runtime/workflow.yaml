@@ -21,6 +21,10 @@ phases:
     artifact: design
     context_slice: architect
     canonical_source: artifacts
+    collaboration:
+      optional_partners:
+        - role: scout
+          purpose: gather current external evidence when recent libraries, frameworks, models, APIs, platform behavior, security standards, benchmarks, papers, regulations, or recommendations could materially change the design
   development:
     owner: developer
     artifact: null

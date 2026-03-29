@@ -32,10 +32,27 @@ roles:
         - role: tester
           purpose: support UI-focused acceptance and accessibility validation
     writes: []
+  scout:
+    agent_type: specialist
+    user_facing: false
+    primary_skill: .github/skills/external-research
+    focus: external-research
+    collaboration:
+      required:
+        - role: architect
+          purpose: gather current external evidence that could materially change the design
+      optional:
+        - role: requirements-engineer
+          purpose: clarify the research question when the problem statement is still broad
+    writes: []
   architect:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/architecture-design
+    collaboration:
+      optional:
+        - role: scout
+          purpose: gather current external evidence when up-to-date sources could change the design
     writes:
       - doc_templates/design/current.yaml
   developer:

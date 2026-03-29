@@ -1,0 +1,14 @@
+name: external-research
+description: Gather concise, current external evidence from primary or respected sources so the architect can make up-to-date design decisions without relying on stale assumptions.
+response_mode: one-shot
+required_inputs:
+  - doc_templates/requirements/current.yaml
+  - doc_templates/design/current.yaml
+  - relevant project memory in framework/memory/
+expected_outputs:
+  - concise research brief with dates, source links, options, tradeoffs, and open questions when needed
+owned_artifacts: []
+completion_criteria:
+  - Current external sources have been identified and summarized.
+  - Freshness-sensitive facts are separated from stable background context.
+  - The brief is short, evidence-backed, and does not make the final architecture decision.

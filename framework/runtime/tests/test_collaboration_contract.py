@@ -45,11 +45,37 @@ class CollaborationContractTests(unittest.TestCase):
         self.assertEqual(required[0]["role"], "requirements-engineer")
         self.assertEqual(optional[0]["role"], "architect")
 
+    def test_scout_payload_requires_architect_collaboration(self) -> None:
+        team = load_team_spec()
+
+        payload = build_specialist_payload(
+            "scout",
+            team,
+            {
+                "phase": "architecture",
+                "owner": "architect",
+                "active_feature": "current external research",
+                "next_action": "dispatch scout",
+            },
+            "Gather current external evidence for the architect.",
+        )
+
+        self.assertEqual(payload["collaboration_contract"]["focus"], "external-research")
+        required = payload["collaboration_contract"]["required"]
+        self.assertEqual(required[0]["role"], "architect")
+        self.assertEqual(payload["owned_outputs"], [])
+
     def test_testing_phase_contract_adds_acceptance_and_non_functional_validation_partners(self) -> None:
         contract = phase_spec("testing")["collaboration"]
 
         self.assertEqual(contract["validates_with"][0]["role"], "requirements-engineer")
         self.assertEqual(contract["consults_when_needed"][0]["role"], "architect")
+
+    def test_architecture_phase_contract_can_request_scout_for_current_research(self) -> None:
+        contract = phase_spec("architecture")["collaboration"]
+
+        self.assertEqual(contract["optional_partners"][0]["role"], "scout")
+        self.assertIn("current external evidence", contract["optional_partners"][0]["purpose"])
 
 
 if __name__ == "__main__":

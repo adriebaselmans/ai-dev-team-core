@@ -9,6 +9,7 @@ Take a user need or feature description and deliver an end-to-end implementation
 - Coordinator: owns intake, delegation, phase transitions, integration, and final reporting; it is read-only with respect to implementation work.
 - Requirements Engineer: clarifies the request and writes the requirement baseline.
 - UX/UI Designer: optionally collaborates during requirements and implementation for user flows, interaction design, accessibility expectations, and visual coherence when the task has meaningful UI scope.
+- Scout: optionally gathers current external evidence when up-to-date sources could materially change an architecture decision.
 - Architect: writes the design approach and technical constraints.
 - Developer: implements the solution in `src/`.
 - Reviewer: reviews the implementation for quality and technical risk before testing.
@@ -86,10 +87,15 @@ Entry condition:
 
 Coordinator actions:
 - Delegate to the architect.
+- Delegate to the scout when the design depends on temporally unstable external information or when current sources could materially change the design.
 - Use repository exploration support when the design depends on an existing repository's architecture, conventions, or extension points.
 - Ensure `doc_templates/design/current.yaml` is updated.
 - Ensure the design reflects clean code, stack-appropriate best practices, and relevant performance tradeoffs.
 - Update memory when the phase is completed.
+
+Heuristic:
+- Use the scout for recent libraries, frameworks, models, APIs, platform behavior, security standards, benchmarks, papers, regulations, or recommendations when freshness could change the design.
+- Skip the scout for stable internal refactors or other work where current external sources are unlikely to change the answer.
 
 Exit condition:
 - The design is implementation-safe.

@@ -125,6 +125,46 @@ slices:
         kind: fact
         scope: project
         limit: 3
+  scout:
+    state:
+      - active_feature
+      - phase
+      - next_action
+    requirements:
+      - status
+      - title
+      - user_need
+      - goal
+      - in_scope
+      - out_of_scope
+      - functional_requirements
+      - acceptance_criteria
+      - constraints
+      - assumptions
+      - open_questions
+    design:
+      - title
+      - design_goal
+      - architecture_approach
+      - affected_areas
+      - interfaces
+      - technology_and_environment_considerations
+      - risks_and_tradeoffs
+      - non_goals
+    memory:
+      latest_brief:
+        kind: phase-brief
+        scope: phase
+        limit: 1
+        single: true
+      project_decisions:
+        kind: decision
+        scope: project
+        limit: 3
+      open_questions:
+        kind: question
+        scope: project
+        limit: 3
   developer:
     state:
       - active_feature

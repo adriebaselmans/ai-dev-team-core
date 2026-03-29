@@ -21,6 +21,8 @@ This file maps team roles to project-local skills and reusable external skills.
 - UX/UI Designer
   Primary: `.github/skills/ui-ux-design`
   Optional external: `playwright`, `webapp-testing`, `web-design-guidelines`, `composition-patterns`
+- Scout
+  Primary: `.github/skills/external-research`
 - Architect
   Primary: `.github/skills/architecture-design`
   Optional external: `openai-docs`, `security-threat-model`, `security-best-practices`, `azure-well-architected`
@@ -57,6 +59,7 @@ Tier 2:
 
 ## Trigger Guidance
 - Use `openai-docs` when architecture or implementation work depends on current OpenAI platform guidance.
+- Use `scout` when architecture work depends on current external information that is temporally unstable or meaningfully uncertain.
 - Use `playwright` or `webapp-testing` when tester or developer work requires real browser automation.
 - Use `security-best-practices` for explicit security review or secure-by-default implementation choices.
 - Use `security-threat-model` for explicit security architecture and abuse-path analysis.
