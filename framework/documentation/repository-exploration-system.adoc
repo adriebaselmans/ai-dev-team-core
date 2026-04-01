@@ -40,7 +40,7 @@ Each analyzed repository should have:
 
 == Coordinator Integration
 
-If repository grounding is required, the coordinator can route a bounded shared-tool task through the runtime contract and return compact repository knowledge to `framework/memory/repository-knowledge/`.
+If repository grounding is required, the coordinator can route a bounded shared-tool request through the active support-dispatch path and return compact repository knowledge to `framework/memory/repository-knowledge/`.
 
 == Interaction With Other Roles
 

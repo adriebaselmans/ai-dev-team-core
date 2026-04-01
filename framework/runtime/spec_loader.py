@@ -37,11 +37,6 @@ def load_yaml(path: Path) -> dict[str, Any]:
 def load_team_spec() -> dict[str, Any]:
     return load_yaml(runtime_dir() / 'team.yaml')
 
-
-def load_workflow_spec() -> dict[str, Any]:
-    return load_yaml(runtime_dir() / 'workflow.yaml')
-
-
 def load_models_config() -> dict[str, Any]:
     return load_yaml(config_dir() / 'models.yaml')
 

@@ -9,7 +9,7 @@ Model-agnostic AI dev team framework with:
 - structured requirements/design/review/DoD artifacts for project delivery
 
 ## Version
-- Current release: `0.9`
+- Current release: `0.9.0`
 
 ## What This Repo Is
 This repo is a reusable project skeleton.
@@ -49,6 +49,11 @@ The active AI-owned project artifacts start empty on purpose:
 
 Those `doc_templates/*/current.yaml` files stay pristine in the bare skeleton repository. They are populated only in bootstrapped project repositories created from this skeleton, where the active orchestrator writes durable phase artifacts from shared state during real project work.
 
+Structured memory follows the same principle:
+- the bare skeleton repo stays pristine
+- bootstrapped project repos may persist reusable cross-run knowledge in `framework/memory/records/`
+- shared state and phase artifacts remain the source of truth for the active run
+
 Generate user-facing docs only on a release branch with:
 
 ```powershell
@@ -85,7 +90,7 @@ In the bare skeleton repository, release-doc export is intentionally disabled. I
 - `framework/config/models.yaml`: role-to-model mapping used by the active orchestrator.
 - `.github/skills/`: project-local skills for repeatable role behavior.
 - `framework/`: team rules, roles, flow state, memory, and helper scripts.
-- `framework/runtime/`: runtime compatibility wrapper plus release-doc export and repository support utilities.
+- `framework/runtime/`: runtime support utilities for state snapshots, artifact export, repository tooling, and optional memory helpers.
 - `doc_templates/`: active AI-owned project artifacts.
 - `docs/`: user-facing generated documentation output.
 - `src/`: implementation code.
@@ -110,7 +115,7 @@ Start Codex in the repo root.
 The root [AGENTS.md](AGENTS.md) tells Codex to use:
 - the coordinator workflow in [framework/AGENTS.md](framework/AGENTS.md)
 - role mappings in [framework/skills.md](framework/skills.md)
-- the runtime contract in [framework/runtime/](framework/runtime/)
+- the runtime support utilities in [framework/runtime/](framework/runtime/)
 - the flow-driven orchestration core in `agents/`, `team_orchestrator/`, `flows/`, and `state/`
 
 Example feature request:
@@ -122,12 +127,12 @@ Build a small REST API in src for managing tasks with create/list/update/delete,
 Flow orchestration commands:
 
 ```powershell
-python run_dev_team.py
+python run_dev_team.py --input "Build a small REST API for tasks"
 python -m team_orchestrator.cli --input "Build a small REST API for tasks"
 ai-dev-team-run --input "Build a small REST API for tasks"
 ```
 
-Legacy runtime contract commands:
+Runtime support commands:
 
 ```powershell
 python -m team_orchestrator.cli run --input "Build a small REST API for tasks"
@@ -151,6 +156,7 @@ Repository exploration support is invoked internally by the coordinator when a t
 - Shared state is the single source of truth for execution, trace, and routing decisions.
 - Role-to-model assignment is declared in `framework/config/models.yaml` and attached to active orchestration state and trace entries.
 - In bootstrapped project repos, the active orchestrator writes durable phase artifacts to `doc_templates/*/current.yaml`; in the bare skeleton repo, those files remain pristine placeholders.
+- In bootstrapped project repos, the active orchestrator may also persist reusable cross-run knowledge to `framework/memory/records/`; it does not duplicate current-run state or phase artifacts there.
 - Support roles are reusable and coordinator-mediated.
 - Review, test, and DoD gates return structured decisions with explicit rework targets.
 - The system supports loops, branching, parallel development fan-out, integration, and safe termination.

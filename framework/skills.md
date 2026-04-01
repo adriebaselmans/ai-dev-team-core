@@ -13,8 +13,7 @@ This file maps team roles to project-local skills and reusable external skills.
 - Coordinator
   Primary: `.github/skills/coordinator-flow`
   Supporting: `.github/skills/memory-update`
-  Supporting: `.github/skills/compaction`
-  Runtime: `framework/runtime/team.yaml`, `framework/runtime/workflow.yaml`, `framework/runtime/task-template.md`
+  Runtime: `flows/software_delivery.yaml`, `framework/runtime/team.yaml`, `framework/config/models.yaml`
 - Requirements Engineer
   Primary: `.github/skills/requirements-clarification`
   Optional external: `pdf`
@@ -36,11 +35,13 @@ This file maps team roles to project-local skills and reusable external skills.
 - Tester
   Primary: `.github/skills/acceptance-testing`
   Optional external: `playwright`, `security-best-practices`, `webapp-testing`, `web-design-guidelines`
+- DoD Reviewer
+  Primary: `.github/skills/acceptance-testing`
+  Optional external: `playwright`, `security-best-practices`, `web-design-guidelines`
 
 ## Shared Support Skills
 - Repository exploration: `.github/skills/repository-exploration`
 - Repository knowledge compaction: `.github/skills/repository-knowledge-compaction`
-- Compaction: `.github/skills/compaction`
 
 ## Installed External Skills
 Tier 1:
@@ -70,4 +71,4 @@ Tier 2:
 - Use `azure-well-architected` only when Azure architecture is in scope.
 
 ## Rule
-- For runtime orchestration, treat `framework/runtime/` as the machine-readable subagent contract.
+- For active runtime orchestration, treat `flows/software_delivery.yaml`, `framework/runtime/team.yaml`, and `framework/config/models.yaml` as the machine-readable contract set.

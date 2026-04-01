@@ -50,19 +50,20 @@ class MemoryRecord:
         return payload
 
 
-def memory_root() -> Path:
-    return repo_root() / "framework" / "memory"
+def memory_root(root: Path | None = None) -> Path:
+    base = root or repo_root()
+    return base / "framework" / "memory"
 
 
-def records_root(*, create: bool = True) -> Path:
-    path = memory_root() / "records"
+def records_root(*, create: bool = True, root: Path | None = None) -> Path:
+    path = memory_root(root) / "records"
     if create:
         path.mkdir(parents=True, exist_ok=True)
     return path
 
 
-def legacy_records_root() -> Path:
-    return memory_root() / "logs"
+def legacy_records_root(root: Path | None = None) -> Path:
+    return memory_root(root) / "logs"
 
 
 def timestamp_utc() -> str:
@@ -83,6 +84,7 @@ def append_memory_record(
     source: str = DEFAULT_SOURCE,
     confidence: str = DEFAULT_CONFIDENCE,
     status: str = DEFAULT_STATUS,
+    root: Path | None = None,
 ) -> Path:
     record = _build_record(
         entry_id=uuid4().hex,
@@ -101,10 +103,10 @@ def append_memory_record(
         supersedes=supersedes,
     )
     if record.supersedes:
-        _ensure_supersedes_target_exists(record.supersedes)
+        _ensure_supersedes_target_exists(record.supersedes, root=root)
 
     file_name = f"{record.timestamp_utc.replace(':', '').replace('-', '')}-{record.entry_id}.json"
-    path = records_root() / file_name
+    path = records_root(root=root) / file_name
     path.write_text(json.dumps(record.as_dict(), indent=2) + "\n", encoding="utf-8")
     return path
 
@@ -121,11 +123,12 @@ def query_memory(
     include_superseded: bool = False,
     source: str | Iterable[str] | None = None,
     status: str | Iterable[str] | None = None,
+    root: Path | None = None,
 ) -> list[dict[str, Any]]:
     if limit <= 0:
         return []
 
-    entries = _load_records()
+    entries = _load_records(root=root)
     kind_filter = _normalize_filter(kind)
     scope_filter = _normalize_filter(scope)
     tag_filter = _normalize_filter(tags)
@@ -167,29 +170,36 @@ def retrieve_memory(
     kind: str | None = None,
     tags: set[str] | None = None,
     limit: int = 10,
+    root: Path | None = None,
 ) -> list[dict[str, Any]]:
-    return query_memory(phase=phase, kind=kind, tags=tags, limit=limit)
+    return query_memory(phase=phase, kind=kind, tags=tags, limit=limit, root=root)
 
 
-def latest_brief(*, phase: str | None = None, subject: str | None = None, scope: str | None = None) -> dict[str, Any] | None:
-    entries = query_memory(kind="phase-brief", phase=phase, subject=subject, scope=scope, limit=1)
+def latest_brief(
+    *,
+    phase: str | None = None,
+    subject: str | None = None,
+    scope: str | None = None,
+    root: Path | None = None,
+) -> dict[str, Any] | None:
+    entries = query_memory(kind="phase-brief", phase=phase, subject=subject, scope=scope, limit=1, root=root)
     return entries[0] if entries else None
 
 
-def _load_records() -> list[dict[str, Any]]:
+def _load_records(*, root: Path | None = None) -> list[dict[str, Any]]:
     entries_by_id: dict[str, dict[str, Any]] = {}
-    for path in _record_paths():
+    for path in _record_paths(root=root):
         record = _load_record(path)
         entries_by_id[record["entry_id"]] = record
     return list(entries_by_id.values())
 
 
-def _record_paths() -> list[Path]:
+def _record_paths(*, root: Path | None = None) -> list[Path]:
     paths: list[Path] = []
-    for root in (legacy_records_root(), records_root(create=False)):
-        if not root.exists():
+    for base in (legacy_records_root(root), records_root(create=False, root=root)):
+        if not base.exists():
             continue
-        paths.extend(sorted(root.glob("*.json")))
+        paths.extend(sorted(base.glob("*.json")))
     return paths
 
 
@@ -349,7 +359,7 @@ def _is_superseded(entry: dict[str, Any], superseded_ids: set[str]) -> bool:
     return isinstance(entry_id, str) and entry_id in superseded_ids
 
 
-def _ensure_supersedes_target_exists(entry_id: str) -> None:
-    if any(record.get("entry_id") == entry_id for record in _load_records()):
+def _ensure_supersedes_target_exists(entry_id: str, *, root: Path | None = None) -> None:
+    if any(record.get("entry_id") == entry_id for record in _load_records(root=root)):
         return
     raise ValueError(f"Memory record supersedes unknown entry '{entry_id}'.")

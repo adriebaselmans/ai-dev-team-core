@@ -10,10 +10,11 @@ Use this skill when acting as the coordinator and a phase has been completed.
 ## Goals
 - Preserve useful project knowledge for future iterations.
 - Keep durable memory structured and retrievable.
+- Avoid duplicating active shared state or phase artifacts.
 
 ## Required Inputs
-- Phase outcome
-- Active artifacts in `docs/`
+- Reusable knowledge produced by the current run
+- Bootstrapped project metadata in `framework/init-metadata.json`
 - Existing structured memory in `framework/memory/records/`
 
 ## Required Outputs
@@ -23,5 +24,7 @@ Use this skill when acting as the coordinator and a phase has been completed.
 ## Rules
 - Structured records are the source of truth for project memory.
 - Use bounded record kinds such as facts, decisions, questions, contradictions, and phase briefs.
-- Keep durable entries short, factual, and useful.
+- Keep durable entries short, factual, reusable, and cross-run valuable.
+- Write structured memory only in bootstrapped project repos created from this skeleton.
+- Do not copy current-run orchestration state, trace, or phase artifacts into memory.
 - Generate markdown snapshots only as explicit exports, not as the normal phase-update path.

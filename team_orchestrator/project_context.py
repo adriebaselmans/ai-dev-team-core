@@ -31,6 +31,13 @@ def artifacts_enabled(root: Path | None = None) -> bool:
     return bool(metadata.get("artifact_persistence", True))
 
 
+def memory_enabled(root: Path | None = None) -> bool:
+    metadata = load_project_metadata(root)
+    if metadata is None:
+        return False
+    return bool(metadata.get("memory_persistence", metadata.get("artifact_persistence", True)))
+
+
 def release_docs_enabled(root: Path | None = None) -> bool:
     metadata = load_project_metadata(root)
     if metadata is None:

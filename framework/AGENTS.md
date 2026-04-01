@@ -1,246 +1,109 @@
 # AI Dev Team Framework
 
-This file defines the canonical team workflow for this repository.
+This file defines the canonical flow-first operating model for this repository.
 
 ## Goal
-Take a user need or feature description and deliver an end-to-end implementation with minimal human intervention.
+Take a user need or feature description and deliver an end-to-end implementation through a state-driven orchestration flow with minimal human intervention.
 
 ## Team Roles
-- Coordinator: owns intake, delegation, phase transitions, integration, and final reporting; it is read-only with respect to implementation work.
-- Requirements Engineer: clarifies the request and writes the requirement baseline.
-- UX/UI Designer: optionally collaborates during requirements and implementation for user flows, interaction design, accessibility expectations, and visual coherence when the task has meaningful UI scope.
-- Scout: optionally gathers current external evidence when up-to-date sources could materially change an architecture decision.
-- Architect: writes the design approach and technical constraints.
-- Developer: implements the solution in `src/`.
-- Reviewer: reviews the implementation for quality and technical risk before testing.
-- Tester: validates the implementation against the requirement baseline and prepares the DoD review.
-- Repository exploration support: shared grounding capability used when repo context is needed.
+- Coordinator: owns intake, routing, support approval, parallelization decisions, integration planning, and final reporting; it is read-only with respect to product and specialist artifacts.
+- Requirements Engineer: turns the user need into an implementation-ready requirement baseline.
+- UX/UI Designer: optional support role for UX, interaction, accessibility, and visual clarity.
+- Scout: optional support role for current external evidence that could materially change a design.
+- Architect: turns requirements into an implementation-safe design and technical work plan.
+- Developer: implements the approved design and any required automated tests.
+- Reviewer: performs technical review and returns structured rework decisions.
+- Tester: validates the implementation behavior and automation coverage and returns structured rework decisions.
+- DoD Reviewer: validates functional acceptance criteria plus architect-defined non-functional and design requirements.
+- Repository Exploration Support: shared grounding capability used when repository context is needed.
 
 Detailed role instructions live in `framework/roles/`.
 Role-to-skill mapping lives in `framework/skills.md`.
-Runtime specs live in `framework/runtime/`.
+Active orchestration code lives in `team_orchestrator/`, `agents/`, `flows/`, and `state/`.
+Runtime support utilities live in `framework/runtime/`.
 
-## Skills
-- Project-local skills live in `.github/skills/`.
-- Roles define ownership and boundaries.
-- Skills define repeatable execution patterns.
-- Prefer project-local skills for this repository's workflow and artifacts.
-- Use reusable external skills when they are available and fit cleanly.
-- Repository exploration is a shared support capability with its own skill contract, not a standalone active team role.
+## Active Runtime Model
+- `flows/software_delivery.yaml` defines the active flow.
+- `framework/runtime/team.yaml` defines the role registry and ownership metadata.
+- `framework/config/models.yaml` defines role-to-model assignment for the active orchestrator.
+- `framework/runtime/state.json` stores the latest persisted orchestration snapshot.
+- `framework/memory/repository-knowledge/` stores durable repository analysis artifacts.
 
-## Runtime Orchestration
-- This repository is moving to a model-agnostic runtime orchestration layer.
-- The coordinator should use bounded specialist dispatch for specialist work.
-- `framework/runtime/team.yaml` defines role registry and spawn rules.
-- `framework/runtime/workflow.yaml` defines the state machine and rollback rules.
-- `framework/runtime/task-template.md` defines the standard subagent task payload.
-- `framework/runtime/review-template.md` defines the standard reviewer output shape.
-- `framework/memory/repository-knowledge/` defines the durable store for analyzed repository knowledge.
-- `framework/runtime/state.json` is the placeholder runtime state snapshot.
+## Flow Summary
+The active default flow is:
 
-## Coordinator Runbook
-The coordinator owns the full feature flow and moves the team through these phases:
-- `idle`
-- `requirements`
-- `architecture`
-- `development`
-- `review`
-- `testing`
-- `dod-review`
-- `done`
+`coordinator intake -> explorer? -> requirements -> ux/ui? -> architect -> support? -> coordinator planning -> developer or parallel developer fan-out -> integration -> reviewer -> tester -> dod-reviewer -> coordinator finalize -> done`
 
-## Phase Flow
-### 1. Idle
-Entry condition:
-- No active feature is currently being worked on.
+Support roles are reusable. They are requested through shared state and dispatched only by the coordinator. Roles do not call each other directly.
 
-Coordinator actions:
-- Receive the user need.
-- Start a new iteration from the requirements phase.
-- Decide whether repository exploration is required before or during the phase flow.
-
-Exit condition:
-- A concrete user need is available.
+## Phase Behavior
+### 1. Intake
+- Coordinator classifies the request as `greenfield` or `existing`.
+- Existing-repo work routes through repository exploration first.
+- Greenfield work routes directly to requirements.
 
 ### 2. Requirements
-Entry condition:
-- A user need exists but is not yet confirmed as implementation-ready.
-
-Coordinator actions:
-- Delegate to the requirements engineer.
-- Delegate to the UX/UI designer as an optional specialist when the request has meaningful UX, interaction, accessibility, or visual design scope.
-- Use repository exploration support first when the request must be grounded in a specific repository and the baseline cannot be written safely without that context.
-- Relay clarification questions to the user only when needed.
-- Update `doc_templates/requirements/current.yaml` until it is clear enough to proceed.
-- Update memory when the phase is completed.
-
-Exit condition:
-- `doc_templates/requirements/current.yaml` is complete enough for autonomous architecture and implementation.
-- `Definition of Ready` in the requirements file is effectively `ready`.
-
-Loop rule:
-- Stay in this phase until blocking ambiguity is removed.
+- Requirements engineer writes the implementation-ready baseline.
+- UX/UI support may be requested when the work is UI-heavy.
+- The user is consulted only when blocking ambiguity remains and autonomy is not appropriate.
+- Requirements loop until the work is ready for architecture.
 
 ### 3. Architecture
-Entry condition:
-- Requirements are ready.
-
-Coordinator actions:
-- Delegate to the architect.
-- Delegate to the scout when the design depends on temporally unstable external information or when current sources could materially change the design.
-- Use repository exploration support when the design depends on an existing repository's architecture, conventions, or extension points.
-- Ensure `doc_templates/design/current.yaml` is updated.
-- Ensure the design reflects clean code, stack-appropriate best practices, and relevant performance tradeoffs.
-- Update memory when the phase is completed.
-
-Heuristic:
-- Use the scout for recent libraries, frameworks, models, APIs, platform behavior, security standards, benchmarks, papers, regulations, or recommendations when freshness could change the design.
-- Skip the scout for stable internal refactors or other work where current external sources are unlikely to change the answer.
-
-Exit condition:
-- The design is implementation-safe.
-- The developer can proceed without guessing key structure or technical direction.
-
-Loop rule:
-- Return to requirements if the architect finds unresolved functional ambiguity or infeasibility.
+- Architect defines the technical design, work items, module boundaries, interfaces, non-functional requirements, and risks.
+- Architect may request repository exploration or scout support through the coordinator.
+- Architecture may route back to requirements if the problem statement is still not implementable.
 
 ### 4. Development
-Entry condition:
-- Requirements and design are both ready.
-
-Coordinator actions:
-- Delegate implementation to the developer.
-- Delegate to repository exploration support when the developer needs grounded understanding of a target repository before making or proposing changes.
-- Ensure code is written in `src/`.
-- Ensure unit tests are added for relevant new or changed behavior.
-- Update memory when the phase is completed.
-
-Exit condition:
-- The intended implementation is present.
-- Relevant unit tests are present.
-- The result is ready for validation.
-
-Loop rule:
-- Return to architecture if implementation reveals a structural design problem.
-- Return to requirements if implementation reveals a material scope or behavior ambiguity.
+- Coordinator decides whether development should be sequential or parallel.
+- When parallel development is used, multiple developer executions may produce worker outputs.
+- One designated developer then integrates and stabilizes the combined result.
+- Developers may request UX/UI, scout, or explorer support only through the coordinator-mediated support mechanism.
 
 ### 5. Review
-Entry condition:
-- Implementation is complete enough for technical review.
-
-Coordinator actions:
-- Delegate review to the reviewer.
-- Use repository exploration support when review findings depend on understanding upstream repository architecture or conventions.
-- Ensure the implementation is checked against requirements, design, and `framework/clean-code.md`.
-- Ensure linting issues and actionable warnings are resolved where practical before testing proceeds.
-- Update memory when the phase is completed.
-
-Exit condition:
-- The reviewer has issued a clear review decision.
-- Blocking findings are resolved or explicitly returned for rework.
-
-Loop rule:
-- Return to development if review findings require code or test changes.
-- Return to architecture if review reveals a structural or design problem.
+- Reviewer critiques the integrated implementation.
+- Reviewer returns a structured decision with `approved`, `feedback`, `blocking_findings`, and `rework_target`.
+- Review may route back to developer, architect, or requirements depending on the finding.
 
 ### 6. Testing
-Entry condition:
-- Review is complete and the change is approved for testing.
-
-Coordinator actions:
-- Delegate validation to the tester.
-- Ensure `doc_templates/dod/current.yaml` is updated.
-- Ensure an automated acceptance or end-to-end regression suite is added when feasible and worthwhile.
-- Ensure the tester records how that regression suite should be rerun later.
-- Update memory when the phase is completed.
-
-Exit condition:
-- The tester has issued a clear DoD decision.
-- A rerunnable automated acceptance or end-to-end suite exists, or `doc_templates/dod/current.yaml` explicitly explains why it was not feasible.
-
-Loop rule:
-- Return to development if defects or coverage gaps must be fixed.
-- Return to architecture or requirements if the defect shows a deeper upstream problem.
+- Tester validates behavior and automation coverage.
+- Tester returns a structured result with `passed`, `errors`, `automated`, and `rework_target`.
+- Testing may route back to developer, architect, or requirements depending on the failure.
 
 ### 7. DoD Review
-Entry condition:
-- The tester has produced `doc_templates/dod/current.yaml`.
+- DoD reviewer validates functional acceptance criteria plus architect-defined non-functional and design requirements.
+- DoD reviewer returns a structured result with `approved`, `feedback`, `blocking_findings`, and `rework_target`.
+- DoD review may route back to developer, architect, or requirements depending on what is missing.
 
-Coordinator actions:
-- Present the DoD review to the user.
-- Ask for approval or feedback.
-
-Exit condition:
-- The user approves, or provides feedback for another iteration.
-
-Loop rule:
-- If the user approves, move to `done`.
-- If the user provides feedback, start a new iteration from `requirements` and preserve all relevant memory.
-
-### 8. Done
-Entry condition:
-- The user has approved the delivered result.
-
-Coordinator actions:
-- Leave the current artifacts as the latest accepted baseline.
-- Ensure memory reflects the accepted state.
-
-Exit condition:
-- The team returns to `idle` when a new user need arrives.
+### 8. Finalization
+- Coordinator records the final orchestration summary and terminates the run.
+- In bootstrapped project repos, durable phase artifacts are written to `doc_templates/*/current.yaml`.
+- Release-facing docs are generated from those artifacts only on release branches in real project repos, not in the bare skeleton repo.
 
 ## Non-Negotiable Rules
-- Do not ask the user for approval between architecture, development, and testing once the requirements are clear.
-- Use repository exploration support only when repository grounding is required by the user request or by a blocking knowledge gap in another role.
-- Treat repository exploration as a shared support capability, not a standalone role.
-- Treat local build, test, and app run actions as implicitly approved within the team workflow.
-- Treat routine dependency install, commit, tag, push, and release actions as implicitly approved within the team workflow when they are part of completing the requested work.
-- When the execution environment still requires a tool-level elevation prompt for a build, test, or run action, request it directly without stopping for an extra conversational approval round.
-- When the execution environment still requires a tool-level elevation prompt for install, commit, tag, push, or release actions, request it directly without stopping for an extra conversational approval round.
-- Do not skip the review phase before testing.
-- Do not treat automated acceptance coverage as optional when the feature can support a stable regression suite.
-- Keep durable project knowledge in `framework/memory/`.
-- Keep durable repository-specific knowledge in `framework/memory/repository-knowledge/`.
-- Use the compaction skill to produce dense phase-boundary briefs when a phase completes.
-- Keep the latest requirements in `doc_templates/requirements/current.yaml`.
-- Keep the latest design in `doc_templates/design/current.yaml`.
-- Keep the latest review in `doc_templates/review/current.yaml`.
-- Keep the latest DoD review in `doc_templates/dod/current.yaml`.
-- Keep implementation in `src/`.
+- Flow is the primary abstraction, not direct agent-to-agent coordination.
+- Shared state is the single source of truth for execution and routing.
+- Agents are stateless and role-specific.
+- Agents read shared state and return only owned partial updates.
+- Agents do not call each other directly.
+- Coordinator-mediated support dispatch is the only collaboration path for support roles.
+- Coordinator is read-only with respect to product and specialist artifacts.
+- Do not ask the user for approval between architecture, development, review, testing, and DoD review once requirements are clear.
+- Do not skip review before testing.
+- Use structured decision outputs, never string parsing, for gate behavior.
+- Keep implementation in `src/` unless the task is framework work inside this skeleton itself.
 - Follow the engineering standards in `framework/clean-code.md`.
-- Use the role-aligned skills in `.github/skills/` and `framework/skills.md` where applicable.
-- Use `framework/runtime/` as the machine-readable contract for native subagent orchestration.
-- The runtime workflow is responsible for persisting `framework/runtime/state.json` and `framework/memory/` updates on behalf of the coordinator.
-- Specialists do not communicate with the user directly; the coordinator owns all user-facing interaction.
-- Return to the user only during requirements clarification and final DoD review.
-- Do not silently skip a phase artifact.
-- Do not assign direct implementation or file-writing work to the coordinator; route such work through specialist roles or shared tools.
+- Treat local install, build, test, run, commit, tag, push, and release actions as implicitly approved when they are part of completing requested work.
+- Specialists do not communicate with the user directly; the coordinator owns user-facing interaction.
+- Do not silently skip a required phase artifact in a bootstrapped project repo.
 
 ## Memory Policy
-Update durable memory at the end of each completed phase.
+- `framework/memory/records/` is the canonical structured project-memory location when reusable cross-run knowledge is captured.
+- `framework/memory/repository-knowledge/` stores durable repository-specific knowledge.
+- `framework/memory/project-log.md`, `framework/memory/decisions.md`, and `framework/memory/known-context.md` are optional human-readable placeholders or exports, not the canonical memory write path.
+- Do not duplicate active shared state, execution trace, or phase artifacts in memory records.
+- The bare skeleton repo should remain pristine. Do not populate project memory artifacts here during framework development.
 
-Canonical durable memory:
-- `framework/memory/records/`: structured project memory records and phase briefs.
-- `framework/memory/repository-knowledge/`: compact repository briefs, machine-readable metadata, and an index for analyzed repositories.
-
-Optional human-readable exports:
-- `framework/memory/project-log.md`
-- `framework/memory/decisions.md`
-- `framework/memory/known-context.md`
-
-Memory update rules:
-- Structured records in `framework/memory/records/` are the source of truth for project memory.
-- Use bounded record kinds and explicit metadata so retrieval remains deterministic.
-- `repository-knowledge/` records reusable repository intelligence that other roles can consult instead of rescanning the same repo.
-- Human-readable markdown memory files are optional exports or legacy snapshots, not the canonical write path.
-- Each durable memory entry should be short, factual, and useful for future agents.
-- The runtime workflow updates structured memory after each completed phase on behalf of the coordinator, not only at the end of the full feature flow.
-
-## Final Review
-The tester must prepare a Definition of Done result that covers:
-- What was built
-- What was verified
-- What automated regression command or suite should be run later
-- Any known gaps or risks
-- What feedback is needed from the user
-
-The coordinator uses that result for the final response.
+## Artifact Policy
+- In the bare skeleton repo, `doc_templates/*/current.yaml` remain pristine placeholders.
+- In bootstrapped project repos created from this skeleton, the active orchestrator persists durable phase artifacts into those YAML files.
+- Human-facing `docs/` are generated from `doc_templates/` only during a release workflow in a bootstrapped project repo.

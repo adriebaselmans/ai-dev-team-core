@@ -94,12 +94,13 @@ roles:
         - role: architect
           purpose: non-functional requirement validation or clarification
     writes:
-      - doc_templates/dod/current.yaml
+      - tests/
   dod-reviewer:
     agent_type: specialist
     user_facing: false
     focus: acceptance-gate
-    writes: []
+    writes:
+      - doc_templates/dod/current.yaml
 
 shared_tools:
   repository-exploration:
@@ -110,6 +111,6 @@ shared_tools:
 
 spawn_rules:
   - Only the coordinator dispatches specialist work.
-  - Specialist payloads must be one-shot and built from context slices plus skill contracts.
+  - Specialist work must be bounded and aligned with the active flow plus role skill contracts.
   - Shared tools may be requested by any phase but are dispatched through the coordinator.
   - Roles may only write owned outputs or explicit shared-tool outputs.

@@ -5,13 +5,12 @@ required_inputs:
   - doc_templates/requirements/current.yaml
   - doc_templates/design/current.yaml
   - framework/clean-code.md
-  - framework/runtime/review-template.md
   - relevant implementation and tests in src/
 expected_outputs:
   - doc_templates/review/current.yaml
-  - clear decision: approved for testing or rework required
+  - clear structured decision: approved for testing or rework required
 owned_artifacts:
   - doc_templates/review/current.yaml
 completion_criteria:
   - Findings are ordered by severity and include file references where possible.
-  - The recommendation clearly states whether testing can proceed.
+  - The review artifact clearly states whether testing can proceed.

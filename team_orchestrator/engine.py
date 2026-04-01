@@ -9,6 +9,7 @@ from state.merge import merge_state
 from team_orchestrator.artifact_sync import ArtifactSynchronizer
 from team_orchestrator.conditions import evaluate_condition, resolve_path, set_path
 from team_orchestrator.logger import TraceLogger
+from team_orchestrator.memory_sync import MemorySynchronizer
 from team_orchestrator.models import RoleModelConfig, load_role_model_map, validate_role_model_map
 
 
@@ -19,11 +20,13 @@ class Orchestrator:
         agents: Mapping[str, Agent],
         logger: TraceLogger | None = None,
         artifact_synchronizer: ArtifactSynchronizer | None = None,
+        memory_synchronizer: MemorySynchronizer | None = None,
     ) -> None:
         self.flow = deepcopy(flow)
         self.agents = dict(agents)
         self.logger = logger or TraceLogger()
         self.artifact_synchronizer = artifact_synchronizer or ArtifactSynchronizer()
+        self.memory_synchronizer = memory_synchronizer or MemorySynchronizer()
         self.role_models = load_role_model_map()
         validate_role_model_map(self.role_models, list(self.agents))
         self._validate_flow()
@@ -74,6 +77,7 @@ class Orchestrator:
                 update = agent.run(working_state)
                 working_state = merge_state(working_state, update)
                 self.artifact_synchronizer.sync(working_state, role_key=role_key, step_name=current_step)
+                self.memory_synchronizer.sync(working_state, role_key=role_key, step_name=current_step)
                 next_step = self._resolve_next_step(step, working_state)
                 self._record_transition(working_state, current_step, role_key, update, next_step, self.logger.log(role_key, update))
             else:
@@ -87,6 +91,7 @@ class Orchestrator:
                     completed.append(str(support_request_before["id"]))
                     working_state["meta"]["completed_support_requests"] = completed
                 self.artifact_synchronizer.sync(working_state, role_key=role_key, step_name=current_step)
+                self.memory_synchronizer.sync(working_state, role_key=role_key, step_name=current_step)
                 next_step = self._resolve_next_step(step, working_state)
                 self._record_transition(working_state, current_step, role_key, update, next_step, self.logger.log(role_key, update))
 

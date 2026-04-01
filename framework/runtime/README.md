@@ -1,6 +1,6 @@
-# Runtime Compatibility Layer
+# Runtime Support Utilities
 
-This folder now contains support utilities around the active flow-driven orchestrator.
+This folder contains support utilities around the active flow-driven orchestrator.
 
 ## Purpose
 - Persist the latest orchestration state snapshot in `state.json`.
@@ -11,13 +11,10 @@ This folder now contains support utilities around the active flow-driven orchest
 - `team.yaml`: role registry, ownership, and dispatch defaults.
 - `state.json`: machine-readable runtime state snapshot written by the active orchestrator.
 - `framework/memory/repository-knowledge/`: durable repository briefs and machine-readable facts for support exploration work.
-- `task-template.md`: retained task payload template.
-- `review-template.md`: retained review template.
 - `spec_loader.py`: YAML spec loading.
 - `artifacts.py` / `export_docs.py`: release-doc export helpers.
-- `memory_store.py` / `memory_export.py`: optional structured memory helpers.
+- `memory_store.py` / `memory_export.py`: optional structured memory helpers for bootstrapped project repos.
 - `repository_tool.py`: repository exploration request builder.
-- `requirements.txt`: compatibility dependency list.
 
 ## Runtime Rule
 - The coordinator is the only top-level user-facing agent.

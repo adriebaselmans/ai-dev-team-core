@@ -1,5 +1,5 @@
 name: coordinator-flow
-description: Run the coordinator phase flow in read-only mode, manage transitions, delegate writes, update memory, and present the final DoD review.
+description: Run the coordinator flow in read-only mode, manage routing, delegate writes, optionally persist reusable project memory, and present the final delivery summary.
 response_mode: one-shot
 policy:
   read_only: true
@@ -7,9 +7,9 @@ policy:
 required_inputs:
   - user request
   - framework/AGENTS.md
+  - flows/software_delivery.yaml
   - framework/runtime/team.yaml
-  - framework/runtime/workflow.yaml
-  - framework/runtime/task-template.md
+  - framework/config/models.yaml
   - framework/runtime/state.json
   - doc_templates/requirements/current.yaml
   - doc_templates/design/current.yaml
@@ -18,11 +18,12 @@ required_inputs:
 expected_outputs:
   - framework/runtime/state.json
   - framework/memory/records/
-  - final user-facing DoD review
+  - final user-facing delivery summary
 owned_artifacts: []
 delegated_artifacts:
   - framework/runtime/state.json
   - framework/memory/records/
 completion_criteria:
-  - Each completed phase is reflected in the status file and structured memory.
-  - The user-facing DoD review is ready when the workflow reaches DoD review.
+  - Each completed run is reflected in the shared state snapshot.
+  - Reusable cross-run memory is persisted only when the repo is a bootstrapped project repo.
+  - The final user-facing delivery summary is ready when the workflow reaches completion.

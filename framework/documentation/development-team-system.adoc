@@ -14,7 +14,7 @@ It describes:
 - the agents and their responsibilities
 - how the coordinator drives work across phases
 - how repository exploration fits in as a conditional shared support capability
-- how the runtime contract supports native subagent execution
+- how the active orchestrator uses shared state, support dispatch, and structured gates
 - how artifacts move from requirements to delivery
 - how memory, review, and testing keep the system durable and auditable
 
@@ -28,8 +28,8 @@ At a high level:
 - specialist agents own bounded work products
 - repository exploration is a shared support capability when repository grounding is required
 - each major delivery phase has an explicit artifact
-- the runtime contract describes the team, workflow, validation, and task payload shape
-- project memory is updated after each completed phase
+- the active orchestrator is flow-driven and state-driven
+- project memory remains optional and structured when it is captured
 
 == Shared Support Capability
 
@@ -54,10 +54,11 @@ rectangle "Specialist Agents" as Specialists {
   rectangle "Developer" as Dev
   rectangle "Reviewer" as Rev
   rectangle "Tester" as Test
+  rectangle "DoD Reviewer" as DoD
 }
 rectangle "Shared Support Capability" as SharedTool
 database "Project Artifacts\n/docs, /src, /framework/memory" as Artifacts
-rectangle "Runtime Contract\n/framework/runtime" as Runtime
+rectangle "Flow + Runtime Metadata\n/flows + /framework/runtime" as Runtime
 
 User --> Coordinator : feature request\napproval or feedback
 Coordinator --> SharedTool : repository analysis task\nwhen needed
@@ -66,17 +67,19 @@ Coordinator --> Arch : architecture task
 Coordinator --> Dev : implementation task
 Coordinator --> Rev : technical review task
 Coordinator --> Test : validation task
+Coordinator --> DoD : acceptance gate task
 
 SharedTool --> Artifacts : repository brief\n+ facts
 RE --> Artifacts : requirements baseline
 Arch --> Artifacts : design baseline
 Dev --> Artifacts : code + unit tests
 Rev --> Artifacts : review findings
-Test --> Artifacts : DoD + regression guidance
+Test --> Artifacts : test evidence\n+ regression guidance
+DoD --> Artifacts : DoD decision
 
-Coordinator --> Artifacts : status + memory updates
-Coordinator --> Runtime : uses workflow and team specs
-Runtime --> Coordinator : task payloads,\nphase validation rules
+Coordinator --> Artifacts : status + durable artifacts
+Coordinator --> Runtime : uses flow, team, and model metadata
+Runtime --> Coordinator : routing rules,\nrole metadata
 @enduml
 ----
 
@@ -84,7 +87,7 @@ Runtime --> Coordinator : task payloads,\nphase validation rules
 
 === Coordinator Layer
 
-The coordinator owns orchestration, phase transitions, memory updates, and user-facing communication.
+The coordinator owns orchestration, phase transitions, support dispatch, and user-facing communication.
 
 === Specialist Layer
 
@@ -95,8 +98,8 @@ Each specialist has a narrow mission and a bounded write scope.
 | Agent | Primary Responsibility | Primary Outputs
 
 | Coordinator
-| Orchestration, user communication, phase control, memory updates
-| `framework/runtime/state.json`, `framework/memory/*`
+| Orchestration, user communication, phase control, support approval
+| `framework/runtime/state.json`
 
 | Repository exploration support
 | Analyze a target repository and capture reusable repository knowledge
@@ -119,7 +122,11 @@ Each specialist has a narrow mission and a bounded write scope.
 | `doc_templates/review/current.yaml`
 
 | Tester
-| Validate user-visible behavior and prepare delivery evidence
+| Validate user-visible behavior and automation coverage
+| automated tests + runtime test evidence
+
+| DoD Reviewer
+| Validate functional acceptance criteria and architect-defined non-functional requirements
 | `doc_templates/dod/current.yaml`
 |===
 
@@ -131,15 +138,16 @@ The repository exploration capability is a shared support path the coordinator c
 
 == Skills and Execution Guidance
 
-- the coordinator uses `coordinator-flow`, `memory-update`, and `compaction`
+- the coordinator uses `coordinator-flow` and `memory-update`
 - the repository exploration support capability uses `repository-exploration` and `repository-knowledge-compaction`
 - the requirements engineer uses `requirements-clarification`
 - the developer uses `implementation-clean-code` and `unit-testing`
 - the tester uses `acceptance-testing`
+- the DoD reviewer uses `acceptance-testing` as an acceptance-gate aid
 
 == Approval and Autonomy Model
 
-The workflow uses a constrained autonomy model: the coordinator may invoke shared support when grounding is required, and after requirements are clear the system should continue through architecture, development, review, and testing without extra approval checkpoints.
+The workflow uses a constrained autonomy model: the coordinator may invoke shared support when grounding is required, and after requirements are clear the system should continue through architecture, development, review, testing, and DoD review without extra approval checkpoints.
 
 == Conclusion
 

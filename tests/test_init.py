@@ -74,6 +74,7 @@ class InitScriptTests(unittest.TestCase):
         self.assertEqual(review["title"], "Example Project")
         self.assertEqual(dod["title"], "Example Project")
         self.assertTrue(metadata["artifact_persistence"])
+        self.assertTrue(metadata["memory_persistence"])
         self.assertTrue(metadata["docs_export_on_release"])
         self.assertIn("Seeded active artifacts", buffer.getvalue())
         self.assertIn("Setup complete.", buffer.getvalue())

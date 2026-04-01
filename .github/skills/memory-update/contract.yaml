@@ -1,14 +1,14 @@
 name: memory-update
-description: Update project memory after a completed phase using the repository's logging conventions.
+description: Update reusable cross-run project memory for bootstrapped project repos without duplicating active state or phase artifacts.
 response_mode: one-shot
 required_inputs:
-  - phase outcome
-  - active artifacts in docs/
+  - reusable project knowledge from the current run
+  - bootstrapped project metadata
   - existing structured memory in framework/memory/records/
 expected_outputs:
   - framework/memory/records/
 owned_artifacts:
   - framework/memory/records/
 completion_criteria:
-  - New durable memory entries are short, factual, and phase-scoped.
-  - Durable memory is written through structured records instead of markdown files.
+  - New durable memory entries are short, factual, and reusable across later runs.
+  - Durable memory is written only for bootstrapped project repos.
