@@ -62,9 +62,14 @@ roles:
     supporting_skills:
       - .github/skills/unit-testing
     writes:
+      - agents/
+      - team_orchestrator/
+      - flows/
+      - state/
       - src/
       - framework/runtime/
       - framework/runtime/tests/
+      - tests/
   reviewer:
     agent_type: specialist
     user_facing: false
@@ -90,6 +95,11 @@ roles:
           purpose: non-functional requirement validation or clarification
     writes:
       - doc_templates/dod/current.yaml
+  dod-reviewer:
+    agent_type: specialist
+    user_facing: false
+    focus: acceptance-gate
+    writes: []
 
 shared_tools:
   repository-exploration:

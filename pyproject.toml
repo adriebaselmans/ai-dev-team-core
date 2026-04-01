@@ -15,11 +15,12 @@ dependencies = [
 
 [project.scripts]
 ai-dev-team-init = "init:main"
+ai-dev-team-run = "team_orchestrator.cli:main"
 
 [tool.setuptools]
 py-modules = ["init"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["framework*"]
+include = ["framework*", "agents*", "team_orchestrator*", "flows*", "state*"]
 namespaces = true
