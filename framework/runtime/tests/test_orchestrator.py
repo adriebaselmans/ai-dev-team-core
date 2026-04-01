@@ -9,64 +9,71 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
-from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import orchestrator
-import state_manager
 
 
-class OrchestratorCommandTests(unittest.TestCase):
+class OrchestratorWrapperTests(unittest.TestCase):
     def setUp(self) -> None:
-        self._sandbox_root = Path(tempfile.mkdtemp(prefix='runtime-orchestrator-', dir=Path(__file__).resolve().parents[3]))
-        (self._sandbox_root / 'framework' / 'runtime').mkdir(parents=True, exist_ok=True)
-        state_manager.STATE_PATH = self._sandbox_root / 'framework' / 'runtime' / 'state.json'
-        state_manager.save_state(dict(state_manager.DEFAULT_STATE))
+        self._sandbox_root = Path(tempfile.mkdtemp(prefix="runtime-wrapper-", dir=Path(__file__).resolve().parents[3]))
+        self.state_path = self._sandbox_root / "state.json"
 
     def tearDown(self) -> None:
         shutil.rmtree(self._sandbox_root, ignore_errors=True)
 
-    def test_start_sets_requirements_phase_and_prints_dispatch(self) -> None:
-        args = argparse.Namespace(feature='framework rework', force=False)
+    def test_run_executes_new_orchestrator_and_persists_state(self) -> None:
+        args = argparse.Namespace(
+            input="Build a robust orchestrator.",
+            flow=str(Path(__file__).resolve().parents[3] / "flows" / "software_delivery.yaml"),
+            repo_path=".",
+            parallel=False,
+            work_item=None,
+            max_iterations=5,
+            max_steps=40,
+            state_path=self.state_path,
+            json=True,
+        )
         buffer = io.StringIO()
+
         with redirect_stdout(buffer):
-            exit_code = orchestrator.cmd_start(args)
+            exit_code = orchestrator.cmd_run(args)
 
         self.assertEqual(exit_code, 0)
-        state = state_manager.load_state()
-        self.assertEqual(state['phase'], 'requirements')
+        self.assertTrue(self.state_path.exists())
         payload = json.loads(buffer.getvalue())
-        self.assertEqual(payload['dispatch']['phase'], 'requirements')
+        self.assertTrue(payload["meta"]["completed"])
+        self.assertEqual(payload["meta"]["role_models"]["developer"]["model"], "gpt-5.4")
 
-    def test_start_rolls_back_when_initial_dispatch_build_fails(self) -> None:
-        args = argparse.Namespace(feature='framework rework', force=False)
-        starting_state = dict(state_manager.DEFAULT_STATE)
-
-        with (
-            patch.object(orchestrator, 'build_phase_dispatch_envelope', side_effect=ValueError('broken dispatch')),
-            patch.object(orchestrator, 'save_state') as save_state_mock,
-        ):
-            with self.assertRaisesRegex(ValueError, 'broken dispatch'):
-                orchestrator.cmd_start(args)
-
-        save_state_mock.assert_not_called()
-        self.assertEqual(state_manager.load_state(), starting_state)
-
-    def test_export_memory_renders_requested_snapshot(self) -> None:
-        args = argparse.Namespace(view='project-log', limit=5)
+    def test_status_reads_persisted_state_summary(self) -> None:
+        self.state_path.write_text(
+            json.dumps(
+                {
+                    "input": "Build a robust orchestrator.",
+                    "meta": {
+                        "current_step": "done",
+                        "completed": True,
+                        "terminated": True,
+                        "termination_reason": "completed",
+                        "last_role": "coordinator",
+                        "flow_name": "software-delivery-orchestration",
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        args = argparse.Namespace(state_path=self.state_path, json=False)
         buffer = io.StringIO()
 
-        with (
-            patch.object(orchestrator, 'render_memory_snapshot', return_value='# Project Log Snapshot\n') as render_mock,
-            redirect_stdout(buffer),
-        ):
-            exit_code = orchestrator.cmd_export_memory(args)
+        with redirect_stdout(buffer):
+            exit_code = orchestrator.cmd_status(args)
 
         self.assertEqual(exit_code, 0)
-        self.assertEqual(buffer.getvalue(), '# Project Log Snapshot\n')
-        render_mock.assert_called_once_with('project-log', limit=5)
+        payload = json.loads(buffer.getvalue())
+        self.assertEqual(payload["current_step"], "done")
+        self.assertTrue(payload["completed"])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

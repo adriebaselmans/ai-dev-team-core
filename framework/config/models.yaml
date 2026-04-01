@@ -24,6 +24,21 @@ roles:
     model: gpt-5.4-mini
     mode: one-shot
     placeholder: true
+  ux-ui-designer:
+    provider: openai
+    model: gpt-5.4-mini
+    mode: one-shot
+    placeholder: true
+  explorer:
+    provider: openai
+    model: gpt-5.4-mini
+    mode: one-shot
+    placeholder: true
+  scout:
+    provider: openai
+    model: gpt-5.4-mini
+    mode: one-shot
+    placeholder: true
   architect:
     provider: openai
     model: gpt-5.4
@@ -40,6 +55,11 @@ roles:
     mode: one-shot
     placeholder: true
   tester:
+    provider: openai
+    model: gpt-5.4-mini
+    mode: one-shot
+    placeholder: true
+  dod-reviewer:
     provider: openai
     model: gpt-5.4-mini
     mode: one-shot

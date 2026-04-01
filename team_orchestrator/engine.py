@@ -8,6 +8,7 @@ from state.factory import prepare_state
 from state.merge import merge_state
 from team_orchestrator.conditions import evaluate_condition, resolve_path, set_path
 from team_orchestrator.logger import TraceLogger
+from team_orchestrator.models import RoleModelConfig, load_role_model_map, validate_role_model_map
 
 
 class Orchestrator:
@@ -20,6 +21,8 @@ class Orchestrator:
         self.flow = deepcopy(flow)
         self.agents = dict(agents)
         self.logger = logger or TraceLogger()
+        self.role_models = load_role_model_map()
+        validate_role_model_map(self.role_models, list(self.agents))
         self._validate_flow()
 
     def run(self, state: dict[str, Any]) -> dict[str, Any]:
@@ -28,6 +31,9 @@ class Orchestrator:
             role_keys=list(self.agents),
             flow_name=str(self.flow.get("name", "unnamed-flow")),
         )
+        working_state["meta"]["role_models"] = {
+            role_key: config.as_dict() for role_key, config in self.role_models.items()
+        }
         current_step = str(working_state["meta"].get("current_step") or self.flow["start_at"])
         working_state["meta"]["visit_counts"][current_step] = int(
             working_state["meta"]["visit_counts"].get(current_step, 0)
@@ -162,6 +168,7 @@ class Orchestrator:
                 {
                     "step": step_name,
                     "role": role_key,
+                    "model": self._model_payload(role_key),
                     "parallel_item": deepcopy(item),
                     "update": deepcopy(update),
                     "next_step": step["next"],
@@ -207,6 +214,7 @@ class Orchestrator:
             {
                 "step": step_name,
                 "role": role_key,
+                "model": self._model_payload(role_key),
                 "update": deepcopy(update),
                 "next_step": next_step,
                 "log": log_line,
@@ -228,3 +236,9 @@ class Orchestrator:
         state["meta"]["current_step"] = terminal_step
         state["meta"]["completed"] = terminal_step == "done"
         return state
+
+    def _model_payload(self, role_key: str) -> dict[str, Any] | None:
+        config: RoleModelConfig | None = self.role_models.get(role_key)
+        if config is None:
+            return None
+        return config.as_dict()

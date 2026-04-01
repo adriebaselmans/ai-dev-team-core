@@ -28,6 +28,7 @@ DEFAULT_STATE: dict[str, Any] = {
     "meta": {
         "flow_name": None,
         "roles": [],
+        "role_models": {},
         "current_step": None,
         "last_role": None,
         "last_next_step": None,

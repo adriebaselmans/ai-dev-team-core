@@ -79,9 +79,10 @@ That writes generated output under `docs/` and is intended to be checked in only
 - `team_orchestrator/`: flow execution engine, condition handling, trace logging, and CLI.
 - `flows/`: YAML flow definitions.
 - `state/`: shared state factory, merge logic, and persistence helpers.
+- `framework/config/models.yaml`: role-to-model mapping used by the active orchestrator.
 - `.github/skills/`: project-local skills for repeatable role behavior.
 - `framework/`: team rules, roles, flow state, memory, and helper scripts.
-- `framework/runtime/`: legacy runtime contract, role registry, state helpers, and compatibility modules.
+- `framework/runtime/`: runtime compatibility wrapper plus release-doc export and repository support utilities.
 - `doc_templates/`: active AI-owned project artifacts.
 - `docs/`: user-facing generated documentation output.
 - `src/`: implementation code.
@@ -126,11 +127,8 @@ ai-dev-team-run --input "Build a small REST API for tasks"
 Legacy runtime contract commands:
 
 ```powershell
-python framework/runtime/orchestrator.py start --feature "Build a small REST API for tasks"
+python framework/runtime/orchestrator.py run --input "Build a small REST API for tasks"
 python framework/runtime/orchestrator.py status
-python framework/runtime/orchestrator.py next-task
-python framework/runtime/orchestrator.py validate
-python framework/runtime/orchestrator.py continue
 python -m unittest discover framework/runtime/tests
 ```
 
@@ -148,7 +146,8 @@ Repository exploration support is invoked internally by the coordinator when a t
 - Flow definitions are data-driven and live in `flows/`.
 - Agents are stateless and only return owned state fields.
 - Shared state is the single source of truth for execution, trace, and routing decisions.
+- Role-to-model assignment is declared in `framework/config/models.yaml` and attached to active orchestration state and trace entries.
 - Support roles are reusable and coordinator-mediated.
 - Review, test, and DoD gates return structured decisions with explicit rework targets.
 - The system supports loops, branching, parallel development fan-out, integration, and safe termination.
-- Runtime specs and legacy compatibility modules remain in `framework/runtime/`.
+- Runtime compatibility commands and release export utilities remain in `framework/runtime/`.
