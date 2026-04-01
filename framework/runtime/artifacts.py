@@ -5,7 +5,10 @@ from typing import Any
 
 import yaml
 
-from spec_loader import load_artifact_schema, repo_root
+try:
+    from .spec_loader import load_artifact_schema, repo_root
+except ImportError:  # pragma: no cover - compatibility for direct script-style imports
+    from spec_loader import load_artifact_schema, repo_root
 
 
 ARTIFACT_FILES = {

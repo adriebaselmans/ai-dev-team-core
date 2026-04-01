@@ -4,8 +4,12 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-from artifacts import ARTIFACT_FILES, load_artifact
-from spec_loader import load_artifact_schema, repo_root
+try:
+    from .artifacts import ARTIFACT_FILES, load_artifact
+    from .spec_loader import load_artifact_schema, repo_root
+except ImportError:  # pragma: no cover - compatibility for direct script-style imports
+    from artifacts import ARTIFACT_FILES, load_artifact
+    from spec_loader import load_artifact_schema, repo_root
 
 
 DOC_FILES = {

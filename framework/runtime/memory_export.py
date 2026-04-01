@@ -3,7 +3,10 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from memory_store import query_memory
+try:
+    from .memory_store import query_memory
+except ImportError:  # pragma: no cover - compatibility for direct script-style imports
+    from memory_store import query_memory
 
 
 def render_project_log_snapshot(*, limit: int = 20) -> str:

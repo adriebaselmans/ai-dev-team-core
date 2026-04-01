@@ -26,7 +26,7 @@ if (-not (Get-Command $Python -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-& $Python framework/runtime/orchestrator.py export-docs
+& $Python -m team_orchestrator.cli export-docs
 
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE

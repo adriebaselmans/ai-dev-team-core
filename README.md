@@ -50,7 +50,7 @@ The active AI-owned project artifacts start empty on purpose:
 Generate user-facing docs only on a release branch with:
 
 ```powershell
-python framework/runtime/orchestrator.py export-docs
+python -m team_orchestrator.cli export-docs
 ```
 
 or:
@@ -127,15 +127,15 @@ ai-dev-team-run --input "Build a small REST API for tasks"
 Legacy runtime contract commands:
 
 ```powershell
-python framework/runtime/orchestrator.py run --input "Build a small REST API for tasks"
-python framework/runtime/orchestrator.py status
-python -m unittest discover framework/runtime/tests
+python -m team_orchestrator.cli run --input "Build a small REST API for tasks"
+python -m team_orchestrator.cli status
+python -m pytest framework/runtime/tests -q
 ```
 
 Generate release-only user-facing docs from `doc_templates/`:
 
 ```powershell
-python framework/runtime/orchestrator.py export-docs
+python -m team_orchestrator.cli export-docs
 pwsh -File framework/scripts/export-release-docs.ps1
 ```
 
@@ -150,4 +150,4 @@ Repository exploration support is invoked internally by the coordinator when a t
 - Support roles are reusable and coordinator-mediated.
 - Review, test, and DoD gates return structured decisions with explicit rework targets.
 - The system supports loops, branching, parallel development fan-out, integration, and safe termination.
-- Runtime compatibility commands and release export utilities remain in `framework/runtime/`.
+- Release export and repository support utilities remain in `framework/runtime/`.

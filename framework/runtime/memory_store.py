@@ -7,7 +7,10 @@ from pathlib import Path
 from typing import Any, Iterable
 from uuid import uuid4
 
-from spec_loader import repo_root
+try:
+    from .spec_loader import repo_root
+except ImportError:  # pragma: no cover - compatibility for direct script-style imports
+    from spec_loader import repo_root
 
 
 MEMORY_SCHEMA_VERSION = 3
