@@ -47,6 +47,8 @@ The active AI-owned project artifacts start empty on purpose:
 - `doc_templates/dod/current.yaml`
 - `framework/memory/*`
 
+Those `doc_templates/*/current.yaml` files stay pristine in the bare skeleton repository. They are populated only in bootstrapped project repositories created from this skeleton, where the active orchestrator writes durable phase artifacts from shared state during real project work.
+
 Generate user-facing docs only on a release branch with:
 
 ```powershell
@@ -60,6 +62,7 @@ pwsh -File framework/scripts/export-release-docs.ps1
 ```
 
 That writes generated output under `docs/` and is intended to be checked in only when releasing.
+In the bare skeleton repository, release-doc export is intentionally disabled. It is enabled only after `init.py` bootstraps a real project repo and records project metadata in `framework/init-metadata.json`.
 
 ## Team
 - Coordinator
@@ -147,6 +150,7 @@ Repository exploration support is invoked internally by the coordinator when a t
 - Agents are stateless and only return owned state fields.
 - Shared state is the single source of truth for execution, trace, and routing decisions.
 - Role-to-model assignment is declared in `framework/config/models.yaml` and attached to active orchestration state and trace entries.
+- In bootstrapped project repos, the active orchestrator writes durable phase artifacts to `doc_templates/*/current.yaml`; in the bare skeleton repo, those files remain pristine placeholders.
 - Support roles are reusable and coordinator-mediated.
 - Review, test, and DoD gates return structured decisions with explicit rework targets.
 - The system supports loops, branching, parallel development fan-out, integration, and safe termination.

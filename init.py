@@ -85,6 +85,8 @@ def write_metadata(name: str, description: str, target_stack: str) -> Path:
         "name": name,
         "description": description,
         "target_stack": target_stack,
+        "artifact_persistence": True,
+        "docs_export_on_release": True,
         "repo_root": str(REPO_ROOT),
         "created_utc": datetime.now(timezone.utc).isoformat(),
     }

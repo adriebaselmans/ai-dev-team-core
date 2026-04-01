@@ -69,7 +69,11 @@ def cmd_status(args: argparse.Namespace) -> int:
 
 
 def cmd_export_docs(_: argparse.Namespace) -> int:
-    written = export_all_docs(release_only=True)
+    try:
+        written = export_all_docs(release_only=True)
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
     _print_json({"written": [str(path) for path in written]})
     return 0
 

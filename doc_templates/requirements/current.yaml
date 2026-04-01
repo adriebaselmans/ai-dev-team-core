@@ -1,38 +1,12 @@
-status: Ready.
-title: Build a first-class local memory subsystem for the dev-team framework
-user_need: Improve the framework's memory handling so memory is a first-class, local-first subsystem that is fully integrated into the dev-team workflow without depending on an external memory server.
-goal: Make memory capture, retrieval, scope, and contradiction handling deterministic, inspectable, and usable by coordinator and specialists as part of the normal team system.
-in_scope:
-- Add a structured local memory layer as the durable project memory source of truth.
-- Define explicit memory record metadata such as type, scope, source, confidence, updated time, and supersession.
-- Add deterministic retrieval helpers that build compact context slices from structured memory.
-- Make phase/context consumers use the structured memory layer where relevant while keeping the system local-first.
-- Allow human-readable memory snapshots only as optional exports instead of canonical synchronized artifacts.
-out_of_scope:
-- Any dependency on an external memory server or hosted service.
-- Any redesign of the role model, coordinator permissions, or phase ownership map.
-- Any broad rewrite of the repository documentation workflow.
-- Any vector database, embedding service, or other heavyweight memory infrastructure unless explicitly justified by implementation needs later.
-functional_requirements:
-- The framework must store memory records locally in a structured form that can be inspected and versioned in git.
-- Memory records must support scope and lifecycle metadata so older facts can be superseded instead of silently accumulated.
-- Retrieval helpers must be able to assemble compact, role-appropriate context from structured memory without requiring an external backend.
-- The coordinator and specialists must be able to consume the structured memory layer through the existing runtime contracts.
-- Structured local records must be the canonical durable memory layer.
-acceptance_criteria:
-- A new structured memory record can be created, retrieved, and superseded using only local repository files and unit tests.
-- Memory retrieval returns compact, scoped context rather than dumping unrelated history.
-- Conflicting or superseded facts are represented explicitly rather than hidden.
-- The runtime can continue to operate without any external memory dependency.
-- Human-readable memory snapshots remain optional and, if produced, are derived from the structured memory layer.
-constraints:
-- Prefer local-first, inspectable, deterministic behavior over opaque automation.
-- Keep the memory subsystem integrated into the dev-team framework instead of treating it as a standalone helper.
-- Preserve the current role model and phase workflow unless a memory-specific integration point requires a small, explicit change.
-assumptions:
-- The repo should remain self-contained and runnable offline.
-- Existing human-readable memory files may remain as legacy snapshots or explicit exports, but the runtime should not depend on keeping them synchronized.
-open_questions:
-- What minimum set of structured memory record types is sufficient for v1?
-- Should contradiction handling be limited to explicit supersession metadata in v1, or also include separate conflict records?
-definition_of_ready: Ready.
+status: Pending.
+title: ""
+user_need: ""
+goal: ""
+in_scope: []
+out_of_scope: []
+functional_requirements: []
+acceptance_criteria: []
+constraints: []
+assumptions: []
+open_questions: []
+definition_of_ready: Not ready.

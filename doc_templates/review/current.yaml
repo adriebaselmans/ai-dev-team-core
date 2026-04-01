@@ -1,8 +1,6 @@
-status: Complete.
-title: Build a first-class local memory subsystem for the dev-team framework
-decision: Approved for testing.
-findings:
-- No blocking findings in the structured memory store, role-scoped query, projection, and validation changes.
-residual_risks:
-- Human-readable memory snapshots are explicit exports only, so anyone expecting them to stay current without rerendering can still misread stale files.
-recommendation: Proceed to testing.
+status: Pending.
+title: ""
+decision: Not reviewed.
+findings: []
+residual_risks: []
+recommendation: ""

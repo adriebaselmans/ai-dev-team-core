@@ -1,33 +1,11 @@
-status: Complete.
-title: Build a first-class local memory subsystem for the dev-team framework
-delivery_summary:
-- Added structured local memory records, deterministic query helpers, and on-demand memory snapshot exports.
-- Wired role context slices to named memory recipes so specialists receive scoped memory bundles.
-- Updated compaction to emit structured phase-brief memory records with supersession.
-requirements_coverage:
-- Local-first, inspectable memory records are stored in git-friendly JSON files.
-- Scope, source, confidence, subject, and supersession metadata are supported.
-- Retrieval returns compact, role-appropriate bundles.
-- The runtime stays fully local and does not depend on an external memory server.
-- Human-readable memory snapshots are optional derived exports rather than synchronized canonical artifacts.
-what_was_built:
-- memory_store now writes versioned structured records and queries active or superseded memory deterministically.
-- memory_export renders on-demand snapshots for project log, decisions, and known context views from structured records only.
-- context_slicer now uses named memory recipes from context_slices.yaml.
-- compaction now writes phase briefs with scope metadata and supersession links.
-- validators now require the new memory runtime module and test files.
-what_was_verified:
-- python -m unittest discover framework/runtime/tests
-- python -m unittest discover framework/runtime
-- Both suites passed with 39 tests.
-automated_regression_coverage:
-- python -m unittest discover framework/runtime/tests
-- python -m unittest discover framework/runtime
-acceptance_test_coverage:
-- Unit coverage exists for structured record queries, role-scoped memory slices, compaction behavior, memory export rendering, orchestrator export wiring, and the runtime validation gate.
-known_gaps_or_risks:
-- The runtime still reads legacy framework/memory/logs/ records during migration, so mixed-store behavior remains supported until old records are retired.
-- The test suite does not yet include an end-to-end CLI export-memory round trip against real files.
-decision: Accepted for user review.
-user_feedback_needed:
-- None.
+status: Pending.
+title: ""
+delivery_summary: []
+requirements_coverage: []
+what_was_built: []
+what_was_verified: []
+automated_regression_coverage: []
+acceptance_test_coverage: []
+known_gaps_or_risks: []
+decision: Not evaluated.
+user_feedback_needed: []

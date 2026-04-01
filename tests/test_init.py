@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import json
 import shutil
 import sys
 import unittest
@@ -56,6 +57,7 @@ class InitScriptTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         mocked_run.assert_not_called()
         self.assertTrue(metadata_path.exists())
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
 
         requirements = yaml.safe_load((self._sandbox_root / "doc_templates" / "requirements" / "current.yaml").read_text(encoding="utf-8"))
         design = yaml.safe_load((self._sandbox_root / "doc_templates" / "design" / "current.yaml").read_text(encoding="utf-8"))
@@ -71,6 +73,8 @@ class InitScriptTests(unittest.TestCase):
         self.assertEqual(design["title"], "Example Project")
         self.assertEqual(review["title"], "Example Project")
         self.assertEqual(dod["title"], "Example Project")
+        self.assertTrue(metadata["artifact_persistence"])
+        self.assertTrue(metadata["docs_export_on_release"])
         self.assertIn("Seeded active artifacts", buffer.getvalue())
         self.assertIn("Setup complete.", buffer.getvalue())
 

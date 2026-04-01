@@ -11,6 +11,8 @@ except ImportError:  # pragma: no cover - compatibility for direct script-style 
     from artifacts import ARTIFACT_FILES, load_artifact
     from spec_loader import load_artifact_schema, repo_root
 
+from team_orchestrator.project_context import release_docs_enabled
+
 
 DOC_FILES = {
     "requirements": "docs/requirements/index.md",
@@ -107,6 +109,8 @@ def render_artifact_doc(name: str) -> str:
 
 
 def export_all_docs(*, release_only: bool = False) -> list[Path]:
+    if not release_docs_enabled(repo_root()):
+        raise RuntimeError("export-docs is only enabled for bootstrapped project repos created from this skeleton.")
     if release_only:
         ensure_release_branch()
     written: list[Path] = []
