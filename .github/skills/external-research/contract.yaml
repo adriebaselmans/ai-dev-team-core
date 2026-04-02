@@ -1,14 +1,21 @@
 name: external-research
-description: Gather concise, current external evidence from primary or respected sources so the architect can make up-to-date design decisions without relying on stale assumptions.
+description: Retrieve current external evidence for freshness-sensitive technical decisions and return a concise, source-backed brief.
 response_mode: one-shot
 required_inputs:
-  - doc_templates/requirements/current.yaml
-  - doc_templates/design/current.yaml
-  - relevant project memory in framework/memory/
+  - bounded research question
+  - why the answer matters
+  - relevant local context when available
 expected_outputs:
-  - concise research brief with dates, source links, options, tradeoffs, and open questions when needed
+  - concise research brief
+  - verified facts
+  - sources with links and dates or versions
+  - implications when relevant
+  - confidence level
+  - remaining unknowns
 owned_artifacts: []
 completion_criteria:
-  - Current external sources have been identified and summarized.
-  - Freshness-sensitive facts are separated from stable background context.
-  - The brief is short, evidence-backed, and does not make the final architecture decision.
+  - The brief is concise and decision-relevant.
+  - Facts are grounded in sources.
+  - Freshness-sensitive claims include dates or versions when practical.
+  - Breaking changes, deprecations, and version differences are called out when relevant.
+  - The brief does not make the final architecture or implementation decision.

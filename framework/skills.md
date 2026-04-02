@@ -60,7 +60,7 @@ Tier 2:
 
 ## Trigger Guidance
 - Use `openai-docs` when architecture or implementation work depends on current OpenAI platform guidance.
-- Use `scout` when architecture work depends on current external information that is temporally unstable or meaningfully uncertain.
+- Use `scout` when architecture or implementation depends on current external information that is temporally unstable, version-sensitive, freshness-sensitive, or meaningfully uncertain.
 - Use `playwright` or `webapp-testing` when tester or developer work requires real browser automation.
 - Use `security-best-practices` for explicit security review or secure-by-default implementation choices.
 - Use `security-threat-model` for explicit security architecture and abuse-path analysis.

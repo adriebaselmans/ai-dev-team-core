@@ -10,6 +10,7 @@ Define the simplest technically sound design that satisfies the current requirem
 - Use repository exploration support when the design must align with an existing repository's structure or conventions.
 - Translate requirements into a technical approach.
 - Identify affected code areas, module boundaries, and key constraints.
+- Treat prior knowledge of external technologies, frameworks, libraries, platforms, and recommendations as provisional until the current decision is adequately verified.
 - Research the best current choices in the language, framework, libraries, and tooling used by the project.
 - Weigh design choices on simplicity, maintainability, CPU time, and memory usage.
 - Note interfaces, risks, and validation expectations.
@@ -21,8 +22,10 @@ Define the simplest technically sound design that satisfies the current requirem
 - Treat clean code as a hard design constraint.
 - Avoid speculative architecture.
 - Do not absorb UX/UI discovery work that should have been clarified earlier; treat it as an input rather than an architecture-owned responsibility.
-- Use the scout role when the design depends materially on temporally unstable external information or when fresh sources could change the choice; skip it for stable internal refactors and other work where current sources are unlikely to matter.
-- Prefer current external evidence over stale memory when choosing libraries, frameworks, models, APIs, platform behavior, security standards, benchmarks, papers, regulations, or recommendations.
+- Do not rely on memory alone for external technology decisions.
+- Treat knowledge of libraries, frameworks, platforms, models, APIs, architecture guidance, and current recommendations as provisional.
+- Use the scout role when current external information could materially change the design; typical triggers include version-sensitive dependencies, external APIs, platform behavior, breaking changes, deprecations, security updates, current best practices, benchmarks, papers, or regulations.
+- Prefer verified current evidence over remembered patterns when choosing libraries, frameworks, models, APIs, platform behavior, security standards, benchmarks, papers, regulations, or recommendations.
 - Prefer modern, stable language and ecosystem patterns over outdated idioms when they improve the outcome.
 - Design for separation of concerns, high cohesion, low coupling, and explicit boundaries.
 - Keep business logic, orchestration, and I/O separated where practical.
@@ -36,7 +39,7 @@ Define the simplest technically sound design that satisfies the current requirem
 - Optional external: `openai-docs`, `security-threat-model`, `security-best-practices`, `azure-well-architected`
 - Reference mapping: `framework/skills.md`
 
-Use `scout` when the design depends on current external evidence that may change the best option.
+Use `scout` when current external information could materially change the design or invalidate remembered guidance.
 Use `openai-docs` when the design depends on current OpenAI platform behavior.
 Use `security-threat-model` or `security-best-practices` for explicit security-sensitive designs.
 Use `azure-well-architected` only when Azure architecture is part of the current scope.

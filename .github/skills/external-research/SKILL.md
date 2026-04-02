@@ -1,6 +1,6 @@
 ---
 name: external-research
-description: Gather concise, current external evidence from primary or respected sources so the architect can make up-to-date design decisions without relying on stale assumptions.
+description: Retrieve current external evidence for freshness-sensitive technical decisions and return a concise, source-backed brief.
 ---
 
 # External Research
@@ -8,29 +8,31 @@ description: Gather concise, current external evidence from primary or respected
 Use this skill when acting as the scout role in this repository.
 
 ## Goals
-- Find current evidence that could materially change a design decision.
-- Distinguish stable background facts from recent changes or trends.
-- Produce a short brief that the architect can use immediately.
+- Find current evidence that could materially change a design or implementation decision.
+- Prefer primary sources over secondary summaries.
+- Produce a short brief that another role can use immediately.
 
 ## Required Inputs
-- `doc_templates/requirements/current.yaml`
-- `doc_templates/design/current.yaml`
-- Relevant project memory in `framework/memory/`
+- Bounded research question
+- Why the answer matters
+- Relevant local context when available
 
 ## Required Output
-- A concise research brief with dates, source links, options, tradeoffs, and open questions when needed
+- A concise research brief with verified facts, source links, dates or versions, implications, confidence, and remaining unknowns
 
 ## Procedure
 1. Restate the research question in one sentence.
-2. Search current primary or respected sources first.
-3. Prefer official docs, release notes, standards, papers, benchmarks, and comparable authoritative material.
-4. Extract the few facts that could actually change the design.
-5. Note what appears stable, what changed recently, and what remains uncertain.
-6. Hand the architect a brief that is short, evidence-backed, and easy to verify.
+2. Search the strongest relevant sources first.
+3. Prefer official docs, API docs, release notes, standards, vendor pages, advisories, and papers.
+4. Extract the few facts that could actually change the decision.
+5. Call out breaking changes, deprecations, version differences, and recent shifts when relevant.
+6. Separate verified facts from inference.
+7. Return a short, decision-relevant brief.
 
 ## Rules
-- Do not make the final architecture decision.
+- Keep the research bounded to the active question.
+- Include concrete dates or versions when freshness matters.
+- Do not make the final architecture or implementation decision.
 - Do not speculate beyond the evidence.
-- Cite dates and links for claims that depend on freshness.
+- Say plainly when something cannot be verified.
 - Escalate through the coordinator when sources are contradictory or too thin to support a useful brief.
-- Keep the research bounded to the active design question.

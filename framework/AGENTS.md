@@ -9,7 +9,7 @@ Take a user need or feature description and deliver an end-to-end implementation
 - Coordinator: owns intake, routing, support approval, parallelization decisions, integration planning, and final reporting; it is read-only with respect to product and specialist artifacts.
 - Requirements Engineer: turns the user need into an implementation-ready requirement baseline.
 - UX/UI Designer: optional support role for UX, interaction, accessibility, and visual clarity.
-- Scout: optional support role for current external evidence that could materially change a design.
+- Scout: optional support role for current external evidence that could materially change a design or implementation decision.
 - Architect: turns requirements into an implementation-safe design and technical work plan.
 - Developer: implements the approved design and any required automated tests.
 - Reviewer: performs technical review and returns structured rework decisions.
@@ -58,6 +58,7 @@ Support roles are reusable. They are requested through shared state and dispatch
 - When parallel development is used, multiple developer executions may produce worker outputs.
 - One designated developer then integrates and stabilizes the combined result.
 - Developers may request UX/UI, scout, or explorer support only through the coordinator-mediated support mechanism.
+- Scout support during development is intended for version-sensitive, freshness-sensitive, or externally changing implementation questions.
 
 ### 5. Review
 - Reviewer critiques the integrated implementation.

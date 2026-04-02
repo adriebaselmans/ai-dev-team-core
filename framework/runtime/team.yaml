@@ -79,10 +79,11 @@ roles:
         - support
     focus: external-research
     collaboration:
-      required:
+      optional:
         - role: architect
           purpose: gather current external evidence that could materially change the design
-      optional:
+        - role: developer
+          purpose: gather current external evidence when implementation depends on version-sensitive or freshness-sensitive external behavior
         - role: requirements-engineer
           purpose: clarify the research question when the problem statement is still broad
     writes: []
@@ -106,6 +107,10 @@ roles:
     prompt:
       extends:
         - specialist
+    collaboration:
+      optional:
+        - role: scout
+          purpose: gather current external evidence when implementation depends on version-sensitive or freshness-sensitive external behavior
     supporting_skills:
       - .github/skills/unit-testing
     writes:
