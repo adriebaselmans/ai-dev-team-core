@@ -3,22 +3,51 @@ runtime: model-agnostic
 top_level_role: coordinator
 specialist_dispatch: orchestrator-owned
 
+prompt_bundles:
+  coordinator:
+    extends:
+      - shared
+    layers:
+      - framework/prompts/coordinator-base.md
+  shared:
+    layers:
+      - framework/prompts/base-system.md
+  specialist:
+    extends:
+      - shared
+    layers:
+      - framework/prompts/specialist-base.md
+  support:
+    extends:
+      - shared
+    layers:
+      - framework/prompts/support-base.md
+
 roles:
   coordinator:
     agent_type: orchestrator
     read_only: true
     writes: []
     user_facing: true
+    prompt:
+      extends:
+        - coordinator
   requirements-engineer:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/requirements-clarification
+    prompt:
+      extends:
+        - specialist
     writes:
       - doc_templates/requirements/current.yaml
   ux-ui-designer:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/ui-ux-design
+    prompt:
+      extends:
+        - support
     focus: ux-ui-design
     collaboration:
       required:
@@ -32,10 +61,22 @@ roles:
         - role: tester
           purpose: support UI-focused acceptance and accessibility validation
     writes: []
+  explorer:
+    agent_type: specialist
+    user_facing: false
+    primary_skill: .github/skills/repository-exploration
+    prompt:
+      extends:
+        - support
+    focus: repository-exploration
+    writes: []
   scout:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/external-research
+    prompt:
+      extends:
+        - support
     focus: external-research
     collaboration:
       required:
@@ -49,6 +90,9 @@ roles:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/architecture-design
+    prompt:
+      extends:
+        - specialist
     collaboration:
       optional:
         - role: scout
@@ -59,6 +103,9 @@ roles:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/implementation-clean-code
+    prompt:
+      extends:
+        - specialist
     supporting_skills:
       - .github/skills/unit-testing
     writes:
@@ -74,6 +121,9 @@ roles:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/code-review
+    prompt:
+      extends:
+        - specialist
     focus: code-review-only
     collaboration:
       required:
@@ -85,6 +135,9 @@ roles:
     agent_type: specialist
     user_facing: false
     primary_skill: .github/skills/acceptance-testing
+    prompt:
+      extends:
+        - specialist
     focus: acceptance-validation
     collaboration:
       required:
@@ -98,6 +151,9 @@ roles:
   dod-reviewer:
     agent_type: specialist
     user_facing: false
+    prompt:
+      extends:
+        - specialist
     focus: acceptance-gate
     writes:
       - doc_templates/dod/current.yaml

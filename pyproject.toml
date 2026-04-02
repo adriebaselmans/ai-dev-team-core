@@ -24,3 +24,14 @@ py-modules = ["init"]
 where = ["."]
 include = ["framework*", "agents*", "team_orchestrator*", "flows*", "state*"]
 namespaces = true
+
+[tool.pytest.ini_options]
+addopts = "-p no:cacheprovider"
+testpaths = ["tests", "framework/runtime/tests"]
+norecursedirs = [
+  ".git",
+  "__pycache__",
+  ".tmp*",
+  "pytest-cache-files-*",
+  "runtime-memory-*",
+]

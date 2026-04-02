@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import json
 import shutil
-import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from uuid import uuid4
 
 import sys
 
@@ -16,7 +16,10 @@ import memory_store
 
 class MemoryStoreTests(unittest.TestCase):
     def setUp(self) -> None:
-        self._sandbox_root = Path(tempfile.mkdtemp(prefix='runtime-memory-', dir=Path(__file__).resolve().parents[3]))
+        sandbox_base = Path(__file__).resolve().parents[3] / '.tmp-pytest-workspace' / 'runtime-memory'
+        sandbox_base.mkdir(parents=True, exist_ok=True)
+        self._sandbox_root = sandbox_base / uuid4().hex
+        self._sandbox_root.mkdir(parents=True, exist_ok=False)
 
     def tearDown(self) -> None:
         shutil.rmtree(self._sandbox_root, ignore_errors=True)
