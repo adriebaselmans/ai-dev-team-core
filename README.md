@@ -161,3 +161,105 @@ Repository exploration support is invoked internally by the coordinator when a t
 - Review, test, and DoD gates return structured decisions with explicit rework targets.
 - The system supports loops, branching, parallel development fan-out, integration, and safe termination.
 - Release export and repository support utilities remain in `framework/runtime/`.
+
+## Execution Backends
+Execution backend selection is configured in [framework/config/models.yaml](framework/config/models.yaml).
+
+There are two layers:
+- `providers`: named provider definitions mapped to concrete backend implementations
+- `roles`: role-to-provider and role-to-model assignments, with optional role-level overrides
+
+Built-in backend types:
+- `openai_responses`
+- `github_copilot_cli`
+- `mock`
+
+Provider-level options are merged with role-level options. Role-level options win when both define the same key.
+
+Example configuration:
+
+```yaml
+providers:
+  openai:
+    backend: openai_responses
+    env:
+      api_key: OPENAI_API_KEY
+    options:
+      store: false
+      reasoning_effort: low
+      verbosity: medium
+
+  github-copilot:
+    backend: github_copilot_cli
+    options:
+      executable: copilot
+      output_format: text
+      silent: true
+      no_ask_user: true
+      no_custom_instructions: true
+      no_auto_update: true
+      stream: off
+
+roles:
+  scout:
+    provider: github-copilot
+    model: gpt-5
+
+  architect:
+    provider: openai
+    model: gpt-5.4
+    options:
+      reasoning_effort: medium
+```
+
+### OpenAI Backend
+The OpenAI backend uses the official Responses API with structured JSON-schema output.
+
+Configure it by:
+1. setting the provider backend to `openai_responses`
+2. exporting the environment variables referenced in that provider's `env` block
+
+Supported environment variables in the default config:
+- `OPENAI_API_KEY`
+- `OPENAI_BASE_URL`
+- `OPENAI_ORG_ID`
+- `OPENAI_PROJECT_ID`
+
+The default setup now installs the OpenAI Python SDK through `pyproject.toml`.
+
+### GitHub Copilot Backend
+The GitHub Copilot backend uses the official `copilot` CLI in programmatic mode.
+
+Configure it by:
+1. setting the provider backend to `github_copilot_cli`
+2. installing the `copilot` CLI
+3. authenticating it on the local machine
+
+Windows install example:
+
+```powershell
+winget install GitHub.Copilot
+```
+
+Cross-platform npm install example:
+
+```powershell
+npm install -g @github/copilot
+```
+
+The backend runs `copilot -p` with explicit flags for:
+- programmatic prompting
+- non-streaming output
+- suppressed interactive clarification
+- disabled nested repo instruction loading
+- least-privilege tool allowances derived from the role tool policy
+
+### How To Switch Backends
+Change the `provider` on the relevant role entries in [framework/config/models.yaml](framework/config/models.yaml).
+
+Common patterns:
+- keep most roles on OpenAI but move `scout` to GitHub Copilot
+- use GitHub Copilot for `developer` while keeping review roles on OpenAI
+- point a role back to `mock` while developing the execution layer
+
+The orchestrator and trace metadata record the provider, backend, model, and resolved options for each role.

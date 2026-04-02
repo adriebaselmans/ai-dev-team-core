@@ -43,3 +43,7 @@ def load_models_config() -> dict[str, Any]:
 
 def load_artifact_schema(name: str) -> dict[str, Any]:
     return load_yaml(schemas_dir() / f'{name}.schema.yaml')
+
+
+def load_role_output_contracts() -> dict[str, Any]:
+    return load_yaml(schemas_dir() / 'role_outputs.schema.yaml')

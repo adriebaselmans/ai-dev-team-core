@@ -4,16 +4,36 @@ default_mode: one-shot
 providers:
   mock:
     backend: mock
+    options: {}
   openai:
-    backend: mock
+    backend: openai_responses
+    env:
+      api_key: OPENAI_API_KEY
+      base_url: OPENAI_BASE_URL
+      organization: OPENAI_ORG_ID
+      project: OPENAI_PROJECT_ID
+    options:
+      store: false
+      reasoning_effort: low
+      verbosity: medium
+  github-copilot:
+    backend: github_copilot_cli
+    options:
+      executable: copilot
+      output_format: text
+      silent: true
+      no_ask_user: true
+      no_custom_instructions: true
+      no_auto_update: true
+      stream: off
   anthropic:
     backend: mock
+    options: {}
   ollama:
     backend: mock
+    options: {}
 
 roles:
-  # Set placeholder: true only for mock-only model identifiers. Remove the flag
-  # and replace the model value with a real provider model when wiring execution.
   coordinator:
     provider: mock
     model: gpt-5.4
@@ -23,44 +43,39 @@ roles:
     provider: openai
     model: gpt-5.4-mini
     mode: one-shot
-    placeholder: true
   ux-ui-designer:
     provider: openai
     model: gpt-5.4-mini
     mode: one-shot
-    placeholder: true
   explorer:
     provider: openai
     model: gpt-5.4-mini
     mode: one-shot
-    placeholder: true
   scout:
-    provider: openai
-    model: gpt-5.4-mini
+    provider: github-copilot
+    model: gpt-5
     mode: one-shot
-    placeholder: true
   architect:
     provider: openai
     model: gpt-5.4
     mode: one-shot
-    placeholder: true
+    options:
+      reasoning_effort: medium
   developer:
     provider: openai
     model: gpt-5.4
     mode: one-shot
-    placeholder: true
+    options:
+      reasoning_effort: medium
   reviewer:
     provider: openai
     model: gpt-5.4-mini
     mode: one-shot
-    placeholder: true
   tester:
     provider: openai
     model: gpt-5.4-mini
     mode: one-shot
-    placeholder: true
   dod-reviewer:
     provider: openai
     model: gpt-5.4-mini
     mode: one-shot
-    placeholder: true

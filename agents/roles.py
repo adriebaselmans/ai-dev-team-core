@@ -4,6 +4,22 @@ from typing import Any
 
 from agents.base import Agent
 from agents.discovery import discover_roles
+from team_orchestrator.context_builders import (
+    ArchitectContextBuilder,
+    DeveloperContextBuilder,
+    DoDReviewerContextBuilder,
+    ExplorerContextBuilder,
+    RequirementsContextBuilder,
+    ReviewerContextBuilder,
+    ScoutContextBuilder,
+    TesterContextBuilder,
+    UXUIContextBuilder,
+)
+from team_orchestrator.execution import (
+    RoleExecutionError,
+    RoleExecutor,
+    ToolPolicy,
+)
 
 
 def _scenario_entries(state: dict[str, Any], key: str) -> list[dict[str, Any]]:
@@ -168,10 +184,45 @@ class CoordinatorAgent(Agent):
 
 
 class RequirementsEngineerAgent(Agent):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        executor: RoleExecutor | None = None,
+        context_builder: RequirementsContextBuilder | None = None,
+        backend: Any | None = None,
+        tool_policy: ToolPolicy | None = None,
+    ) -> None:
         super().__init__("requirements-engineer", {"requirements", "support_request"})
+        self.executor = executor or RoleExecutor()
+        self.context_builder = context_builder or RequirementsContextBuilder()
+        self.backend = backend
+        self.tool_policy = tool_policy or ToolPolicy(
+            allow_local_read=True,
+            allow_local_write=False,
+            allow_shell=False,
+            allow_browser=False,
+            allow_external_research=False,
+            notes=(
+                "Requirements work should ground itself in the user request and local repository context.",
+                "Escalate ambiguity instead of inventing missing requirements.",
+            ),
+        )
 
     def _run(self, state: dict[str, Any]) -> dict[str, Any]:
+        try:
+            result = self.executor.execute(
+                role_key="requirements-engineer",
+                state=state,
+                step_name=str(state.get("meta", {}).get("current_step") or "requirements"),
+                context_builder=self.context_builder,
+                backend=self.backend,
+                tool_policy=self.tool_policy,
+            )
+            return result.update
+        except RoleExecutionError:
+            return self._fallback_run(state)
+
+    def _fallback_run(self, state: dict[str, Any]) -> dict[str, Any]:
         support_request = _support_request_for(state, "requirements-engineer")
         ready = bool(state.get("input"))
         return {
@@ -195,43 +246,128 @@ class RequirementsEngineerAgent(Agent):
 
 
 class UXUIDesignerAgent(Agent):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        executor: RoleExecutor | None = None,
+        context_builder: UXUIContextBuilder | None = None,
+        backend: Any | None = None,
+        tool_policy: ToolPolicy | None = None,
+    ) -> None:
         super().__init__("ux-ui-designer", {"ux_ui"})
+        self.executor = executor or RoleExecutor()
+        self.context_builder = context_builder or UXUIContextBuilder()
+        self.backend = backend
+        self.tool_policy = tool_policy or ToolPolicy(
+            allow_local_read=True,
+            allow_local_write=False,
+            allow_shell=False,
+            allow_browser=False,
+            allow_external_research=False,
+            notes=(
+                "UX/UI support is read-only and should remain bounded to the active UX question.",
+                "Focus on flows, states, clarity, and accessibility expectations.",
+            ),
+        )
 
     def _run(self, state: dict[str, Any]) -> dict[str, Any]:
         request_payload = state.get("support_request") or {}
         ui_heavy = bool((state.get("coordination") or {}).get("ui_heavy"))
-        guidance = []
-        if ui_heavy or request_payload.get("support_role") == "ux-ui-designer":
-            guidance = [
-                "Keep decision traces readable for humans reviewing the flow.",
-                "Treat accessibility and interaction clarity as acceptance inputs when UI scope is material.",
-            ]
-        return {
-            "ux_ui": {
-                "status": "ready" if guidance else "skipped",
-                "guidance": guidance,
-                "requested_by": request_payload.get("requested_by"),
+        active = ui_heavy or request_payload.get("support_role") == "ux-ui-designer"
+        if not active:
+            return {
+                "ux_ui": {
+                    "status": "skipped",
+                    "guidance": [],
+                    "requested_by": request_payload.get("requested_by"),
+                }
             }
-        }
+
+        try:
+            result = self.executor.execute(
+                role_key="ux-ui-designer",
+                state=state,
+                step_name=str(state.get("meta", {}).get("current_step") or "ux-ui"),
+                context_builder=self.context_builder,
+                backend=self.backend,
+                tool_policy=self.tool_policy,
+            )
+            return result.update
+        except RoleExecutionError as exc:
+            return {
+                "ux_ui": {
+                    "status": "blocked",
+                    "guidance": [str(exc)],
+                    "requested_by": request_payload.get("requested_by"),
+                }
+            }
 
 
 class ExplorerAgent(Agent):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        executor: RoleExecutor | None = None,
+        context_builder: ExplorerContextBuilder | None = None,
+        backend: Any | None = None,
+        tool_policy: ToolPolicy | None = None,
+    ) -> None:
         super().__init__("explorer", {"analysis"})
         self._known_roles = [role.key for role in discover_roles()]
+        self.executor = executor or RoleExecutor()
+        self.context_builder = context_builder or ExplorerContextBuilder()
+        self.backend = backend
+        self.tool_policy = tool_policy or ToolPolicy(
+            allow_local_read=True,
+            allow_local_write=False,
+            allow_shell=False,
+            allow_browser=False,
+            allow_external_research=False,
+            notes=(
+                "Explorer grounds work in the local repository only.",
+                "Explorer must stay read-only and return concise repository insights.",
+            ),
+        )
 
     def _run(self, state: dict[str, Any]) -> dict[str, Any]:
         request_payload = state.get("support_request") or {}
         repo_mode = (state.get("coordination") or {}).get("repo_mode")
+        active = repo_mode == "existing" or request_payload.get("support_role") == "explorer"
+        if not active:
+            return {
+                "analysis": {
+                    "status": "skipped",
+                    "repository_roles": list(self._known_roles),
+                    "insights": [],
+                    "requested_by": request_payload.get("requested_by"),
+                }
+            }
+
+        try:
+            result = self.executor.execute(
+                role_key="explorer",
+                state=state,
+                step_name=str(state.get("meta", {}).get("current_step") or "initial-exploration"),
+                context_builder=self.context_builder,
+                backend=self.backend,
+                tool_policy=self.tool_policy,
+            )
+            return result.update
+        except RoleExecutionError:
+            return self._fallback_run(state)
+
+    def _fallback_run(self, state: dict[str, Any]) -> dict[str, Any]:
+        request_payload = state.get("support_request") or {}
+        repo_mode = (state.get("coordination") or {}).get("repo_mode")
+        active = repo_mode == "existing" or request_payload.get("support_role") == "explorer"
         return {
             "analysis": {
-                "status": "ready" if repo_mode == "existing" or request_payload.get("support_role") == "explorer" else "skipped",
-                "repository_roles": self._known_roles,
+                "status": "ready" if active else "skipped",
+                "repository_roles": list(self._known_roles),
                 "insights": [
                     "Repository contains existing runtime configs and tests that should be preserved during refactor."
                 ]
-                if repo_mode == "existing" or request_payload.get("support_role") == "explorer"
+                if active
                 else [],
                 "requested_by": request_payload.get("requested_by"),
             }
@@ -239,25 +375,126 @@ class ExplorerAgent(Agent):
 
 
 class ScoutAgent(Agent):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        executor: RoleExecutor | None = None,
+        context_builder: ScoutContextBuilder | None = None,
+        backend: Any | None = None,
+        tool_policy: ToolPolicy | None = None,
+    ) -> None:
         super().__init__("scout", {"research"})
+        self.executor = executor or RoleExecutor()
+        self.context_builder = context_builder or ScoutContextBuilder()
+        self.backend = backend
+        self.tool_policy = tool_policy or ToolPolicy(
+            allow_local_read=True,
+            allow_local_write=False,
+            allow_shell=False,
+            allow_browser=False,
+            allow_external_research=True,
+            notes=(
+                "Scout may use external research tooling to gather current evidence.",
+                "Scout must stay read-only and return a concise research brief.",
+            ),
+        )
 
     def _run(self, state: dict[str, Any]) -> dict[str, Any]:
         request_payload = state.get("support_request") or {}
-        return {
-            "research": {
-                "status": "ready" if request_payload.get("support_role") == "scout" else "skipped",
-                "brief": [request_payload.get("question")] if request_payload.get("support_role") == "scout" else [],
-                "requested_by": request_payload.get("requested_by"),
+        if request_payload.get("support_role") != "scout":
+            return {"research": self._empty_research(status="skipped", requested_by=request_payload.get("requested_by"))}
+
+        question = str(request_payload.get("question") or "").strip()
+        if not question:
+            return {
+                "research": self._empty_research(
+                    status="blocked",
+                    requested_by=request_payload.get("requested_by"),
+                    unknowns=["Support request is missing a research question."],
+                )
             }
+
+        try:
+            result = self.executor.execute(
+                role_key="scout",
+                state=state,
+                step_name=str(state.get("meta", {}).get("current_step") or "support-execute"),
+                context_builder=self.context_builder,
+                backend=self.backend,
+                tool_policy=self.tool_policy,
+            )
+            return result.update
+        except RoleExecutionError as exc:
+            return {
+                "research": self._empty_research(
+                    status="blocked",
+                    requested_by=request_payload.get("requested_by"),
+                    brief=[question],
+                    unknowns=[str(exc)],
+                    confidence="low",
+                )
+            }
+
+    def _empty_research(
+        self,
+        *,
+        status: str,
+        requested_by: Any,
+        brief: list[str] | None = None,
+        unknowns: list[str] | None = None,
+        confidence: str | None = None,
+    ) -> dict[str, Any]:
+        return {
+            "status": status,
+            "brief": list(brief or []),
+            "requested_by": requested_by,
+            "verified_facts": [],
+            "sources": [],
+            "confidence": confidence,
+            "unknowns": list(unknowns or []),
         }
 
 
 class ArchitectAgent(Agent):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        executor: RoleExecutor | None = None,
+        context_builder: ArchitectContextBuilder | None = None,
+        backend: Any | None = None,
+        tool_policy: ToolPolicy | None = None,
+    ) -> None:
         super().__init__("architect", {"design", "support_request"})
+        self.executor = executor or RoleExecutor()
+        self.context_builder = context_builder or ArchitectContextBuilder()
+        self.backend = backend
+        self.tool_policy = tool_policy or ToolPolicy(
+            allow_local_read=True,
+            allow_local_write=False,
+            allow_shell=False,
+            allow_browser=False,
+            allow_external_research=False,
+            notes=(
+                "Architect should use the provided support outputs instead of broad ad hoc research.",
+                "Prefer the simplest viable design grounded in verified requirements and evidence.",
+            ),
+        )
 
     def _run(self, state: dict[str, Any]) -> dict[str, Any]:
+        try:
+            result = self.executor.execute(
+                role_key="architect",
+                state=state,
+                step_name=str(state.get("meta", {}).get("current_step") or "architecture"),
+                context_builder=self.context_builder,
+                backend=self.backend,
+                tool_policy=self.tool_policy,
+            )
+            return result.update
+        except RoleExecutionError:
+            return self._fallback_run(state)
+
+    def _fallback_run(self, state: dict[str, Any]) -> dict[str, Any]:
         existing_design = state.get("design") or {}
         support_request = _support_request_for(state, "architect")
         work_items = list(existing_design.get("work_items", []))
@@ -284,10 +521,55 @@ class ArchitectAgent(Agent):
 
 
 class DeveloperAgent(Agent):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        executor: RoleExecutor | None = None,
+        context_builder: DeveloperContextBuilder | None = None,
+        backend: Any | None = None,
+        tool_policy: ToolPolicy | None = None,
+    ) -> None:
         super().__init__("developer", {"development", "development_artifact", "support_request"})
+        self.executor = executor or RoleExecutor()
+        self.context_builder = context_builder or DeveloperContextBuilder()
+        self.backend = backend
+        self.tool_policy = tool_policy or ToolPolicy(
+            allow_local_read=True,
+            allow_local_write=True,
+            allow_shell=True,
+            allow_browser=False,
+            allow_external_research=False,
+            writable_paths=(
+                "agents/",
+                "team_orchestrator/",
+                "flows/",
+                "state/",
+                "src/",
+                "framework/runtime/",
+                "framework/runtime/tests/",
+                "tests/",
+            ),
+            notes=(
+                "Developer may modify only owned implementation paths.",
+                "Use Scout support instead of ad hoc external research when current external behavior matters.",
+            ),
+        )
 
     def _run(self, state: dict[str, Any]) -> dict[str, Any]:
+        try:
+            result = self.executor.execute(
+                role_key="developer",
+                state=state,
+                step_name=str(state.get("meta", {}).get("current_step") or "development"),
+                context_builder=self.context_builder,
+                backend=self.backend,
+                tool_policy=self.tool_policy,
+            )
+            return result.update
+        except RoleExecutionError:
+            return self._fallback_run(state)
+
+    def _fallback_run(self, state: dict[str, Any]) -> dict[str, Any]:
         step = str(state.get("meta", {}).get("current_step", ""))
         support_request = _support_request_for(state, "developer")
         development = state.get("development") or {}
@@ -330,10 +612,45 @@ class DeveloperAgent(Agent):
 
 
 class ReviewerAgent(Agent):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        executor: RoleExecutor | None = None,
+        context_builder: ReviewerContextBuilder | None = None,
+        backend: Any | None = None,
+        tool_policy: ToolPolicy | None = None,
+    ) -> None:
         super().__init__("reviewer", {"review", "support_request"})
+        self.executor = executor or RoleExecutor()
+        self.context_builder = context_builder or ReviewerContextBuilder()
+        self.backend = backend
+        self.tool_policy = tool_policy or ToolPolicy(
+            allow_local_read=True,
+            allow_local_write=False,
+            allow_shell=False,
+            allow_browser=False,
+            allow_external_research=False,
+            notes=(
+                "Reviewer remains read-only and should ground findings in the provided artifacts.",
+                "Call out residual risks and explicit rework targets when approval is not justified.",
+            ),
+        )
 
     def _run(self, state: dict[str, Any]) -> dict[str, Any]:
+        try:
+            result = self.executor.execute(
+                role_key="reviewer",
+                state=state,
+                step_name=str(state.get("meta", {}).get("current_step") or "review"),
+                context_builder=self.context_builder,
+                backend=self.backend,
+                tool_policy=self.tool_policy,
+            )
+            return result.update
+        except RoleExecutionError:
+            return self._fallback_run(state)
+
+    def _fallback_run(self, state: dict[str, Any]) -> dict[str, Any]:
         support_request = _support_request_for(state, "reviewer")
         revision = int((state.get("development") or {}).get("revision", 0))
         scenario = _scenario_for_revision(state, "review", revision)
@@ -354,10 +671,45 @@ class ReviewerAgent(Agent):
 
 
 class TesterAgent(Agent):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        executor: RoleExecutor | None = None,
+        context_builder: TesterContextBuilder | None = None,
+        backend: Any | None = None,
+        tool_policy: ToolPolicy | None = None,
+    ) -> None:
         super().__init__("tester", {"test_results", "support_request"})
+        self.executor = executor or RoleExecutor()
+        self.context_builder = context_builder or TesterContextBuilder()
+        self.backend = backend
+        self.tool_policy = tool_policy or ToolPolicy(
+            allow_local_read=True,
+            allow_local_write=False,
+            allow_shell=False,
+            allow_browser=False,
+            allow_external_research=False,
+            notes=(
+                "Tester validates acceptance against the provided requirements and design constraints.",
+                "Return explicit failures and rework targets when validation does not pass.",
+            ),
+        )
 
     def _run(self, state: dict[str, Any]) -> dict[str, Any]:
+        try:
+            result = self.executor.execute(
+                role_key="tester",
+                state=state,
+                step_name=str(state.get("meta", {}).get("current_step") or "testing"),
+                context_builder=self.context_builder,
+                backend=self.backend,
+                tool_policy=self.tool_policy,
+            )
+            return result.update
+        except RoleExecutionError:
+            return self._fallback_run(state)
+
+    def _fallback_run(self, state: dict[str, Any]) -> dict[str, Any]:
         support_request = _support_request_for(state, "tester")
         revision = int((state.get("development") or {}).get("revision", 0))
         scenario = _scenario_for_revision(state, "test", revision)
@@ -376,10 +728,45 @@ class TesterAgent(Agent):
 
 
 class DodReviewerAgent(Agent):
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        executor: RoleExecutor | None = None,
+        context_builder: DoDReviewerContextBuilder | None = None,
+        backend: Any | None = None,
+        tool_policy: ToolPolicy | None = None,
+    ) -> None:
         super().__init__("dod-reviewer", {"dod_review"})
+        self.executor = executor or RoleExecutor()
+        self.context_builder = context_builder or DoDReviewerContextBuilder()
+        self.backend = backend
+        self.tool_policy = tool_policy or ToolPolicy(
+            allow_local_read=True,
+            allow_local_write=False,
+            allow_shell=False,
+            allow_browser=False,
+            allow_external_research=False,
+            notes=(
+                "DoD review is read-only and should validate final acceptance against requirements and design constraints.",
+                "Return explicit blocking findings when Definition of Done is not satisfied.",
+            ),
+        )
 
     def _run(self, state: dict[str, Any]) -> dict[str, Any]:
+        try:
+            result = self.executor.execute(
+                role_key="dod-reviewer",
+                state=state,
+                step_name=str(state.get("meta", {}).get("current_step") or "dod-review"),
+                context_builder=self.context_builder,
+                backend=self.backend,
+                tool_policy=self.tool_policy,
+            )
+            return result.update
+        except RoleExecutionError:
+            return self._fallback_run(state)
+
+    def _fallback_run(self, state: dict[str, Any]) -> dict[str, Any]:
         revision = int((state.get("development") or {}).get("revision", 0))
         scenario = _scenario_for_revision(state, "dod_review", revision)
         approved = bool(scenario.get("approved", True))
