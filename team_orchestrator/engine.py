@@ -10,8 +10,12 @@ from team_orchestrator.artifact_sync import ArtifactSynchronizer
 from team_orchestrator.conditions import evaluate_condition, resolve_path, set_path
 from team_orchestrator.logger import TraceLogger
 from team_orchestrator.memory_sync import MemorySynchronizer
-from team_orchestrator.models import RoleModelConfig, load_role_model_map, validate_role_model_map
 from team_orchestrator.prompts import RolePromptConfig, load_role_prompt_map, validate_role_prompt_map
+from team_orchestrator.runtimes import (
+    RoleRuntimeConfig,
+    load_role_runtime_map,
+    validate_role_runtime_map,
+)
 
 
 class Orchestrator:
@@ -28,9 +32,9 @@ class Orchestrator:
         self.logger = logger or TraceLogger()
         self.artifact_synchronizer = artifact_synchronizer or ArtifactSynchronizer()
         self.memory_synchronizer = memory_synchronizer or MemorySynchronizer()
-        self.role_models = load_role_model_map()
+        self.role_runtimes = load_role_runtime_map()
         self.role_prompts = load_role_prompt_map()
-        validate_role_model_map(self.role_models, list(self.agents))
+        validate_role_runtime_map(self.role_runtimes, list(self.agents))
         validate_role_prompt_map(self.role_prompts, list(self.agents))
         self._validate_flow()
 
@@ -40,8 +44,8 @@ class Orchestrator:
             role_keys=list(self.agents),
             flow_name=str(self.flow.get("name", "unnamed-flow")),
         )
-        working_state["meta"]["role_models"] = {
-            role_key: config.as_dict() for role_key, config in self.role_models.items()
+        working_state["meta"]["role_runtimes"] = {
+            role_key: config.as_dict() for role_key, config in self.role_runtimes.items()
         }
         working_state["meta"]["role_prompts"] = {
             role_key: config.as_dict() for role_key, config in self.role_prompts.items()
@@ -184,7 +188,7 @@ class Orchestrator:
                 {
                     "step": step_name,
                     "role": role_key,
-                    "model": self._model_payload(role_key),
+                    "runtime": self._runtime_payload(role_key),
                     "prompt": self._prompt_payload(role_key),
                     "parallel_item": deepcopy(item),
                     "update": deepcopy(update),
@@ -231,7 +235,7 @@ class Orchestrator:
             {
                 "step": step_name,
                 "role": role_key,
-                "model": self._model_payload(role_key),
+                "runtime": self._runtime_payload(role_key),
                 "prompt": self._prompt_payload(role_key),
                 "update": deepcopy(update),
                 "next_step": next_step,
@@ -257,8 +261,8 @@ class Orchestrator:
             self.artifact_synchronizer.sync(state, role_key="coordinator", step_name="finalize")
         return state
 
-    def _model_payload(self, role_key: str) -> dict[str, Any] | None:
-        config: RoleModelConfig | None = self.role_models.get(role_key)
+    def _runtime_payload(self, role_key: str) -> dict[str, Any] | None:
+        config: RoleRuntimeConfig | None = self.role_runtimes.get(role_key)
         if config is None:
             return None
         return config.as_dict()

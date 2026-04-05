@@ -2,18 +2,18 @@
 
 ## Highest-Priority Gap
 
-### Prove Live Backend Execution End to End
-The framework now supports real execution backends for OpenAI and GitHub Copilot, but current coverage is still based on mocked backend tests rather than full live-provider runs.
+### Prove Native Host Execution End to End
+The framework is now designed around native GitHub Copilot in Visual Studio Code execution, with Codex as the compatibility runtime. Current automated coverage validates contracts, flow behavior, runtime metadata, and native agent profile consistency, but it still does not prove real host-native execution end to end.
 
 What is still missing:
-- verify OpenAI execution with a real configured `OPENAI_API_KEY`
-- verify GitHub Copilot CLI execution on a machine with `copilot` installed and authenticated
-- confirm model identifiers, auth handling, and structured-output behavior against real providers
-- add an opt-in integration test path for live backend validation without making normal CI depend on external credentials
+- verify GitHub Copilot in Visual Studio Code with the native `.github/agents/*.agent.md` profiles
+- verify Codex compatibility against the same role and flow contracts in a real Codex session
+- confirm native handoffs, support-role dispatch, and role selection behave as intended in both hosts
+- add an opt-in integration validation path that checks host-native behavior without making normal CI depend on an interactive editor or hosted agent environment
 
 Why this matters:
-- the orchestration, contracts, and backend adapters are now in place
-- the main remaining risk is runtime behavior in real provider environments rather than local framework consistency
+- the orchestration, contracts, prompts, and native agent profiles are now in place
+- the main remaining risk is real host-native behavior rather than local framework consistency
 
 Suggested next step:
-- add provider-gated integration checks that run only when the required credentials or CLI are available
+- add host-gated integration checks that run only when the required native environment is available

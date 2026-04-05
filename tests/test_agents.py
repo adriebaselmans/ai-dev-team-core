@@ -44,6 +44,14 @@ def test_gate_roles_return_structured_decisions() -> None:
     test_results = registry["tester"].run(state)["test_results"]
     dod_review = registry["dod-reviewer"].run(state)["dod_review"]
 
-    assert set(review) == {"decision", "approved", "feedback", "score", "blocking_findings", "rework_target"}
+    assert set(review) == {
+        "decision",
+        "approved",
+        "feedback",
+        "score",
+        "blocking_findings",
+        "rework_target",
+        "residual_risks",
+    }
     assert set(test_results) == {"decision", "passed", "errors", "automated", "rework_target"}
     assert set(dod_review) == {"decision", "approved", "feedback", "blocking_findings", "rework_target"}

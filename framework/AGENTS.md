@@ -25,9 +25,13 @@ Runtime support utilities live in `framework/runtime/`.
 ## Active Runtime Model
 - `flows/software_delivery.yaml` defines the active flow.
 - `framework/runtime/team.yaml` defines the role registry and ownership metadata.
-- `framework/config/models.yaml` defines role-to-model assignment for the active orchestrator.
+- `framework/config/runtimes.yaml` defines the native host runtime mapping for roles.
 - `framework/runtime/state.json` stores the latest persisted orchestration snapshot.
 - `framework/memory/repository-knowledge/` stores durable repository analysis artifacts.
+
+GitHub Copilot in Visual Studio Code is the primary runtime.
+Codex is the supported compatibility runtime.
+The Python orchestrator remains a validation harness, not the preferred specialist execution path.
 
 ## Flow Summary
 The active default flow is:

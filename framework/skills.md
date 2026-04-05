@@ -13,7 +13,7 @@ This file maps team roles to project-local skills and reusable external skills.
 - Coordinator
   Primary: `.github/skills/coordinator-flow`
   Supporting: `.github/skills/memory-update`
-  Runtime: `flows/software_delivery.yaml`, `framework/runtime/team.yaml`, `framework/config/models.yaml`
+  Runtime: `flows/software_delivery.yaml`, `framework/runtime/team.yaml`, `framework/config/runtimes.yaml`
 - Requirements Engineer
   Primary: `.github/skills/requirements-clarification`
   Optional external: `pdf`
@@ -71,4 +71,4 @@ Tier 2:
 - Use `azure-well-architected` only when Azure architecture is in scope.
 
 ## Rule
-- For active runtime orchestration, treat `flows/software_delivery.yaml`, `framework/runtime/team.yaml`, and `framework/config/models.yaml` as the machine-readable contract set.
+- For active runtime orchestration, treat `flows/software_delivery.yaml`, `framework/runtime/team.yaml`, and `framework/config/runtimes.yaml` as the machine-readable contract set.

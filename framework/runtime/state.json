@@ -20,7 +20,8 @@
   "meta": {
     "flow_name": null,
     "roles": [],
-    "role_models": {},
+    "role_runtimes": {},
+    "role_prompts": {},
     "current_step": null,
     "last_role": null,
     "last_next_step": null,

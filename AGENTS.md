@@ -6,6 +6,8 @@ When Codex starts in this repo, use the coordinator workflow defined in [framewo
 
 ## Default Behavior
 - Treat the user request as input for the coordinator.
+- Prefer the native Copilot agent model declared in `.github/agents/` when the host supports it.
+- In Codex, follow the same role, flow, prompt, and runtime contracts as a compatibility path.
 - Move through the active flow defined in `flows/software_delivery.yaml`, using the coordinator policy in `framework/AGENTS.md`.
 - Use the project-local skills in `.github/skills/` and the role mapping in `framework/skills.md` where applicable.
 - Use `framework/runtime/` for team metadata, state snapshots, artifact export, memory helpers, and repository exploration support utilities.
