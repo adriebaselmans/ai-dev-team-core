@@ -21,7 +21,7 @@ Use this skill when acting as the coordinator in this repository.
 - `framework/AGENTS.md`
 - `flows/software_delivery.yaml`
 - `framework/runtime/team.yaml`
-- `framework/config/models.yaml`
+- `framework/config/runtimes.yaml`
 - `framework/runtime/state.json`
 - Active artifacts in `doc_templates/`
 - Current project memory in `framework/memory/`
@@ -34,7 +34,7 @@ Use this skill when acting as the coordinator in this repository.
 
 ## Procedure
 1. Read `framework/AGENTS.md` and `flows/software_delivery.yaml`.
-2. Read `framework/runtime/team.yaml` and `framework/config/models.yaml`.
+2. Read `framework/runtime/team.yaml` and `framework/config/runtimes.yaml`.
 3. Update `framework/runtime/state.json` before and after each run.
 4. Route the correct specialist role for the active phase through the shared-state flow.
 5. Route explorer, scout, or UX/UI support only through coordinator-mediated support approval.
