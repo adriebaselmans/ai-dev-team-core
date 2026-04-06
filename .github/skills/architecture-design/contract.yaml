@@ -4,9 +4,9 @@ response_mode: one-shot
 required_inputs:
   - doc_templates/requirements/current.yaml
   - doc_templates/design/current.yaml
-  - framework/clean-code.md
+  - .ai-team/framework/clean-code.md
   - relevant code in src/
-  - project memory in framework/memory/
+  - project memory in .ai-team/framework/memory/
 expected_outputs:
   - doc_templates/design/current.yaml
 owned_artifacts:

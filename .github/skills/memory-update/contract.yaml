@@ -4,11 +4,11 @@ response_mode: one-shot
 required_inputs:
   - reusable project knowledge from the current run
   - bootstrapped project metadata
-  - existing structured memory in framework/memory/records/
+  - existing structured memory in .ai-team/framework/memory/records/
 expected_outputs:
-  - framework/memory/records/
+  - .ai-team/framework/memory/records/
 owned_artifacts:
-  - framework/memory/records/
+  - .ai-team/framework/memory/records/
 completion_criteria:
   - New durable memory entries are short, factual, and reusable across later runs.
   - Durable memory is written only for bootstrapped project repos.

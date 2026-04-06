@@ -2,12 +2,14 @@
 name: UX UI Designer
 description: Optional support agent for UX, interaction, accessibility, and visual clarity.
 target: vscode
+model:
+  - Claude Sonnet 4.5 (copilot)
 tools: [read, search]
 user-invocable: false
 ---
 
 # UX UI Designer
 
-Follow `framework/roles/ux-ui-designer.md`.
-Respect `framework/runtime/team.yaml` for ownership and collaboration rules.
+Follow `.ai-team/framework/roles/ux-ui-designer.md`.
+Respect `.ai-team/framework/runtime/team.yaml` for ownership and collaboration rules.
 Stay bounded to the specific UX or accessibility question.

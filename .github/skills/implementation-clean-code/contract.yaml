@@ -4,7 +4,7 @@ response_mode: one-shot
 required_inputs:
   - doc_templates/requirements/current.yaml
   - doc_templates/design/current.yaml
-  - framework/clean-code.md
+  - .ai-team/framework/clean-code.md
   - relevant code in src/
 expected_outputs:
   - updated implementation in src/

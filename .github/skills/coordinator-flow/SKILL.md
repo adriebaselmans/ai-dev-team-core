@@ -18,24 +18,24 @@ Use this skill when acting as the coordinator in this repository.
 
 ## Required Inputs
 - User request
-- `framework/AGENTS.md`
-- `flows/software_delivery.yaml`
-- `framework/runtime/team.yaml`
-- `framework/config/runtimes.yaml`
-- `framework/runtime/state.json`
+- `.ai-team/framework/AGENTS.md`
+- `.ai-team/flows/software_delivery.yaml`
+- `.ai-team/framework/runtime/team.yaml`
+- `.ai-team/framework/config/runtimes.yaml`
+- `.ai-team/framework/runtime/state.json`
 - Active artifacts in `doc_templates/`
-- Current project memory in `framework/memory/`
-- Current repository briefs in `framework/memory/repository-knowledge/`
+- Current project memory in `.ai-team/framework/memory/`
+- Current repository briefs in `.ai-team/framework/memory/repository-knowledge/`
 
 ## Required Outputs
-- Updated `framework/runtime/state.json`
+- Updated `.ai-team/framework/runtime/state.json`
 - Updated durable memory entries only when reusable cross-run knowledge is produced in a bootstrapped project repo
 - Final user-facing delivery summary
 
 ## Procedure
-1. Read `framework/AGENTS.md` and `flows/software_delivery.yaml`.
-2. Read `framework/runtime/team.yaml` and `framework/config/runtimes.yaml`.
-3. Update `framework/runtime/state.json` before and after each run.
+1. Read `.ai-team/framework/AGENTS.md` and `.ai-team/flows/software_delivery.yaml`.
+2. Read `.ai-team/framework/runtime/team.yaml` and `.ai-team/framework/config/runtimes.yaml`.
+3. Update `.ai-team/framework/runtime/state.json` before and after each run.
 4. Route the correct specialist role for the active phase through the shared-state flow.
 5. Route explorer, scout, or UX/UI support only through coordinator-mediated support approval.
 6. Validate that the required artifact for that phase exists and is coherent when artifact persistence is enabled.
@@ -66,10 +66,10 @@ Use this skill when acting as the coordinator in this repository.
 - Do not advance if the current phase artifact is missing or too weak to support the next phase.
 
 ## Memory Rules
-- Capture only reusable cross-run knowledge in `framework/memory/records/`.
+- Capture only reusable cross-run knowledge in `.ai-team/framework/memory/records/`.
 - Write structured memory only in bootstrapped project repos, not in the bare skeleton repo.
 - Do not duplicate active shared state or phase artifacts in memory.
-- Keep `framework/memory/repository-knowledge/` current when repository exploration produces reusable intelligence.
+- Keep `.ai-team/framework/memory/repository-knowledge/` current when repository exploration produces reusable intelligence.
 - Treat `project-log.md`, `decisions.md`, and `known-context.md` as optional exports or legacy snapshots, not the primary write path.
 
 ## Interaction Rules

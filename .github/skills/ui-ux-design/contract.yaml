@@ -4,7 +4,7 @@ response_mode: one-shot
 required_inputs:
   - doc_templates/requirements/current.yaml
   - doc_templates/design/current.yaml
-  - relevant project memory in framework/memory/
+  - relevant project memory in .ai-team/framework/memory/
 expected_outputs:
   - bounded UX/UI guidance for the active task
   - clarification questions for the coordinator when user-flow or interaction ambiguity remains

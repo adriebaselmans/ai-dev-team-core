@@ -15,9 +15,9 @@ Use this skill when acting as the architect in this repository.
 ## Required Inputs
 - `doc_templates/requirements/current.yaml`
 - `doc_templates/design/current.yaml`
-- `framework/clean-code.md`
+- `.ai-team/framework/clean-code.md`
 - Relevant code in `src/`
-- Project memory in `framework/memory/`
+- Project memory in `.ai-team/framework/memory/`
 
 ## Required Output
 - Updated `doc_templates/design/current.yaml`

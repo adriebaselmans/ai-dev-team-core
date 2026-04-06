@@ -15,12 +15,12 @@ Use this skill when the user asks to base work on a specific repository, asks fo
 ## Required Inputs
 - Target repository path, URL, or checkout location
 - The user request or downstream role question that motivates the exploration
-- Existing repository knowledge in `framework/memory/repository-knowledge/` when available
+- Existing repository knowledge in `.ai-team/framework/memory/repository-knowledge/` when available
 
 ## Required Outputs
-- `framework/memory/repository-knowledge/<repo-slug>/brief.md`
-- `framework/memory/repository-knowledge/<repo-slug>/facts.json`
-- `framework/memory/repository-knowledge/index.md` when the repository is new to the knowledge store
+- `.ai-team/framework/memory/repository-knowledge/<repo-slug>/brief.md`
+- `.ai-team/framework/memory/repository-knowledge/<repo-slug>/facts.json`
+- `.ai-team/framework/memory/repository-knowledge/index.md` when the repository is new to the knowledge store
 
 ## Procedure
 1. Identify the target repository, its local path or source URL, and its current revision when available.

@@ -15,7 +15,7 @@ Use this skill after repository exploration or when refreshing an existing repos
 ## Required Inputs
 - Raw repository findings
 - Existing repository brief or facts file, if any
-- `framework/memory/repository-knowledge/TEMPLATE.md`
+- `.ai-team/framework/memory/repository-knowledge/TEMPLATE.md`
 
 ## Required Outputs
 - Updated `brief.md`

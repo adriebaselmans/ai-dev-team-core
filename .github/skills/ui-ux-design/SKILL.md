@@ -15,7 +15,7 @@ Use this skill when acting as the UX/UI designer in this repository.
 ## Required Inputs
 - `doc_templates/requirements/current.yaml`
 - `doc_templates/design/current.yaml`
-- Relevant project memory in `framework/memory/`
+- Relevant project memory in `.ai-team/framework/memory/`
 
 ## Required Output
 - Bounded UX/UI guidance for the active task

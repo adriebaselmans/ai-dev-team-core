@@ -6,23 +6,23 @@ policy:
   direct_file_writes: delegated
 required_inputs:
   - user request
-  - framework/AGENTS.md
-  - flows/software_delivery.yaml
-  - framework/runtime/team.yaml
-  - framework/config/runtimes.yaml
-  - framework/runtime/state.json
+  - .ai-team/framework/AGENTS.md
+  - .ai-team/flows/software_delivery.yaml
+  - .ai-team/framework/runtime/team.yaml
+  - .ai-team/framework/config/runtimes.yaml
+  - .ai-team/framework/runtime/state.json
   - doc_templates/requirements/current.yaml
   - doc_templates/design/current.yaml
   - doc_templates/review/current.yaml
   - doc_templates/dod/current.yaml
 expected_outputs:
-  - framework/runtime/state.json
-  - framework/memory/records/
+  - .ai-team/framework/runtime/state.json
+  - .ai-team/framework/memory/records/
   - final user-facing delivery summary
 owned_artifacts: []
 delegated_artifacts:
-  - framework/runtime/state.json
-  - framework/memory/records/
+  - .ai-team/framework/runtime/state.json
+  - .ai-team/framework/memory/records/
 completion_criteria:
   - Each completed run is reflected in the shared state snapshot.
   - Reusable cross-run memory is persisted only when the repo is a bootstrapped project repo.

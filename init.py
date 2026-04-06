@@ -14,8 +14,12 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parent
 
 
+def ai_team_root() -> Path:
+    return REPO_ROOT / ".ai-team"
+
+
 def metadata_path() -> Path:
-    return REPO_ROOT / "framework" / "init-metadata.json"
+    return ai_team_root() / "framework" / "init-metadata.json"
 
 
 def required_paths() -> list[Path]:
@@ -23,9 +27,9 @@ def required_paths() -> list[Path]:
         REPO_ROOT / "AGENTS.md",
         REPO_ROOT / "README.md",
         REPO_ROOT / "CHANGELOG.md",
-        REPO_ROOT / "framework",
-        REPO_ROOT / "framework" / "runtime",
-        REPO_ROOT / "framework" / "roles",
+        ai_team_root() / "framework",
+        ai_team_root() / "framework" / "runtime",
+        ai_team_root() / "framework" / "roles",
         REPO_ROOT / ".github" / "skills",
         REPO_ROOT / "doc_templates",
         REPO_ROOT / "docs",
@@ -129,7 +133,7 @@ def _seed_artifacts(metadata: dict[str, str]) -> list[str]:
             "data_flow": [],
             "interfaces": [],
             "technology_and_environment_considerations": [f"Target stack: {metadata['target_stack']}"],
-            "clean_code_constraints": ["Follow framework/clean-code.md."],
+            "clean_code_constraints": ["Follow .ai-team/framework/clean-code.md."],
             "performance_considerations": [],
             "risks_and_tradeoffs": [],
             "non_goals": [],

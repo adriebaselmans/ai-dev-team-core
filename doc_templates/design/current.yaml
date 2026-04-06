@@ -1,13 +1,29 @@
-title: ""
-design_goal: ""
-architecture_approach: []
-affected_areas: []
+title: Example Project
+design_goal: Refactor the orchestration runtime.
+architecture_approach:
+- Use the coordinator-owned task brief as the compact handoff contract for downstream
+  roles.
+- Keep support work isolated through explorer and scout when extra repository or external
+  context is needed.
+affected_areas:
+- Refactor the orchestration runtime.
 separation_of_concerns: []
-module_boundaries: []
-data_flow: []
-interfaces: []
-technology_and_environment_considerations: []
+module_boundaries:
+- Framework contract files remain canonical.
+- Native host agent files consume the canonical role and prompt contracts.
+data_flow:
+- coordinator -> requirements -> architect -> developer -> reviewer -> tester -> dod-reviewer
+- support roles are dispatched through coordinator approval and resume the requester.
+interfaces:
+- Downstream roles consume task_brief plus owned upstream artifacts by default.
+- Role outputs continue to satisfy the structured contracts.
+- The orchestrator trace records runtime metadata rather than provider backend metadata.
+technology_and_environment_considerations:
+- 'Target stack: Python 3.12'
 clean_code_constraints: []
 performance_considerations: []
-risks_and_tradeoffs: []
+risks_and_tradeoffs:
+- Native host behavior is less directly testable than pure Python execution.
+- Compact mode reduces token usage but depends on coordinator classification staying
+  conservative.
 non_goals: []

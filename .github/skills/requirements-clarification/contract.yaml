@@ -4,7 +4,7 @@ response_mode: one-shot
 required_inputs:
   - user need from the coordinator
   - doc_templates/requirements/current.yaml
-  - relevant project memory in framework/memory/
+  - relevant project memory in .ai-team/framework/memory/
 expected_outputs:
   - doc_templates/requirements/current.yaml
   - clarification questions for the coordinator when needed

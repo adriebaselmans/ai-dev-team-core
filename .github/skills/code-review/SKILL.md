@@ -15,7 +15,7 @@ Use this skill when acting as the reviewer in this repository.
 ## Required Inputs
 - `doc_templates/requirements/current.yaml`
 - `doc_templates/design/current.yaml`
-- `framework/clean-code.md`
+- `.ai-team/framework/clean-code.md`
 - Relevant implementation and tests in `src/`
 
 ## Required Outputs

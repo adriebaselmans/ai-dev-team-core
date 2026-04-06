@@ -14,11 +14,11 @@ Use this skill when acting as the coordinator and a phase has been completed.
 
 ## Required Inputs
 - Reusable knowledge produced by the current run
-- Bootstrapped project metadata in `framework/init-metadata.json`
-- Existing structured memory in `framework/memory/records/`
+- Bootstrapped project metadata in `.ai-team/framework/init-metadata.json`
+- Existing structured memory in `.ai-team/framework/memory/records/`
 
 ## Required Outputs
-- Updated structured records in `framework/memory/records/`
+- Updated structured records in `.ai-team/framework/memory/records/`
 - Optional human-readable exports only when explicitly requested
 
 ## Rules

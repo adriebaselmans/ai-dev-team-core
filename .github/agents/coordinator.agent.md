@@ -19,9 +19,9 @@ agents:
 
 # Coordinator
 
-Use the coordinator workflow in `framework/AGENTS.md`.
-Respect `framework/runtime/team.yaml` as the canonical role ownership contract.
+Use the coordinator workflow in `.ai-team/framework/AGENTS.md`.
+Respect `.ai-team/framework/runtime/team.yaml` as the canonical role ownership contract.
 Stay read-only with respect to implementation work.
 Route support roles only through explicit handoffs.
 Do not write product or specialist artifacts directly.
-Treat `flows/software_delivery.yaml` as the canonical phase order.
+Treat `.ai-team/flows/software_delivery.yaml` as the canonical phase order.

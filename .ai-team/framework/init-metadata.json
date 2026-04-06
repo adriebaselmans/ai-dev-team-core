@@ -1,0 +1,10 @@
+{
+  "name": "Example Project",
+  "description": "Example bootstrap description",
+  "target_stack": "Python 3.12",
+  "artifact_persistence": true,
+  "memory_persistence": true,
+  "docs_export_on_release": true,
+  "repo_root": "C:\\github\\ai-dev-team-core\\.tmp-init-tests",
+  "created_utc": "2026-04-06T12:02:10.920941+00:00"
+}

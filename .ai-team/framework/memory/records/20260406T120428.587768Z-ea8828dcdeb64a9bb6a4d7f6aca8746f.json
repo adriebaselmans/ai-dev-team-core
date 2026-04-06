@@ -1,0 +1,41 @@
+{
+  "entry_id": "ea8828dcdeb64a9bb6a4d7f6aca8746f",
+  "timestamp_utc": "2026-04-06T12:04:28.587768Z",
+  "version": 3,
+  "kind": "decision",
+  "phase": "architecture",
+  "scope": "project",
+  "subject": "Refactor the system into a flow-driven orchestrator.",
+  "source": "architect",
+  "confidence": "high",
+  "status": "active",
+  "tags": [
+    "architecture",
+    "design"
+  ],
+  "summary": "Architecture baseline accepted for: Refactor the system into a flow-driven orchestrator.",
+  "artifact_refs": [],
+  "payload": {
+    "architecture": [
+      "Use the coordinator-owned task brief as the compact handoff contract for downstream roles.",
+      "Keep support work isolated through explorer and scout when extra repository or external context is needed.",
+      "Treat Copilot VS Code custom agents as the primary execution surface.",
+      "Keep Codex compatible through the same role, prompt, and flow contracts.",
+      "Keep Python orchestration as a validation and test harness rather than the main runtime."
+    ],
+    "non_functional_requirements": [
+      "Native handoffs must stay readable and role-bounded.",
+      "Flow and artifact behavior must remain deterministic in the validation harness."
+    ],
+    "work_items": [
+      {
+        "id": "primary-change",
+        "description": "Refactor the system into a flow-driven orchestrator."
+      },
+      {
+        "id": "validation",
+        "description": "Keep schemas, prompts, flow validation, and handoffs aligned."
+      }
+    ]
+  }
+}
