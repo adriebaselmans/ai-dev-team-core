@@ -2,3 +2,5 @@ __pycache__/
 *.py[cod]
 .tmp-*/
 .tmp-runtime-tests/
+.ai-team/framework/init-metadata.json
+.ai-team/framework/memory/records/*.json
