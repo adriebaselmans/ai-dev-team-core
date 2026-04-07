@@ -4,7 +4,7 @@ description: Fresh external-evidence support agent for architecture and implemen
 target: vscode
 model:
   - Claude Haiku 4.5 (copilot)
-tools: [read, search]
+tools: [read, search, web]
 user-invocable: false
 ---
 

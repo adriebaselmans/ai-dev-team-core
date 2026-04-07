@@ -4,7 +4,7 @@ description: Optional support agent for UX, interaction, accessibility, and visu
 target: vscode
 model:
   - Claude Sonnet 4.5 (copilot)
-tools: [read, search]
+tools: [read, search, web]
 user-invocable: false
 ---
 

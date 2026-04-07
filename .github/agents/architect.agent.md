@@ -5,7 +5,7 @@ target: vscode
 model:
   - Claude Opus 4.6 (copilot)
   - Claude Sonnet 4.5 (copilot)
-tools: [read, edit, search]
+tools: [read, edit, search, web]
 user-invocable: false
 ---
 

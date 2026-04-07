@@ -109,6 +109,27 @@ def test_native_profile_tool_scopes_match_team_contract() -> None:
             assert "edit" in tools
 
 
+def test_native_profile_tool_aliases_cover_role_capabilities() -> None:
+    root = Path(__file__).resolve().parents[2]
+    expected_aliases = {
+        "coordinator": {"read", "search", "agent"},
+        "requirements-engineer": {"read", "edit", "search"},
+        "ux-ui-designer": {"read", "search", "web"},
+        "explorer": {"read", "search"},
+        "scout": {"read", "search", "web"},
+        "architect": {"read", "edit", "search", "web"},
+        "developer": {"read", "edit", "search", "execute"},
+        "reviewer": {"read", "edit", "search"},
+        "tester": {"read", "edit", "search", "execute"},
+        "dod-reviewer": {"read", "edit", "search"},
+    }
+
+    runtime_map = load_role_runtime_map()
+    for role_key, expected in expected_aliases.items():
+        frontmatter, _ = _load_profile(root, str(runtime_map[role_key].agent_profile))
+        assert set(frontmatter["tools"]) == expected
+
+
 def test_copilot_model_preferences_match_agent_profiles() -> None:
     root = Path(__file__).resolve().parents[2]
     runtime_map = load_role_runtime_map()
