@@ -52,6 +52,7 @@ def test_gate_roles_return_structured_decisions() -> None:
         "blocking_findings",
         "rework_target",
         "residual_risks",
+        "technology_mismatches",
     }
     assert set(test_results) == {
         "decision",
@@ -62,3 +63,15 @@ def test_gate_roles_return_structured_decisions() -> None:
         "validation_attempts",
     }
     assert set(dod_review) == {"decision", "approved", "feedback", "blocking_findings", "rework_target"}
+
+
+def test_architect_and_developer_preserve_explicit_technology_choices() -> None:
+    registry = build_default_agent_registry()
+    state = create_initial_state("Build a 3D game in .NET 10 with an engine chosen during architecture.")
+
+    design = registry["architect"].run(state)["design"]
+    state["design"] = design
+    development = registry["developer"].run(state)["development"]
+
+    assert design["technology_choices"]
+    assert development["technology_alignment"]

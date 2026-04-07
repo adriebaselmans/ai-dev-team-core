@@ -27,3 +27,4 @@ risks_and_tradeoffs:
 - Compact mode reduces token usage but depends on coordinator classification staying
   conservative.
 non_goals: []
+technology_choices: []

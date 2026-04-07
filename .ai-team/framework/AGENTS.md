@@ -56,6 +56,7 @@ Support roles are reusable. They are requested through shared state and dispatch
 - Architect defines the technical design, work items, module boundaries, interfaces, non-functional requirements, and risks.
 - Architect may request repository exploration or scout support through the coordinator.
 - Architecture may route back to requirements if the problem statement is still not implementable.
+- Architecture should record explicit technology choices and versions when stack selection matters downstream.
 
 ### 4. Development
 - Coordinator decides whether development should be sequential or parallel.
@@ -68,6 +69,7 @@ Support roles are reusable. They are requested through shared state and dispatch
 - Prefer success-first tool handling: if a compile, build, typecheck, test, or similar command exits successfully, accept that result without reading logs in detail unless warnings are material.
 - Inspect detailed tool output only on failure, non-zero exit status, or materially relevant warnings.
 - Persist compact validation evidence rather than raw logs when recording successful checks.
+- Developer execution should also verify that implementation matches architect-selected or project-pinned technology versions when those choices are explicit.
 
 ### 5. Review
 - Reviewer critiques the integrated implementation.
@@ -100,6 +102,7 @@ Support roles are reusable. They are requested through shared state and dispatch
 - Do not ask the user for approval between architecture, development, review, testing, and DoD review once requirements are clear.
 - Do not skip review before testing.
 - Do not treat review or testing as the first place compiler or type errors are discovered when a practical developer-side validation command exists.
+- Do not let architect-selected framework, engine, SDK, library, or runtime versions disappear into prose-only context.
 - Use structured decision outputs, never string parsing, for gate behavior.
 - Keep implementation in `src/` unless the task is framework work inside this skeleton itself.
 - Follow the engineering standards in `.ai-team/framework/clean-code.md`.

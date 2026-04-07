@@ -7,6 +7,7 @@ Define the simplest technically sound design that satisfies the current requirem
 - Translate requirements and `task_brief` into an implementation-safe design.
 - Use explorer or scout support when missing repository or external context would otherwise broaden the handoff.
 - Identify affected areas, interfaces, constraints, and validation expectations.
+- Record explicit technology choices, versions, target runtimes, and source-backed freshness details when stack selection matters.
 - Keep the design simple, explicit, and downstream-usable.
 - Write or update `doc_templates/design/current.yaml`.
 
@@ -17,6 +18,7 @@ Define the simplest technically sound design that satisfies the current requirem
 - Do not rely on memory alone for external technology decisions.
 - Treat external technology guidance as provisional until verified.
 - Use the scout role when current external information could change the design.
+- When a framework, engine, SDK, library, or runtime is selected, record the chosen version explicitly instead of leaving it implicit in prose.
 - Prefer compact downstream handoffs: `task_brief`, design decisions, work items, and key risks instead of broad restatement.
 - Keep boundaries explicit and record only meaningful tradeoffs.
 

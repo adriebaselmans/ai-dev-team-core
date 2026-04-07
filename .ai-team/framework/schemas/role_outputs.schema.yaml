@@ -19,6 +19,41 @@ definitions:
     required:
       - id
       - description
+  technology_choice:
+    type: object
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+      category:
+        enum: ["engine", "framework", "library", "sdk", "runtime", "tooling", "platform", "other"]
+      version:
+        type: string
+      target_runtime:
+        anyOf:
+          - type: string
+          - type: "null"
+      rationale:
+        type: string
+      source:
+        anyOf:
+          - type: string
+          - type: "null"
+      verified_at:
+        anyOf:
+          - type: string
+          - type: "null"
+      status:
+        enum: ["latest_verified", "project_pinned", "inherited", "unknown"]
+    required:
+      - name
+      - category
+      - version
+      - target_runtime
+      - rationale
+      - source
+      - verified_at
+      - status
   validation_attempt:
     type: object
     additionalProperties: false
@@ -308,11 +343,16 @@ definitions:
         $ref: "#/definitions/string_list"
       risks_and_tradeoffs:
         $ref: "#/definitions/string_list"
+      technology_choices:
+        type: array
+        items:
+          $ref: "#/definitions/technology_choice"
     required:
       - approved_for_build
       - architecture
       - non_functional_requirements
       - work_items
+      - technology_choices
   development:
     type: object
     additionalProperties: false
@@ -342,6 +382,30 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/validation_attempt"
+      technology_alignment:
+        type: array
+        items:
+          type: object
+          additionalProperties: false
+          properties:
+            name:
+              type: string
+            expected_version:
+              type: string
+            actual_version:
+              anyOf:
+                - type: string
+                - type: "null"
+            status:
+              enum: ["aligned", "mismatch", "unverified"]
+            summary:
+              type: string
+          required:
+            - name
+            - expected_version
+            - actual_version
+            - status
+            - summary
     required:
       - status
       - revision
@@ -350,6 +414,7 @@ definitions:
       - changes
       - integration_owner
       - validation_attempts
+      - technology_alignment
   development_artifact:
     type: object
     additionalProperties: false
@@ -386,6 +451,8 @@ definitions:
         enum: ["developer", "architect", "requirements-engineer"]
       residual_risks:
         $ref: "#/definitions/string_list"
+      technology_mismatches:
+        $ref: "#/definitions/string_list"
     required:
       - decision
       - approved
@@ -393,6 +460,7 @@ definitions:
       - score
       - blocking_findings
       - rework_target
+      - technology_mismatches
   test_results:
     type: object
     additionalProperties: false

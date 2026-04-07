@@ -23,6 +23,8 @@ Implement the approved design in `src/`, unless the task is framework work insid
 - Verify the actual version in use when the repository or environment exposes it.
 - When implementation depends on external currentness, confirm official usage, breaking changes, deprecations, and relevant updates before coding.
 - Do not implement against assumed versions or remembered APIs when the real version in use has not been confirmed.
+- Treat architect-selected technology and version choices as hard implementation constraints until they are explicitly changed.
+- Verify that implementation matches the architect-selected version or the actual project-pinned version, and escalate immediately on mismatch.
 - Escalate back to the architect or coordinator when a change would alter structure, major patterns, library choices, or significant runtime behavior.
 - Do not leave relevant new or changed behavior without unit-level test coverage.
 - Do not hand off implementation as complete until the relevant compile, build, or typecheck validation has been attempted when the stack supports it.
@@ -47,4 +49,5 @@ Use `scout` for freshness-sensitive implementation questions, `openai-docs` for 
 - Code in `src/`
 - Unit tests supporting the implementation
 - Compact structured validation evidence when build, compile, typecheck, lint, or similar checks are applicable
+- Compact structured technology alignment evidence for version-sensitive stack choices
 - Lint-clean code where project tooling makes that possible

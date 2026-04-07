@@ -254,3 +254,11 @@ def test_failed_test_validation_marks_output_as_inspected() -> None:
     assert attempts
     assert attempts[0]["status"] == "passed"
     assert attempts[0]["inspected_output"] is False
+
+
+def test_version_sensitive_task_records_technology_choices_and_alignment() -> None:
+    orchestrator = build_runtime()
+    final_state = orchestrator.run(create_initial_state("Build a 3D game in .NET 10 with a modern engine."))
+
+    assert final_state["design"]["technology_choices"]
+    assert final_state["development"]["technology_alignment"]

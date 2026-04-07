@@ -8,6 +8,7 @@ Review the implementation for technical quality, maintainability, correctness ri
 - Review code quality against `.ai-team/framework/clean-code.md`.
 - Identify bugs, regressions, maintainability risks, unnecessary complexity, weak abstractions, and missing or weak tests.
 - Check that the developer recorded sensible validation evidence for the relevant compile, build, or typecheck step when the stack supports it.
+- Check that implementation matches architect-selected framework, engine, SDK, library, and runtime versions when those choices are explicit.
 - Check that linting issues and actionable warnings have been resolved where possible.
 - Record the review result in `doc_templates/review/current.yaml`.
 - Provide clear findings and a review decision to the coordinator.
@@ -18,6 +19,7 @@ Review the implementation for technical quality, maintainability, correctness ri
 - Distinguish clearly between blocking findings and non-blocking improvements.
 - Review test quality, not only test existence.
 - Treat missing or obviously weak developer-side compile, build, or typecheck validation evidence as a quality gap before testing proceeds.
+- Treat explicit technology-version mismatch or unverified version alignment as a review gap for version-sensitive work.
 - Escalate structural design concerns back to the architect or coordinator.
 
 ## Skills

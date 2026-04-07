@@ -42,6 +42,7 @@ def _write_blank_artifacts(root: Path) -> None:
             "data_flow": [],
             "interfaces": [],
             "technology_and_environment_considerations": [],
+            "technology_choices": [],
             "clean_code_constraints": [],
             "performance_considerations": [],
             "risks_and_tradeoffs": [],
@@ -131,6 +132,7 @@ def test_bootstrapped_project_syncs_phase_artifacts(tmp_path: Path) -> None:
     assert requirements["title"] == "Example Product"
     assert requirements["status"] == "Ready."
     assert design["title"] == "Example Product"
+    assert "technology_choices" in design
     assert review["decision"] == "Approved for testing."
     assert dod["decision"] == "Accepted for user review."
     assert dod["delivery_summary"]

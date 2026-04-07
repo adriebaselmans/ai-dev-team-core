@@ -89,6 +89,7 @@ class ArtifactSynchronizer:
             "performance_considerations": list(design.get("performance_considerations", [])),
             "risks_and_tradeoffs": list(design.get("risks_and_tradeoffs", [])),
             "non_goals": list(design.get("non_goals", [])),
+            "technology_choices": list(design.get("technology_choices", [])),
         }
 
     def _review_payload(self, state: dict[str, Any], *, title: str) -> dict[str, Any]:

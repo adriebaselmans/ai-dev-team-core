@@ -166,6 +166,38 @@ def _compact_validation_attempt(
     }
 
 
+def _default_technology_choices(state: dict[str, Any]) -> list[dict[str, Any]]:
+    request = str((state.get("task_brief") or {}).get("objective") or state.get("input", "")).lower()
+    choices: list[dict[str, Any]] = []
+    if ".net 10" in request or "dotnet 10" in request or ".net" in request:
+        choices.append(
+            {
+                "name": ".NET",
+                "category": "runtime",
+                "version": "10",
+                "target_runtime": ".NET 10",
+                "rationale": "Runtime target selected during architecture and must remain consistent through implementation.",
+                "source": "architectural decision",
+                "verified_at": None,
+                "status": "inherited",
+            }
+        )
+    if "engine" in request or "game" in request:
+        choices.append(
+            {
+                "name": "Chosen game engine",
+                "category": "engine",
+                "version": "to-be-verified",
+                "target_runtime": next((choice["target_runtime"] for choice in choices if choice["category"] == "runtime"), None),
+                "rationale": "Engine choice must be preserved explicitly so downstream implementation does not fall back to stale examples.",
+                "source": "architectural decision",
+                "verified_at": None,
+                "status": "unknown",
+            }
+        )
+    return choices
+
+
 class CoordinatorAgent(Agent):
     def __init__(self) -> None:
         super().__init__("coordinator", {"coordination", "support_request", "task_brief"})
@@ -506,6 +538,7 @@ class ArchitectAgent(Agent):
                     if compact
                     else ["Removing provider backends reduces flexibility but sharply reduces maintenance burden."]
                 ),
+                "technology_choices": list(existing_design.get("technology_choices", [])) or _default_technology_choices(state),
             },
             "support_request": support_request,
         }
@@ -547,6 +580,21 @@ class DeveloperAgent(Agent):
         worker_results = list(development.get("worker_results", []))
         if step == "integrate-development":
             changes.append("Integrated and stabilized worker results from parallel development.")
+        technology_choices = list((state.get("design") or {}).get("technology_choices", []))
+        technology_alignment = [
+            {
+                "name": str(choice.get("name", "")),
+                "expected_version": str(choice.get("version", "")),
+                "actual_version": str(choice.get("version", "")) if choice.get("version") else None,
+                "status": "aligned" if choice.get("version") and choice.get("version") != "to-be-verified" else "unverified",
+                "summary": (
+                    "Implementation stayed aligned with the architect-selected version."
+                    if choice.get("version") and choice.get("version") != "to-be-verified"
+                    else "Version was not yet concretely verified from project files or fresh sources."
+                ),
+            }
+            for choice in technology_choices
+        ]
         return {
             "development": {
                 "status": "implemented",
@@ -571,6 +619,7 @@ class DeveloperAgent(Agent):
                         inspected_output=False,
                     ),
                 ],
+                "technology_alignment": technology_alignment,
             },
             "support_request": support_request,
         }
@@ -585,17 +634,39 @@ class ReviewerAgent(Agent):
         revision = int((state.get("development") or {}).get("revision", 0))
         scenario = _scenario_for_revision(state, "review", revision)
         approved = bool(scenario.get("approved", revision > 0))
+        technology_mismatches = [
+            str(item.get("summary", "Technology version alignment is not verified."))
+            for item in (state.get("development") or {}).get("technology_alignment", [])
+            if item.get("status") == "mismatch"
+        ]
+        if not technology_mismatches:
+            technology_mismatches = [
+                str(item.get("summary", "Technology version alignment is not verified."))
+                for item in (state.get("development") or {}).get("technology_alignment", [])
+                if item.get("status") == "unverified"
+            ]
+        if technology_mismatches and approved:
+            approved = False
         return {
             "review": {
                 "decision": "approved" if approved else "rework",
                 "approved": approved,
                 "feedback": str(
-                    scenario.get("feedback", "Approved for testing." if approved else "Implementation requires rework.")
+                    scenario.get(
+                        "feedback",
+                        "Approved for testing." if approved else "Implementation requires rework or explicit version alignment."
+                    )
                 ),
                 "score": float(scenario.get("score", 0.94 if approved else 0.51)),
-                "blocking_findings": list(scenario.get("blocking_findings", [] if approved else ["Reviewer requested changes."])),
+                "blocking_findings": list(
+                    scenario.get(
+                        "blocking_findings",
+                        [] if approved else ["Reviewer requested changes.", *technology_mismatches],
+                    )
+                ),
                 "rework_target": str(scenario.get("rework_target", "developer")),
                 "residual_risks": list(scenario.get("residual_risks", [])),
+                "technology_mismatches": technology_mismatches,
             },
             "support_request": support_request,
         }
