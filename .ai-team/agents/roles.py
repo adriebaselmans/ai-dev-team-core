@@ -149,6 +149,23 @@ def _effective_support_request(state: dict[str, Any], requester: str) -> dict[st
     return _inferred_support_request(state, requester)
 
 
+def _compact_validation_attempt(
+    *,
+    kind: str,
+    command: str,
+    status: str,
+    inspected_output: bool,
+    summary: str = "",
+) -> dict[str, Any]:
+    return {
+        "kind": kind,
+        "command": command,
+        "status": status,
+        "inspected_output": inspected_output,
+        "summary": summary,
+    }
+
+
 class CoordinatorAgent(Agent):
     def __init__(self) -> None:
         super().__init__("coordinator", {"coordination", "support_request", "task_brief"})
@@ -540,6 +557,20 @@ class DeveloperAgent(Agent):
                 "integration_owner": (state.get("coordination") or {}).get("integration_owner", "designated-developer"),
                 "blockers": [],
                 "rework_target": None,
+                "validation_attempts": [
+                    _compact_validation_attempt(
+                        kind="typecheck",
+                        command="run the primary compile/build/typecheck command for the stack",
+                        status="passed",
+                        inspected_output=False,
+                    ),
+                    _compact_validation_attempt(
+                        kind="lint",
+                        command="run the primary lint command when available",
+                        status="passed",
+                        inspected_output=False,
+                    ),
+                ],
             },
             "support_request": support_request,
         }
@@ -587,6 +618,15 @@ class TesterAgent(Agent):
                 "errors": errors,
                 "automated": bool(scenario.get("automated", True)),
                 "rework_target": str(scenario.get("rework_target", "developer")),
+                "validation_attempts": [
+                    _compact_validation_attempt(
+                        kind="test",
+                        command="run the primary automated acceptance or regression command",
+                        status="passed" if passed else "failed",
+                        inspected_output=not passed,
+                        summary="" if passed else ", ".join(errors),
+                    )
+                ],
             },
             "support_request": support_request,
         }

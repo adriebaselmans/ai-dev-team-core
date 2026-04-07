@@ -63,6 +63,11 @@ Support roles are reusable. They are requested through shared state and dispatch
 - One designated developer then integrates and stabilizes the combined result.
 - Developers may request UX/UI, scout, or explorer support only through the coordinator-mediated support mechanism.
 - Scout support during development is intended for version-sensitive, freshness-sensitive, or externally changing implementation questions.
+- When the stack provides an obvious compile, build, or typecheck command, developer execution should attempt it before handoff.
+- Validation should be progressive: start with the cheapest deterministic compile, build, or typecheck command that meaningfully validates the change, then widen only as scope and risk justify it.
+- Prefer success-first tool handling: if a compile, build, typecheck, test, or similar command exits successfully, accept that result without reading logs in detail unless warnings are material.
+- Inspect detailed tool output only on failure, non-zero exit status, or materially relevant warnings.
+- Persist compact validation evidence rather than raw logs when recording successful checks.
 
 ### 5. Review
 - Reviewer critiques the integrated implementation.
@@ -94,6 +99,7 @@ Support roles are reusable. They are requested through shared state and dispatch
 - Coordinator is read-only with respect to product and specialist artifacts.
 - Do not ask the user for approval between architecture, development, review, testing, and DoD review once requirements are clear.
 - Do not skip review before testing.
+- Do not treat review or testing as the first place compiler or type errors are discovered when a practical developer-side validation command exists.
 - Use structured decision outputs, never string parsing, for gate behavior.
 - Keep implementation in `src/` unless the task is framework work inside this skeleton itself.
 - Follow the engineering standards in `.ai-team/framework/clean-code.md`.

@@ -9,6 +9,7 @@ Implement the approved design in `src/`, unless the task is framework work insid
 - Use scout or exploration support only when missing external or repository context would otherwise broaden the work.
 - Follow `.ai-team/framework/clean-code.md` in all implementation work.
 - Add or update unit tests for all relevant new or changed logic.
+- Run the relevant compile, build, or typecheck validation when the stack provides one.
 - Run linting where available and fix warnings or violations where practical.
 - Leave the repo in a state the tester can validate.
 
@@ -24,6 +25,11 @@ Implement the approved design in `src/`, unless the task is framework work insid
 - Do not implement against assumed versions or remembered APIs when the real version in use has not been confirmed.
 - Escalate back to the architect or coordinator when a change would alter structure, major patterns, library choices, or significant runtime behavior.
 - Do not leave relevant new or changed behavior without unit-level test coverage.
+- Do not hand off implementation as complete until the relevant compile, build, or typecheck validation has been attempted when the stack supports it.
+- Use progressive validation: start with the cheapest deterministic compile, build, or typecheck command that meaningfully validates the change, then widen to lint or broader tests only as scope and risk justify it.
+- Prefer success-first validation: if a compile, build, typecheck, test, or similar tool exits successfully, treat the run as passed without reading logs in detail unless warnings are material to the task.
+- Inspect logs or detailed output only on failure, on non-zero exit status, or when warnings are explicitly surfaced as important.
+- Record validation evidence compactly: command, kind, pass or fail status, whether output was inspected, and only a short summary when something failed or materially warned.
 - Do not leave avoidable lint errors or actionable warnings unresolved when a practical fix exists.
 - Update docs only when the implementation changes the current truth.
 - Prefer compact working context; pull in broader repo or external context only when blocked.
@@ -40,4 +46,5 @@ Use `scout` for freshness-sensitive implementation questions, `openai-docs` for 
 ## Required Output
 - Code in `src/`
 - Unit tests supporting the implementation
+- Compact structured validation evidence when build, compile, typecheck, lint, or similar checks are applicable
 - Lint-clean code where project tooling makes that possible

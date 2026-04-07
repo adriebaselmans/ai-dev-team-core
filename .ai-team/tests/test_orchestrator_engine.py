@@ -222,3 +222,35 @@ def test_compact_mode_avoids_parallel_development_for_small_tasks() -> None:
     steps = [entry["step"] for entry in final_state["trace"]]
     assert "parallel-development" not in steps
     assert final_state["coordination"]["parallel_development"] is False
+
+
+def test_development_records_compact_validation_evidence() -> None:
+    orchestrator = build_runtime()
+    final_state = orchestrator.run(create_initial_state("Rename a runtime helper."))
+
+    attempts = final_state["development"]["validation_attempts"]
+    assert attempts
+    assert attempts[0]["status"] == "passed"
+    assert attempts[0]["inspected_output"] is False
+
+
+def test_failed_test_validation_marks_output_as_inspected() -> None:
+    orchestrator = build_runtime()
+    final_state = orchestrator.run(
+        create_initial_state(
+            "Refactor with one failing validation cycle.",
+            overrides={
+                "scenarios": {
+                    "test": [
+                        {"revision": 1, "passed": False, "errors": ["Acceptance suite failed."]},
+                        {"revision": 2, "passed": True, "errors": []},
+                    ]
+                }
+            },
+        )
+    )
+
+    attempts = final_state["test_results"]["validation_attempts"]
+    assert attempts
+    assert attempts[0]["status"] == "passed"
+    assert attempts[0]["inspected_output"] is False

@@ -19,6 +19,26 @@ definitions:
     required:
       - id
       - description
+  validation_attempt:
+    type: object
+    additionalProperties: false
+    properties:
+      kind:
+        enum: ["build", "compile", "typecheck", "lint", "test", "other"]
+      command:
+        type: string
+      status:
+        enum: ["passed", "failed", "skipped", "not_applicable"]
+      inspected_output:
+        type: boolean
+      summary:
+        type: string
+    required:
+      - kind
+      - command
+      - status
+      - inspected_output
+      - summary
   task_brief:
     type: object
     additionalProperties: false
@@ -318,6 +338,10 @@ definitions:
         anyOf:
           - enum: ["developer", "architect", "requirements-engineer"]
           - type: "null"
+      validation_attempts:
+        type: array
+        items:
+          $ref: "#/definitions/validation_attempt"
     required:
       - status
       - revision
@@ -325,6 +349,7 @@ definitions:
       - worker_results
       - changes
       - integration_owner
+      - validation_attempts
   development_artifact:
     type: object
     additionalProperties: false
@@ -382,12 +407,17 @@ definitions:
         type: boolean
       rework_target:
         enum: ["developer", "architect", "requirements-engineer"]
+      validation_attempts:
+        type: array
+        items:
+          $ref: "#/definitions/validation_attempt"
     required:
       - decision
       - passed
       - errors
       - automated
       - rework_target
+      - validation_attempts
   dod_review:
     type: object
     additionalProperties: false

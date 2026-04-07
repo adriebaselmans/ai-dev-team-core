@@ -8,7 +8,7 @@ Native AI dev team skeleton with:
 - a small Python validation harness for contracts, state, artifacts, and tests
 
 ## Version
-- Current release: `1.0.2`
+- Current release: `1.0.3`
 
 ## Runtime Priority
 1. GitHub Copilot in Visual Studio Code via `.github/agents/*.agent.md`

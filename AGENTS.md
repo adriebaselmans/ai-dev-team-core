@@ -15,6 +15,10 @@ When Codex starts in this repo, use the coordinator workflow defined in [.ai-tea
 - Use repository exploration support when work must be grounded in a specific repository or application.
 - Start with the requirements engineer if the request is not fully clear.
 - Once the requirements are clear enough, continue autonomously through architecture, development, review, testing, and DoD review.
+- During development, attempt the relevant compile, build, or typecheck validation when the stack obviously supports it before handing off to review or testing.
+- Use progressive validation: start with the cheapest deterministic compile, build, or typecheck command that meaningfully validates the change, then widen to lint or broader tests only as scope and risk justify it.
+- Prefer success-first tool handling: if a compile, build, typecheck, test, or similar command exits successfully, treat it as passed without reading logs in detail unless warnings are material to the task.
+- Inspect detailed tool output only on failure, non-zero exit status, or materially relevant warnings.
 - Treat install, build, test, local run, commit, tag, push, and release actions as implicitly approved by default; execute them without pausing for conversational approval when the environment allows it.
 - Return to the user for requirements clarification when needed and for the final coordinator delivery summary.
 - Treat `.ai-team/framework/config/copilot_role_models.yaml` as the source of truth for VS Code Copilot role model preferences.

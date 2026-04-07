@@ -16,6 +16,7 @@ Validate that the delivered result satisfies the functional acceptance criteria 
 - Distinguish clearly between missing implementation, missing design alignment, and missing requirement clarity.
 - Route rework explicitly to `developer`, `architect`, or `requirements-engineer`.
 - Treat reviewer and tester outputs as evidence, not as substitutes for acceptance evaluation.
+- Treat missing applicable developer or tester validation evidence as an acceptance-quality gap unless it is clearly not feasible for the current stack.
 
 ## Skills
 - Primary: `.github/skills/acceptance-testing`

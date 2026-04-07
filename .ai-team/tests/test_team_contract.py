@@ -40,6 +40,9 @@ def test_codex_entry_contract_enforces_role_discipline() -> None:
     assert "State the active role before substantial work." in entry
     assert "If the coordinator starts implementing anyway, treat that as a workflow violation" in entry
     assert "Do not collapse multiple specialist phases into one implicit coordinator pass." in entry
+    assert "Prefer success-first tool handling" in entry
     assert "do not collapse coordinator, architect, developer, reviewer, tester, or DoD reviewer" in framework
+    assert "Prefer success-first tool handling" in framework
+    assert "Do not treat review or testing as the first place compiler or type errors are discovered" in framework
     assert "a specialist phase counts as executed only when the active role has been explicitly switched" in framework
     assert "Treat any coordinator-side implementation edit as a workflow violation" in coordinator
