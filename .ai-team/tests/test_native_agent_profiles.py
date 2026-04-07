@@ -45,12 +45,12 @@ def test_coordinator_agent_profile_declares_specialist_agents() -> None:
     assert frontmatter["disable-model-invocation"] is True
     assert "agent" in frontmatter["tools"]
     assert "edit" not in frontmatter["tools"]
-    assert "requirements-engineer" in frontmatter["agents"]
-    assert "architect" in frontmatter["agents"]
-    assert "developer" in frontmatter["agents"]
-    assert "reviewer" in frontmatter["agents"]
-    assert "tester" in frontmatter["agents"]
-    assert "dod-reviewer" in frontmatter["agents"]
+    assert "Requirements Engineer" in frontmatter["agents"]
+    assert "Architect" in frontmatter["agents"]
+    assert "Developer" in frontmatter["agents"]
+    assert "Reviewer" in frontmatter["agents"]
+    assert "Tester" in frontmatter["agents"]
+    assert "DoD Reviewer" in frontmatter["agents"]
     assert ".ai-team/framework/AGENTS.md" in profile
 
 
@@ -76,19 +76,34 @@ def test_only_coordinator_declares_subagents_or_handoffs() -> None:
         frontmatter, _ = _load_profile(root, str(config.agent_profile))
         if role_key == "coordinator":
             assert set(frontmatter.get("agents", [])) == {
-                "requirements-engineer",
-                "ux-ui-designer",
-                "explorer",
-                "scout",
-                "architect",
-                "developer",
-                "reviewer",
-                "tester",
-                "dod-reviewer",
+                "Requirements Engineer",
+                "UX UI Designer",
+                "Explorer",
+                "Scout",
+                "Architect",
+                "Developer",
+                "Reviewer",
+                "Tester",
+                "DoD Reviewer",
             }
             continue
         assert "agents" not in frontmatter
         assert "handoffs" not in frontmatter
+
+
+def test_coordinator_allowed_subagents_match_custom_agent_display_names() -> None:
+    root = Path(__file__).resolve().parents[2]
+    runtime_map = load_role_runtime_map()
+    frontmatter, _ = _load_profile(root, ".github/agents/coordinator.agent.md")
+
+    expected_names = set()
+    for role_key, config in runtime_map.items():
+        if role_key == "coordinator":
+            continue
+        role_frontmatter, _ = _load_profile(root, str(config.agent_profile))
+        expected_names.add(str(role_frontmatter["name"]))
+
+    assert set(frontmatter["agents"]) == expected_names
 
 
 def test_native_profile_tool_scopes_match_team_contract() -> None:
