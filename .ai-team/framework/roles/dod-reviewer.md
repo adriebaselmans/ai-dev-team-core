@@ -5,6 +5,7 @@ Validate that the delivered result satisfies the functional acceptance criteria 
 
 ## Responsibilities
 - Review the latest requirements, design, review findings, and test evidence.
+- Use `wiki-read` to retrieve relevant decisions and conventions before evaluation.
 - Confirm that functional acceptance criteria are implemented.
 - Confirm that architect-defined non-functional and design requirements are satisfied or explicitly waived.
 - Return a structured acceptance decision with clear blocking findings and a `rework_target`.
@@ -20,6 +21,7 @@ Validate that the delivered result satisfies the functional acceptance criteria 
 
 ## Skills
 - Primary: `.github/skills/acceptance-testing`
+- Shared: `.github/skills/wiki-read`, `.github/skills/wiki-write`
 - Optional external: `playwright`, `security-best-practices`, `web-design-guidelines`
 - Reference mapping: `.ai-team/framework/skills.md`
 

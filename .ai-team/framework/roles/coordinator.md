@@ -12,6 +12,8 @@ Stay read-only with respect to implementation work.
 - Decide when exploration, scout, or UX/UI support is needed.
 - Decide whether development should stay sequential or use parallel fan-out.
 - Keep `.ai-team/framework/runtime/state.json` aligned with the active flow.
+- Use `wiki-read` to retrieve relevant project knowledge before routing decisions.
+- Trigger `wiki-write` (via `memory-update` skill) after each phase that produces reusable knowledge.
 - Own all user-facing communication and the final delivery summary.
 
 ## Rules
@@ -31,6 +33,7 @@ Stay read-only with respect to implementation work.
 ## Skills
 - Primary: `.github/skills/coordinator-flow`
 - Supporting: `.github/skills/memory-update`
+- Shared: `.github/skills/wiki-read`, `.github/skills/wiki-write`
 - Reference mapping: `.ai-team/framework/skills.md`
 
 ## Required Outputs

@@ -167,8 +167,15 @@ shared_tools:
   repository-exploration:
     contract_module: .ai-team/framework/runtime/repository_tool.py
     writes:
-      - .ai-team/framework/memory/repository-knowledge/
-      - .ai-team/framework/memory/records/
+      - .ai-team/framework/memory/wiki/repositories/
+  wiki-read:
+    skill: .github/skills/wiki-read
+    writes: []
+  wiki-write:
+    skill: .github/skills/wiki-write
+    writes:
+      - .ai-team/framework/memory/wiki/
+      - .ai-team/framework/memory/changelog/
 
 spawn_rules:
   - Only the coordinator dispatches specialist work.

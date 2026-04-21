@@ -1,0 +1,36 @@
+version: 1
+updated: null
+total_pages: 0
+categories:
+  project:
+    count: 0
+    summary: "Project identity, goals, scope, stakeholders"
+    hot: []
+  architecture:
+    count: 0
+    summary: "Stack, modules, interfaces, deployment topology"
+    hot: []
+  decisions:
+    count: 0
+    summary: "ADR-style decision records with rationale"
+    hot: []
+  conventions:
+    count: 0
+    summary: "Coding standards, naming, patterns, team agreements"
+    hot: []
+  domain:
+    count: 0
+    summary: "Business rules, glossary, domain concepts"
+    hot: []
+  repositories:
+    count: 0
+    summary: "Analyzed repository briefs and facts"
+    hot: []
+  incidents:
+    count: 0
+    summary: "Bugs, rework cycles, lessons learned"
+    hot: []
+  context:
+    count: 0
+    summary: "Active constraints, environment, runtime facts"
+    hot: []

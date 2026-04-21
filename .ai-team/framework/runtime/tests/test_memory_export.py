@@ -11,51 +11,48 @@ import memory_export
 
 
 class MemoryExportTests(unittest.TestCase):
-    def test_render_project_log_snapshot_uses_structured_phase_briefs(self) -> None:
+    def test_render_project_log_snapshot_uses_wiki_pages(self) -> None:
         with patch.object(
             memory_export,
-            'query_memory',
+            'query_wiki',
             return_value=[
                 {
-                    'timestamp_utc': '2026-03-29T10:00:00.000000Z',
-                    'phase': 'requirements',
-                    'scope': 'phase',
-                    'subject': 'memory subsystem',
+                    'updated': '2026-03-29T10:00:00.000000Z',
+                    'cat': 'project',
                     'summary': 'Compact brief for requirements',
-                    'payload': {
-                        'why_it_changed': 'Requirements completed.',
-                        'resulting_state': 'Ready for architecture.',
-                    },
+                    'tags': ['phase-brief', 'requirements'],
                 }
             ],
-        ) as query_memory_mock:
+        ) as query_wiki_mock:
             markdown = memory_export.render_project_log_snapshot(limit=5)
 
         self.assertIn('# Project Log Snapshot', markdown)
         self.assertIn('Compact brief for requirements', markdown)
-        self.assertIn('Why it changed: Requirements completed.', markdown)
-        query_memory_mock.assert_called_once_with(
-            kind='phase-brief',
+        query_wiki_mock.assert_called_once_with(
+            category='project',
             limit=5,
-            include_superseded=True,
-            active_only=False,
+            root=None,
         )
 
-    def test_render_known_context_snapshot_groups_facts_and_decisions(self) -> None:
+    def test_render_known_context_snapshot_groups_context_and_decisions(self) -> None:
         with patch.object(
             memory_export,
-            'query_memory',
+            'query_wiki',
             side_effect=[
-                [{'summary': 'The runtime is local-first', 'phase': 'development', 'payload': {'context': 'No hosted backend'}}],
-                [{'summary': 'Keep records in git', 'phase': 'architecture', 'payload': {'decision': 'JSON files only'}}],
+                [{'updated': '2026-04-01T10:00:00Z', 'summary': 'The runtime is local-first', 'tags': ['context']}],
+                [{'updated': '2026-04-01T10:00:00Z', 'summary': 'Keep records in git', 'tags': ['decision']}],
             ],
         ):
             markdown = memory_export.render_known_context_snapshot(fact_limit=3, decision_limit=2)
 
-        self.assertIn('## Active Facts', markdown)
+        self.assertIn('## Active Context', markdown)
         self.assertIn('The runtime is local-first', markdown)
         self.assertIn('## Active Decisions', markdown)
         self.assertIn('Keep records in git', markdown)
+
+    def test_render_memory_snapshot_raises_on_unknown_view(self) -> None:
+        with self.assertRaisesRegex(ValueError, "Unknown memory snapshot view 'invalid'"):
+            memory_export.render_memory_snapshot('invalid')
 
 
 if __name__ == '__main__':

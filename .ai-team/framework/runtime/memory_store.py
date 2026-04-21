@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 from uuid import uuid4
+
+import yaml
 
 try:
     from .spec_loader import repo_root
@@ -13,7 +16,7 @@ except ImportError:  # pragma: no cover - compatibility for direct script-style 
     from spec_loader import repo_root
 
 
-MEMORY_SCHEMA_VERSION = 3
+MEMORY_SCHEMA_VERSION = 4
 DEFAULT_SCOPE = "project"
 DEFAULT_SOURCE = "runtime"
 DEFAULT_CONFIDENCE = "medium"
@@ -21,6 +24,18 @@ DEFAULT_STATUS = "active"
 VALID_RECORD_KINDS = {"fact", "decision", "question", "contradiction", "phase-brief"}
 VALID_RECORD_STATUSES = {"active", "superseded", "resolved"}
 VALID_CONFIDENCE_LEVELS = {"low", "medium", "high"}
+
+# Wiki page status values
+VALID_PAGE_STATUSES = {"active", "stale", "archived"}
+
+# Category-to-record-kind mapping for wiki placement
+KIND_CATEGORY_MAP: dict[str, str] = {
+    "fact": "context",
+    "decision": "decisions",
+    "question": "context",
+    "contradiction": "incidents",
+    "phase-brief": "project",
+}
 
 
 @dataclass(frozen=True)
@@ -55,6 +70,14 @@ def memory_root(root: Path | None = None) -> Path:
     return base / ".ai-team" / "framework" / "memory"
 
 
+def wiki_root(root: Path | None = None) -> Path:
+    return memory_root(root) / "wiki"
+
+
+def changelog_root(root: Path | None = None) -> Path:
+    return memory_root(root) / "changelog"
+
+
 def records_root(*, create: bool = True, root: Path | None = None) -> Path:
     path = memory_root(root) / "records"
     if create:
@@ -74,6 +97,280 @@ def timestamp_utc() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
 
+# ---------------------------------------------------------------------------
+# Wiki page I/O
+# ---------------------------------------------------------------------------
+
+_FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
+
+
+def _parse_wiki_page(path: Path) -> dict[str, Any] | None:
+    """Parse a wiki page and return its frontmatter as a dict, or None."""
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8")
+    match = _FRONTMATTER_RE.match(text)
+    if not match:
+        return None
+    try:
+        fm = yaml.safe_load(match.group(1))
+    except yaml.YAMLError:
+        return None
+    if not isinstance(fm, dict):
+        return None
+    fm["_body"] = text[match.end():]
+    fm["_path"] = str(path)
+    return fm
+
+
+def _page_id_from_subject(subject: str | None, kind: str, phase: str) -> str:
+    """Derive a kebab-case page ID from subject, kind, and phase."""
+    base = subject or f"{kind}-{phase}"
+    slug = re.sub(r"[^a-z0-9]+", "-", base.lower().strip()).strip("-")
+    return slug[:80] if slug else f"{kind}-{uuid4().hex[:8]}"
+
+
+def _write_wiki_page(
+    *,
+    category: str,
+    page_id: str,
+    summary: str,
+    body: str,
+    tags: list[str],
+    by: str,
+    refs: list[str] | None = None,
+    root: Path | None = None,
+) -> Path:
+    """Write or update a wiki page. Returns the page path."""
+    cat_dir = wiki_root(root) / category
+    cat_dir.mkdir(parents=True, exist_ok=True)
+    page_path = cat_dir / f"{page_id}.md"
+
+    now = timestamp_utc()
+    rev = 1
+    created = now
+
+    existing = _parse_wiki_page(page_path)
+    if existing:
+        rev = int(existing.get("rev", 0)) + 1
+        created = existing.get("created", now)
+
+    frontmatter = {
+        "id": page_id,
+        "cat": category,
+        "rev": rev,
+        "created": created,
+        "updated": now,
+        "by": by,
+        "tags": tags,
+        "summary": summary,
+        "status": "active",
+    }
+    if refs:
+        frontmatter["refs"] = refs
+
+    fm_text = yaml.safe_dump(frontmatter, sort_keys=False, default_flow_style=None)
+    page_text = f"---\n{fm_text}---\n{body}\n"
+    page_path.write_text(page_text, encoding="utf-8")
+    return page_path
+
+
+def _update_category_index(category: str, *, root: Path | None = None) -> None:
+    """Rebuild a category _index.yaml from page frontmatter."""
+    cat_dir = wiki_root(root) / category
+    if not cat_dir.exists():
+        return
+    pages: list[dict[str, Any]] = []
+    for md_file in sorted(cat_dir.glob("*.md")):
+        fm = _parse_wiki_page(md_file)
+        if fm and fm.get("status") != "archived":
+            pages.append({
+                "id": fm.get("id", md_file.stem),
+                "summary": fm.get("summary", ""),
+                "tags": fm.get("tags", []),
+                "rev": fm.get("rev", 1),
+                "updated": fm.get("updated", ""),
+            })
+    pages.sort(key=lambda p: p.get("updated", ""), reverse=True)
+    index_data = {
+        "category": category,
+        "updated": timestamp_utc(),
+        "pages": pages,
+    }
+    index_path = cat_dir / "_index.yaml"
+    index_path.write_text(yaml.safe_dump(index_data, sort_keys=False), encoding="utf-8")
+
+
+def _update_root_index(*, root: Path | None = None) -> None:
+    """Rebuild the root wiki _index.yaml from all category indexes."""
+    w_root = wiki_root(root)
+    if not w_root.exists():
+        return
+
+    schema_path = w_root / "_schema.yaml"
+    schema: dict[str, Any] = {}
+    if schema_path.exists():
+        schema = yaml.safe_load(schema_path.read_text(encoding="utf-8")) or {}
+
+    categories_config = schema.get("categories", {})
+    categories: dict[str, Any] = {}
+    total_pages = 0
+
+    for cat_dir in sorted(w_root.iterdir()):
+        if not cat_dir.is_dir() or cat_dir.name.startswith("_"):
+            continue
+        cat_index = cat_dir / "_index.yaml"
+        if cat_index.exists():
+            cat_data = yaml.safe_load(cat_index.read_text(encoding="utf-8")) or {}
+            pages = cat_data.get("pages", [])
+        else:
+            pages = []
+
+        count = len(pages)
+        total_pages += count
+        purpose = (categories_config.get(cat_dir.name, {}) or {}).get("purpose", "")
+        hot = pages[:3]
+        categories[cat_dir.name] = {
+            "count": count,
+            "summary": purpose,
+            "hot": hot,
+        }
+
+    root_index = {
+        "version": 1,
+        "updated": timestamp_utc(),
+        "total_pages": total_pages,
+        "categories": categories,
+    }
+    index_path = w_root / "_index.yaml"
+    index_path.write_text(yaml.safe_dump(root_index, sort_keys=False), encoding="utf-8")
+
+
+def _append_changelog(
+    *,
+    role: str,
+    action: str,
+    target: str,
+    summary: str,
+    root: Path | None = None,
+) -> None:
+    """Append an entry to the monthly changelog."""
+    cl_root = changelog_root(root)
+    cl_root.mkdir(parents=True, exist_ok=True)
+
+    now = datetime.now(timezone.utc)
+    month_file = cl_root / f"{now.strftime('%Y-%m')}.yaml"
+
+    entry = {
+        "ts": now.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+        "role": role,
+        "action": action,
+        "target": target,
+        "summary": summary[:80],
+    }
+
+    entries: list[dict[str, Any]] = []
+    if month_file.exists():
+        existing = yaml.safe_load(month_file.read_text(encoding="utf-8"))
+        if isinstance(existing, list):
+            entries = existing
+    entries.append(entry)
+    month_file.write_text(yaml.safe_dump(entries, sort_keys=False), encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# Public API — wiki-backed
+# ---------------------------------------------------------------------------
+
+def write_wiki_page(
+    *,
+    kind: str,
+    phase: str,
+    summary: str,
+    payload: dict[str, Any] | None = None,
+    tags: list[str] | None = None,
+    subject: str | None = None,
+    source: str = DEFAULT_SOURCE,
+    root: Path | None = None,
+) -> Path:
+    """Write a wiki page from structured knowledge. Returns the page path."""
+    category = KIND_CATEGORY_MAP.get(kind, "context")
+    page_id = _page_id_from_subject(subject, kind, phase)
+    clean_tags = _clean_text_list(tags) + [kind, phase]
+    clean_summary = _required_text(summary, "Wiki page summary must not be empty.")
+
+    body_lines: list[str] = []
+    if payload:
+        for key, value in payload.items():
+            if isinstance(value, list):
+                body_lines.append(f"## {key}")
+                for item in value:
+                    body_lines.append(f"- {item}")
+            else:
+                body_lines.append(f"- {key}: {value}")
+    body = "\n".join(body_lines)
+
+    page_path = _write_wiki_page(
+        category=category,
+        page_id=page_id,
+        summary=clean_summary,
+        body=body,
+        tags=clean_tags,
+        by=source,
+        root=root,
+    )
+
+    action = "updated" if page_path.exists() else "created"
+    _update_category_index(category, root=root)
+    _update_root_index(root=root)
+    _append_changelog(
+        role=source,
+        action=action,
+        target=f"wiki/{category}/{page_id}",
+        summary=clean_summary,
+        root=root,
+    )
+
+    return page_path
+
+
+def query_wiki(
+    *,
+    category: str | None = None,
+    tags: Iterable[str] | None = None,
+    limit: int = 10,
+    root: Path | None = None,
+) -> list[dict[str, Any]]:
+    """Query wiki pages by category and/or tags. Returns list of frontmatter dicts."""
+    if limit <= 0:
+        return []
+    w_root = wiki_root(root)
+    if not w_root.exists():
+        return []
+
+    tag_filter = _normalize_filter(tags)
+    results: list[dict[str, Any]] = []
+
+    dirs = [w_root / category] if category else sorted(w_root.iterdir())
+    for cat_dir in dirs:
+        if not cat_dir.is_dir() or cat_dir.name.startswith("_"):
+            continue
+        for md_file in sorted(cat_dir.glob("*.md"), reverse=True):
+            fm = _parse_wiki_page(md_file)
+            if not fm or fm.get("status") == "archived":
+                continue
+            if tag_filter and not tag_filter.issubset(set(fm.get("tags", []))):
+                continue
+            results.append(fm)
+            if len(results) >= limit:
+                return results
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Legacy API — kept for backward compatibility with orchestrator + tests
+# ---------------------------------------------------------------------------
+
 def append_memory_record(
     *,
     kind: str,
@@ -90,7 +387,9 @@ def append_memory_record(
     status: str = DEFAULT_STATUS,
     root: Path | None = None,
 ) -> Path:
-    record = _build_record(
+    """Write a memory record as a wiki page. Legacy API wrapper."""
+    # Validate inputs using original constraints
+    _build_record(
         entry_id=uuid4().hex,
         timestamp=timestamp_utc(),
         kind=kind,
@@ -106,13 +405,17 @@ def append_memory_record(
         payload=payload,
         supersedes=supersedes,
     )
-    if record.supersedes:
-        _ensure_supersedes_target_exists(record.supersedes, root=root)
 
-    file_name = f"{record.timestamp_utc.replace(':', '').replace('-', '')}-{record.entry_id}.json"
-    path = records_root(root=root) / file_name
-    path.write_text(json.dumps(record.as_dict(), indent=2) + "\n", encoding="utf-8")
-    return path
+    return write_wiki_page(
+        kind=kind,
+        phase=phase,
+        summary=summary,
+        payload=payload,
+        tags=tags,
+        subject=subject,
+        source=source,
+        root=root,
+    )
 
 
 def query_memory(
@@ -129,9 +432,124 @@ def query_memory(
     status: str | Iterable[str] | None = None,
     root: Path | None = None,
 ) -> list[dict[str, Any]]:
+    """Query memory. Reads from wiki pages and legacy records."""
     if limit <= 0:
         return []
 
+    # Determine category from kind
+    category = None
+    if isinstance(kind, str) and kind in KIND_CATEGORY_MAP:
+        category = KIND_CATEGORY_MAP[kind]
+
+    # Build combined tag filter
+    combined_tags: list[str] = []
+    if tags:
+        combined_tags.extend(tags)
+    if isinstance(kind, str):
+        combined_tags.append(kind)
+    if phase:
+        combined_tags.append(phase)
+
+    wiki_results = query_wiki(
+        category=category,
+        tags=combined_tags if combined_tags else None,
+        limit=limit,
+        root=root,
+    )
+
+    # Convert wiki frontmatter to legacy record format for compatibility
+    results: list[dict[str, Any]] = []
+    for fm in wiki_results:
+        record = {
+            "entry_id": fm.get("id", ""),
+            "timestamp_utc": fm.get("updated", ""),
+            "version": MEMORY_SCHEMA_VERSION,
+            "kind": _extract_kind_from_tags(fm.get("tags", [])),
+            "phase": _extract_phase_from_tags(fm.get("tags", [])),
+            "scope": DEFAULT_SCOPE,
+            "subject": fm.get("id"),
+            "source": fm.get("by", DEFAULT_SOURCE),
+            "confidence": DEFAULT_CONFIDENCE,
+            "status": fm.get("status", DEFAULT_STATUS),
+            "tags": fm.get("tags", []),
+            "summary": fm.get("summary", ""),
+            "artifact_refs": fm.get("refs", []),
+            "payload": {},
+        }
+        if subject and record.get("subject") != subject:
+            continue
+        results.append(record)
+        if len(results) >= limit:
+            break
+
+    # Fall back to legacy records if wiki has no results
+    if not results:
+        results = _load_legacy_records(
+            phase=phase, kind=kind, scope=scope, tags=tags,
+            subject=subject, limit=limit, active_only=active_only,
+            include_superseded=include_superseded, source=source,
+            status=status, root=root,
+        )
+
+    return results
+
+
+def retrieve_memory(
+    *,
+    phase: str | None = None,
+    kind: str | None = None,
+    tags: set[str] | None = None,
+    limit: int = 10,
+    root: Path | None = None,
+) -> list[dict[str, Any]]:
+    return query_memory(phase=phase, kind=kind, tags=tags, limit=limit, root=root)
+
+
+def latest_brief(
+    *,
+    phase: str | None = None,
+    subject: str | None = None,
+    scope: str | None = None,
+    root: Path | None = None,
+) -> dict[str, Any] | None:
+    entries = query_memory(kind="phase-brief", phase=phase, subject=subject, scope=scope, limit=1, root=root)
+    return entries[0] if entries else None
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _extract_kind_from_tags(tags: list[str]) -> str:
+    for tag in tags:
+        if tag in VALID_RECORD_KINDS:
+            return tag
+    return "fact"
+
+
+def _extract_phase_from_tags(tags: list[str]) -> str:
+    kind_tags = VALID_RECORD_KINDS | {"active", "stale", "archived"}
+    for tag in tags:
+        if tag not in kind_tags:
+            return tag
+    return "unknown"
+
+
+def _load_legacy_records(
+    *,
+    phase: str | None = None,
+    kind: str | Iterable[str] | None = None,
+    scope: str | Iterable[str] | None = None,
+    tags: Iterable[str] | None = None,
+    subject: str | None = None,
+    limit: int = 10,
+    active_only: bool = True,
+    include_superseded: bool = False,
+    source: str | Iterable[str] | None = None,
+    status: str | Iterable[str] | None = None,
+    root: Path | None = None,
+) -> list[dict[str, Any]]:
+    """Load from legacy JSON records for backward compatibility."""
     entries = _load_records(root=root)
     kind_filter = _normalize_filter(kind)
     scope_filter = _normalize_filter(scope)
@@ -166,28 +584,6 @@ def query_memory(
         if len(results) >= limit:
             break
     return results
-
-
-def retrieve_memory(
-    *,
-    phase: str | None = None,
-    kind: str | None = None,
-    tags: set[str] | None = None,
-    limit: int = 10,
-    root: Path | None = None,
-) -> list[dict[str, Any]]:
-    return query_memory(phase=phase, kind=kind, tags=tags, limit=limit, root=root)
-
-
-def latest_brief(
-    *,
-    phase: str | None = None,
-    subject: str | None = None,
-    scope: str | None = None,
-    root: Path | None = None,
-) -> dict[str, Any] | None:
-    entries = query_memory(kind="phase-brief", phase=phase, subject=subject, scope=scope, limit=1, root=root)
-    return entries[0] if entries else None
 
 
 def _load_records(*, root: Path | None = None) -> list[dict[str, Any]]:

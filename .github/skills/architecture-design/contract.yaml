@@ -6,7 +6,7 @@ required_inputs:
   - doc_templates/design/current.yaml
   - .ai-team/framework/clean-code.md
   - relevant code in src/
-  - project memory in .ai-team/framework/memory/
+  - project wiki via wiki-read skill
 expected_outputs:
   - doc_templates/design/current.yaml
 owned_artifacts:

@@ -27,7 +27,8 @@ Runtime support utilities live in `.ai-team/framework/runtime/`.
 - `.ai-team/framework/runtime/team.yaml` defines the role registry and ownership metadata.
 - `.ai-team/framework/config/runtimes.yaml` defines the native host runtime mapping for roles.
 - `.ai-team/framework/runtime/state.json` stores the latest persisted orchestration snapshot.
-- `.ai-team/framework/memory/repository-knowledge/` stores durable repository analysis artifacts.
+- `.ai-team/framework/memory/wiki/` is the canonical project knowledge store.
+- `.ai-team/framework/memory/changelog/` is the append-only audit trail of wiki writes.
 
 GitHub Copilot in Visual Studio Code is the primary runtime.
 Codex is the supported compatibility runtime.
@@ -121,11 +122,17 @@ Support roles are reusable. They are requested through shared state and dispatch
 - Do not bypass review, testing, or DoD review even when the implementation appears straightforward.
 
 ## Memory Policy
-- `.ai-team/framework/memory/records/` is the canonical structured project-memory location when reusable cross-run knowledge is captured.
-- `.ai-team/framework/memory/repository-knowledge/` stores durable repository-specific knowledge.
-- `.ai-team/framework/memory/project-log.md`, `.ai-team/framework/memory/decisions.md`, and `.ai-team/framework/memory/known-context.md` are optional human-readable placeholders or exports, not the canonical memory write path.
-- Do not duplicate active shared state, execution trace, or phase artifacts in memory records.
-- The bare skeleton repo should remain pristine. Do not populate project memory artifacts here during framework development.
+- `.ai-team/framework/memory/wiki/` is the canonical knowledge store. Pages are living documents organized by category.
+- `.ai-team/framework/memory/wiki/_index.yaml` is the entry point for all knowledge retrieval.
+- `.ai-team/framework/memory/wiki/_schema.yaml` defines the category registry and page format.
+- `.ai-team/framework/memory/changelog/` is the append-only audit trail of wiki writes.
+- Every role reads wiki knowledge at phase start using the `wiki-read` skill.
+- Every role that produces reusable cross-run knowledge writes wiki pages using the `wiki-write` skill.
+- Pages are updated in place (living documents), not appended. The wiki reflects current truth, not history.
+- Categories are extensible: agents may create new categories via `_schema.yaml` when no existing category fits.
+- Indexes (`_index.yaml`) are rebuildable caches derived from page frontmatter, not authoritative sources.
+- Do not duplicate active shared state, execution trace, or phase artifacts in wiki pages.
+- The bare skeleton repo should remain pristine. Do not populate wiki pages here during framework development.
 
 ## Artifact Policy
 - In the bare skeleton repo, `doc_templates/*/current.yaml` remain pristine placeholders.

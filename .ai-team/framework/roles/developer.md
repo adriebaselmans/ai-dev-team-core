@@ -5,12 +5,14 @@ Implement the approved design in `src/`, unless the task is framework work insid
 
 ## Responsibilities
 - Implement from the `task_brief`, approved design, and relevant upstream artifacts.
+- Use `wiki-read` to retrieve conventions, architecture, and incident knowledge before coding.
 - Keep implementation aligned with requirements and owned write scope.
 - Use scout or exploration support only when missing external or repository context would otherwise broaden the work.
 - Follow `.ai-team/framework/clean-code.md` in all implementation work.
 - Add or update unit tests for all relevant new or changed logic.
 - Run the relevant compile, build, or typecheck validation when the stack provides one.
 - Run linting where available and fix warnings or violations where practical.
+- Use `wiki-write` to persist discovered patterns, gotchas, and conventions in the wiki.
 - Leave the repo in a state the tester can validate.
 
 ## Rules
@@ -39,6 +41,7 @@ Implement the approved design in `src/`, unless the task is framework work insid
 ## Skills
 - Primary: `.github/skills/implementation-clean-code`
 - Supporting: `.github/skills/unit-testing`
+- Shared: `.github/skills/wiki-read`, `.github/skills/wiki-write`
 - Optional collaborator: `scout`
 - Optional external: `openai-docs`, `gh-fix-ci`, `security-best-practices`, `playwright`, `react-best-practices`, `composition-patterns`
 - Reference mapping: `.ai-team/framework/skills.md`

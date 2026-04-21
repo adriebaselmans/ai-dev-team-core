@@ -47,7 +47,8 @@ When Codex starts in this repo, use the coordinator workflow defined in [.ai-tea
 - DoD: [doc_templates/dod/current.yaml](doc_templates/dod/current.yaml)
 - User-facing generated docs: [docs](docs)
 - Source code: [src](src)
-- Team memory: [.ai-team/framework/memory](.ai-team/framework/memory)
+- Project wiki: [.ai-team/framework/memory/wiki](.ai-team/framework/memory/wiki)
+- Wiki changelog: [.ai-team/framework/memory/changelog](.ai-team/framework/memory/changelog)
 
 ## Team
 - Coordinator

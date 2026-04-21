@@ -1,14 +1,16 @@
 name: memory-update
-description: Update reusable cross-run project memory for bootstrapped project repos without duplicating active state or phase artifacts.
+description: Update the project wiki with reusable cross-run knowledge using wiki-write, without duplicating active state or phase artifacts.
 response_mode: one-shot
 required_inputs:
   - reusable project knowledge from the current run
   - bootstrapped project metadata
-  - existing structured memory in .ai-team/framework/memory/records/
+  - existing wiki in .ai-team/framework/memory/wiki/
 expected_outputs:
-  - .ai-team/framework/memory/records/
+  - .ai-team/framework/memory/wiki/
+  - .ai-team/framework/memory/changelog/
 owned_artifacts:
-  - .ai-team/framework/memory/records/
+  - .ai-team/framework/memory/wiki/
+  - .ai-team/framework/memory/changelog/
 completion_criteria:
-  - New durable memory entries are short, factual, and reusable across later runs.
-  - Durable memory is written only for bootstrapped project repos.
+  - New durable wiki pages are short, factual, and reusable across later runs.
+  - Wiki is written only for bootstrapped project repos.

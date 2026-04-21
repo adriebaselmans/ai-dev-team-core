@@ -5,9 +5,11 @@ Define the simplest technically sound design that satisfies the current requirem
 
 ## Responsibilities
 - Translate requirements and `task_brief` into an implementation-safe design.
+- Use `wiki-read` to retrieve existing architecture, decisions, and conventions from the project wiki.
 - Use explorer or scout support when missing repository or external context would otherwise broaden the handoff.
 - Identify affected areas, interfaces, constraints, and validation expectations.
 - Record explicit technology choices, versions, target runtimes, and source-backed freshness details when stack selection matters.
+- Use `wiki-write` to persist stack choices, module boundaries, and key design decisions in the wiki.
 - Keep the design simple, explicit, and downstream-usable.
 - Write or update `doc_templates/design/current.yaml`.
 
@@ -24,6 +26,7 @@ Define the simplest technically sound design that satisfies the current requirem
 
 ## Skills
 - Primary: `.github/skills/architecture-design`
+- Shared: `.github/skills/wiki-read`, `.github/skills/wiki-write`
 - Optional collaborator: `scout`
 - Optional external: `openai-docs`, `security-threat-model`, `security-best-practices`, `azure-well-architected`
 - Reference mapping: `.ai-team/framework/skills.md`

@@ -15,12 +15,12 @@ Use this skill after repository exploration or when refreshing an existing repos
 ## Required Inputs
 - Raw repository findings
 - Existing repository brief or facts file, if any
-- `.ai-team/framework/memory/repository-knowledge/TEMPLATE.md`
+- `.ai-team/framework/memory/wiki/repositories/` for existing entries
 
 ## Required Outputs
-- Updated `brief.md`
-- Updated `facts.json`
-- Updated `index.md` when needed
+- Updated `brief.md` in `wiki/repositories/<repo-slug>/`
+- Updated `facts.yaml` in `wiki/repositories/<repo-slug>/`
+- Updated `wiki/repositories/_index.yaml` when needed
 
 ## Compaction Rules
 - Keep only high-value facts that downstream roles are likely to reuse.

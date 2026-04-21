@@ -5,10 +5,12 @@ Turn the user need into a requirement baseline that is clear enough to implement
 
 ## Responsibilities
 - Identify ambiguities, missing scope, and acceptance criteria.
+- Use `wiki-read` to retrieve domain knowledge, prior decisions, and project context.
 - Collaborate with the UX/UI designer when the request has meaningful UI, UX, accessibility, or interaction-design scope.
 - Use repository exploration support when the request must be grounded in an existing repository.
 - Draft targeted clarification questions for the coordinator when required.
 - Write or update `doc_templates/requirements/current.yaml`.
+- Use `wiki-write` to persist new domain terms, business rules, and constraints in the wiki.
 - Capture assumptions that unblock implementation.
 
 ## Rules
@@ -20,6 +22,7 @@ Turn the user need into a requirement baseline that is clear enough to implement
 
 ## Skills
 - Primary: `.github/skills/requirements-clarification`
+- Shared: `.github/skills/wiki-read`, `.github/skills/wiki-write`
 - Optional external: `pdf`
 - Reference mapping: `.ai-team/framework/skills.md`
 

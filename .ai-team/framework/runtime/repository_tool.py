@@ -14,4 +14,5 @@ def repository_exploration_request(target_path: str, objective: str) -> dict[str
             "extension_points",
         ],
         "memory_tags": ["repository-knowledge", "exploration"],
+        "wiki_category": "repositories",
     }

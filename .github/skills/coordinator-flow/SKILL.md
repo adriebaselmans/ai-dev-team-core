@@ -24,8 +24,7 @@ Use this skill when acting as the coordinator in this repository.
 - `.ai-team/framework/config/runtimes.yaml`
 - `.ai-team/framework/runtime/state.json`
 - Active artifacts in `doc_templates/`
-- Current project memory in `.ai-team/framework/memory/`
-- Current repository briefs in `.ai-team/framework/memory/repository-knowledge/`
+- Project wiki in `.ai-team/framework/memory/wiki/`
 
 ## Required Outputs
 - Updated `.ai-team/framework/runtime/state.json`
@@ -66,11 +65,12 @@ Use this skill when acting as the coordinator in this repository.
 - Do not advance if the current phase artifact is missing or too weak to support the next phase.
 
 ## Memory Rules
-- Capture only reusable cross-run knowledge in `.ai-team/framework/memory/records/`.
-- Write structured memory only in bootstrapped project repos, not in the bare skeleton repo.
-- Do not duplicate active shared state or phase artifacts in memory.
-- Keep `.ai-team/framework/memory/repository-knowledge/` current when repository exploration produces reusable intelligence.
-- Treat `project-log.md`, `decisions.md`, and `known-context.md` as optional exports or legacy snapshots, not the primary write path.
+- At phase start, use `wiki-read` to retrieve relevant project knowledge from `.ai-team/framework/memory/wiki/`.
+- After each phase that produces reusable knowledge, use `wiki-write` to persist it as wiki pages.
+- Wiki pages are living documents — update existing pages, do not create duplicates.
+- Keep `.ai-team/framework/memory/wiki/repositories/` current when repository exploration produces reusable intelligence.
+- Every wiki write automatically appends to `.ai-team/framework/memory/changelog/`.
+- Write wiki pages only in bootstrapped project repos, not in the bare skeleton repo.
 
 ## Interaction Rules
 - Specialists do not talk to the user directly.

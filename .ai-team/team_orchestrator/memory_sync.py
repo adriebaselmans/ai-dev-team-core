@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Callable
 
-from framework.runtime.memory_store import append_memory_record, query_memory
+from framework.runtime.memory_store import query_wiki, write_wiki_page
 from team_orchestrator.project_context import load_project_metadata, memory_enabled, repo_root
 
 
@@ -12,12 +12,12 @@ class MemorySynchronizer:
         self,
         root: Path | None = None,
         *,
-        record_writer: Callable[..., Path] = append_memory_record,
-        record_query: Callable[..., list[dict[str, Any]]] = query_memory,
+        page_writer: Callable[..., Path] = write_wiki_page,
+        page_query: Callable[..., list[dict[str, Any]]] = query_wiki,
     ) -> None:
         self.root = root or repo_root()
-        self.record_writer = record_writer
-        self.record_query = record_query
+        self.page_writer = page_writer
+        self.page_query = page_query
 
     def sync(self, state: dict[str, Any], *, role_key: str, step_name: str) -> list[Path]:
         if not memory_enabled(self.root):
@@ -42,7 +42,6 @@ class MemorySynchronizer:
         return self._write_if_changed(
             kind="fact",
             phase=step_name,
-            scope="repository",
             subject=repo_path,
             source="explorer",
             tags=["repository-knowledge", "exploration"],
@@ -65,7 +64,6 @@ class MemorySynchronizer:
         return self._write_if_changed(
             kind="decision",
             phase="architecture",
-            scope="project",
             subject=subject,
             source="architect",
             tags=["architecture", "design"],
@@ -78,41 +76,30 @@ class MemorySynchronizer:
         *,
         kind: str,
         phase: str,
-        scope: str,
         subject: str,
         source: str,
         tags: list[str],
         summary: str,
         payload: dict[str, Any],
     ) -> list[Path]:
-        previous_entries = self.record_query(
-            kind=kind,
-            phase=phase,
-            scope=scope,
-            subject=subject,
-            limit=1,
-            include_superseded=True,
-            active_only=False,
+        # Check if wiki already has an equivalent page
+        existing = self.page_query(
+            tags=[kind, phase] if phase else [kind],
+            limit=5,
             root=self.root,
         )
-        supersedes: str | None = None
-        if previous_entries:
-            latest = previous_entries[0]
-            if latest.get("summary") == summary and latest.get("payload") == payload:
+        for page in existing:
+            if page.get("summary") == summary:
                 return []
-            supersedes = str(latest.get("entry_id") or "") or None
 
-        record_path = self.record_writer(
+        page_path = self.page_writer(
             kind=kind,
             phase=phase,
-            scope=scope,
-            subject=subject,
-            source=source,
-            confidence="high",
             summary=summary,
             payload=payload,
             tags=tags,
-            supersedes=supersedes,
+            subject=subject,
+            source=source,
             root=self.root,
         )
-        return [record_path]
+        return [page_path]

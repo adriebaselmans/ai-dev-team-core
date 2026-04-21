@@ -17,12 +17,14 @@ required_inputs:
   - doc_templates/dod/current.yaml
 expected_outputs:
   - .ai-team/framework/runtime/state.json
-  - .ai-team/framework/memory/records/
+  - .ai-team/framework/memory/wiki/ (when reusable knowledge is produced)
+  - .ai-team/framework/memory/changelog/ (audit trail of wiki writes)
   - final user-facing delivery summary
 owned_artifacts: []
 delegated_artifacts:
   - .ai-team/framework/runtime/state.json
-  - .ai-team/framework/memory/records/
+  - .ai-team/framework/memory/wiki/
+  - .ai-team/framework/memory/changelog/
 completion_criteria:
   - Each completed run is reflected in the shared state snapshot.
   - Reusable cross-run memory is persisted only when the repo is a bootstrapped project repo.

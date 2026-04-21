@@ -5,9 +5,11 @@ Validate that the implementation satisfies the requirement baseline and provide 
 
 ## Responsibilities
 - Validate the implementation against the requirements, design, and active task brief.
+- Use `wiki-read` to retrieve domain knowledge, conventions, and known incidents before testing.
 - Validate relevant edge cases and regressions.
 - Create and maintain an automated end-to-end or acceptance-level regression suite when that is feasible and worthwhile for the current stack and feature.
 - Return structured validation results and rework targets when failures occur.
+- Use `wiki-write` to persist test strategy insights and lessons learned in the wiki.
 - Call out any gaps, risks, or follow-up work for the DoD reviewer.
 - If the tester modifies tests, harness code, fixtures, or automation, run the relevant validation for those tester-owned changes and record concise evidence.
 
@@ -23,6 +25,7 @@ Validate that the implementation satisfies the requirement baseline and provide 
 
 ## Skills
 - Primary: `.github/skills/acceptance-testing`
+- Shared: `.github/skills/wiki-read`, `.github/skills/wiki-write`
 - Optional external: `playwright`, `security-best-practices`, `webapp-testing`, `web-design-guidelines`
 - Reference mapping: `.ai-team/framework/skills.md`
 

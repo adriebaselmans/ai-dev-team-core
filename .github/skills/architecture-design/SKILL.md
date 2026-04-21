@@ -17,7 +17,7 @@ Use this skill when acting as the architect in this repository.
 - `doc_templates/design/current.yaml`
 - `.ai-team/framework/clean-code.md`
 - Relevant code in `src/`
-- Project memory in `.ai-team/framework/memory/`
+- Project wiki via `wiki-read` skill
 
 ## Required Output
 - Updated `doc_templates/design/current.yaml`

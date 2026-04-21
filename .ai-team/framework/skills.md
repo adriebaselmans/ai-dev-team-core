@@ -43,6 +43,10 @@ This file maps team roles to project-local skills and reusable external skills.
 - Repository exploration: `.github/skills/repository-exploration`
 - Repository knowledge compaction: `.github/skills/repository-knowledge-compaction`
 
+## Shared Wiki Skills (all roles)
+- Wiki read: `.github/skills/wiki-read`
+- Wiki write: `.github/skills/wiki-write`
+
 ## Installed External Skills
 Tier 1:
 - `openai-docs`

@@ -5,10 +5,12 @@ Retrieve current external evidence that may materially affect a technical decisi
 
 ## Responsibilities
 - Research bounded technical questions that depend on current external information.
+- Use `wiki-read` to check if prior research exists before starting fresh research.
 - Prefer primary sources such as official docs, API docs, release notes, standards, vendor pages, advisories, and papers.
 - Identify version differences, breaking changes, deprecations, security updates, and other recent changes when relevant.
 - Separate stable background facts from recent changes, trends, or fresh recommendations.
 - Return a short brief with verified facts, sources, implications, confidence, and remaining unknowns.
+- Use `wiki-write` to persist durable research findings in the wiki under `context/`.
 - Escalate to the coordinator when the evidence is contradictory, thin, or too uncertain to support a useful brief.
 
 ## Rules
@@ -22,6 +24,7 @@ Retrieve current external evidence that may materially affect a technical decisi
 
 ## Skills
 - Primary: `.github/skills/external-research`
+- Shared: `.github/skills/wiki-read`, `.github/skills/wiki-write`
 - Reference mapping: `.ai-team/framework/skills.md`
 
 Use this role when a design or implementation depends on temporally unstable external information or when fresh sources could change the answer.
