@@ -13,8 +13,8 @@ Use this skill when acting as the tester for a feature where acceptance or end-t
 - Leave behind a rerunnable automated regression suite whenever the feature can support it.
 
 ## Required Inputs
-- `doc_templates/requirements/current.yaml`
-- `doc_templates/design/current.yaml`
+- `phase_artifacts/requirements/current.yaml`
+- `phase_artifacts/design/current.yaml`
 - Implementation and existing tests
 - Current DoD artifact
 

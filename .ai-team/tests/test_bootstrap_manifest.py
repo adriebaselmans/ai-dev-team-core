@@ -30,3 +30,4 @@ def test_bootstrap_manifest_excludes_framework_source_runtime_dirs() -> None:
     assert ".ai-team/team_orchestrator" not in include_paths
     assert ".ai-team/state" not in include_paths
     assert ".ai-team/tests" not in include_paths
+    assert ".ai-team/runtime" in include_paths

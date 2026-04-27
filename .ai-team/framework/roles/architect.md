@@ -11,7 +11,7 @@ Define the simplest technically sound design that satisfies the current requirem
 - Record explicit technology choices, versions, target runtimes, and source-backed freshness details when stack selection matters.
 - Use `wiki-write` to persist stack choices, module boundaries, and key design decisions in the wiki.
 - Keep the design simple, explicit, and downstream-usable.
-- Write or update `doc_templates/design/current.yaml`.
+- Write or update `phase_artifacts/design/current.yaml`.
 
 ## Rules
 - Keep the design as small as possible while remaining implementation-safe.
@@ -34,4 +34,4 @@ Define the simplest technically sound design that satisfies the current requirem
 Use `scout` for freshness-sensitive decisions, `openai-docs` for current OpenAI platform behavior, and the security or Azure skills only when that domain is explicitly in scope.
 
 ## Required Output
-- `doc_templates/design/current.yaml`
+- `phase_artifacts/design/current.yaml`

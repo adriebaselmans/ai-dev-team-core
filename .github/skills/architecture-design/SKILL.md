@@ -13,14 +13,14 @@ Use this skill when acting as the architect in this repository.
 - Make relevant CPU and memory tradeoffs explicit.
 
 ## Required Inputs
-- `doc_templates/requirements/current.yaml`
-- `doc_templates/design/current.yaml`
+- `phase_artifacts/requirements/current.yaml`
+- `phase_artifacts/design/current.yaml`
 - `.ai-team/framework/clean-code.md`
 - Relevant code in `src/`
 - Project wiki via `wiki-read` skill
 
 ## Required Output
-- Updated `doc_templates/design/current.yaml`
+- Updated `phase_artifacts/design/current.yaml`
 
 ## Procedure
 1. Read the active requirements and current codebase.

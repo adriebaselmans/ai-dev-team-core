@@ -1,6 +1,11 @@
+.DS_Store
+.venv/
 __pycache__/
 *.py[cod]
+*.egg-info/
 .tmp-*/
 .tmp-runtime-tests/
 .ai-team/framework/init-metadata.json
-.ai-team/framework/memory/records/*.json
+.ai-team/runtime/state.json
+.ai-team/memory/index/
+.ai-team/memory/records/*.json

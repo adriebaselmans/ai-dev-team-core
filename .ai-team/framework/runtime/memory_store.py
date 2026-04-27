@@ -67,7 +67,7 @@ class MemoryRecord:
 
 def memory_root(root: Path | None = None) -> Path:
     base = root or repo_root()
-    return base / ".ai-team" / "framework" / "memory"
+    return base / ".ai-team" / "memory"
 
 
 def wiki_root(root: Path | None = None) -> Path:

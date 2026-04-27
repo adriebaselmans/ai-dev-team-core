@@ -26,12 +26,13 @@ Runtime support utilities live in `.ai-team/framework/runtime/`.
 - `.ai-team/flows/software_delivery.yaml` defines the active flow.
 - `.ai-team/framework/runtime/team.yaml` defines the role registry and ownership metadata.
 - `.ai-team/framework/config/runtimes.yaml` defines the native host runtime mapping for roles.
-- `.ai-team/framework/runtime/state.json` stores the latest persisted orchestration snapshot.
-- `.ai-team/framework/memory/wiki/` is the canonical project knowledge store.
-- `.ai-team/framework/memory/changelog/` is the append-only audit trail of wiki writes.
+- `.ai-team/context/` defines context optimization policy, optional adapters, activation modes, and fallbacks.
+- `.ai-team/runtime/state.json` stores the latest persisted local orchestration snapshot and is ignored by git.
+- `.ai-team/memory/wiki/` is the canonical project knowledge store.
+- `.ai-team/memory/changelog/` is the append-only audit trail of wiki writes.
 
-GitHub Copilot in Visual Studio Code is the primary runtime.
-Codex is the supported compatibility runtime.
+Native project-agent hosts are the preferred runtime when available.
+Instruction-compatible hosts use the same repository contracts without a separate provider-specific flow.
 The Python orchestrator remains a validation harness, not the preferred specialist execution path.
 
 ## Flow Summary
@@ -89,7 +90,7 @@ Support roles are reusable. They are requested through shared state and dispatch
 
 ### 8. Finalization
 - Coordinator records the final orchestration summary and terminates the run.
-- In bootstrapped project repos, durable phase artifacts are written to `doc_templates/*/current.yaml`.
+- In bootstrapped project repos, durable phase artifacts are written to `phase_artifacts/*/current.yaml`.
 - Release-facing docs are generated from those artifacts only on release branches in real project repos, not in the bare skeleton repo.
 
 ## Non-Negotiable Rules
@@ -111,21 +112,21 @@ Support roles are reusable. They are requested through shared state and dispatch
 - Specialists do not communicate with the user directly; the coordinator owns user-facing interaction.
 - Do not silently skip a required phase artifact in a bootstrapped project repo.
 
-## Codex Compatibility Enforcement
-- In Codex, state the active role before substantial work.
-- In Codex, do not collapse coordinator, architect, developer, reviewer, tester, or DoD reviewer into one undifferentiated execution pass.
-- In Codex, a specialist phase counts as executed only when the active role has been explicitly switched to the role that owns that phase.
-- In Codex, restate the active role at each major phase transition and stay within that role until the next handoff.
+## Compatibility Enforcement
+- In instruction-compatible hosts, state the active role before substantial work.
+- In instruction-compatible hosts, do not collapse coordinator, architect, developer, reviewer, tester, or DoD reviewer into one undifferentiated execution pass.
+- In instruction-compatible hosts, a specialist phase counts as executed only when the active role has been explicitly switched to the role that owns that phase.
+- In instruction-compatible hosts, restate the active role at each major phase transition and stay within that role until the next handoff.
 - If acting as coordinator, do not edit implementation files, tests, runtime implementation, or other specialist-owned artifacts.
 - If acting as coordinator and the next needed action is implementation work, stop and resume from the correct specialist role instead of continuing in coordinator mode.
 - If a workflow violation occurs, restate the active role, return to the correct phase, and continue from there.
 - Do not bypass review, testing, or DoD review even when the implementation appears straightforward.
 
 ## Memory Policy
-- `.ai-team/framework/memory/wiki/` is the canonical knowledge store. Pages are living documents organized by category.
-- `.ai-team/framework/memory/wiki/_index.yaml` is the entry point for all knowledge retrieval.
-- `.ai-team/framework/memory/wiki/_schema.yaml` defines the category registry and page format.
-- `.ai-team/framework/memory/changelog/` is the append-only audit trail of wiki writes.
+- `.ai-team/memory/wiki/` is the canonical knowledge store. Pages are living documents organized by category.
+- `.ai-team/memory/wiki/_index.yaml` is the entry point for all knowledge retrieval.
+- `.ai-team/memory/wiki/_schema.yaml` defines the category registry and page format.
+- `.ai-team/memory/changelog/` is the append-only audit trail of wiki writes.
 - Every role reads wiki knowledge at phase start using the `wiki-read` skill.
 - Every role that produces reusable cross-run knowledge writes wiki pages using the `wiki-write` skill.
 - Pages are updated in place (living documents), not appended. The wiki reflects current truth, not history.
@@ -134,7 +135,16 @@ Support roles are reusable. They are requested through shared state and dispatch
 - Do not duplicate active shared state, execution trace, or phase artifacts in wiki pages.
 - The bare skeleton repo should remain pristine. Do not populate wiki pages here during framework development.
 
+## Token Policy
+- Use `.ai-team/context/policy.yaml` as the source for phase context loading, output classes, memory retrieval, and command summary policy.
+- Use `.ai-team/context/adapters.yaml` to determine whether optional adapters are disabled, detected, enabled, required, or falling back.
+- Load wiki indexes before pages, and load only pages relevant to the active phase profile.
+- Prefer compact phase handoff briefs over raw transcripts, logs, or repeated artifact dumps.
+- Use compact output modes for routine handoffs when the task is low risk or the user requests token reduction.
+- Do not apply compact modes to safety warnings, irreversible operations, legal/compliance text, or formal phase artifacts.
+- The skeleton must operate correctly when every external context adapter is absent.
+
 ## Artifact Policy
-- In the bare skeleton repo, `doc_templates/*/current.yaml` remain pristine placeholders.
+- In the bare skeleton repo, `phase_artifacts/*/current.yaml` remain pristine placeholders.
 - In bootstrapped project repos created from this skeleton, the active orchestrator persists durable phase artifacts into those YAML files.
-- Human-facing `docs/` are generated from `doc_templates/` only during a release workflow in a bootstrapped project repo.
+- Human-facing `docs/` are generated from `phase_artifacts/` only during a release workflow in a bootstrapped project repo.

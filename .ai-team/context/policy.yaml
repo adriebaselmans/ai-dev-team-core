@@ -1,0 +1,168 @@
+version: 1
+name: context-optimization-policy
+summary: Self-describing context, memory, and output policy for token-aware AI team execution.
+
+defaults:
+  wiki_entrypoint: .ai-team/memory/wiki/_index.yaml
+  compact_mode: compact
+  max_wiki_pages: 4
+  max_wiki_page_tokens: 200
+  handoff_style: compact-structured
+  cache_policy:
+    state_key: meta.context_cache
+    store_indexes: true
+    store_pages: false
+    committed_cache_allowed: false
+
+output_policy:
+  default_mode: compact
+  user_modes: [normal, compact, caveman-lite, caveman-full, caveman-ultra]
+  never_compress:
+    - formal_artifact
+    - safety_warning
+    - destructive_action
+    - legal_compliance
+    - user_clarification_sensitive
+  classes:
+    formal_artifact:
+      default_mode: normal
+      allowed_adapters: []
+    user_final:
+      default_mode: compact
+      allowed_adapters: [builtin-compact]
+    phase_handoff:
+      default_mode: compact
+      allowed_adapters: [builtin-compact, caveman]
+    routine_status:
+      default_mode: compact
+      allowed_adapters: [builtin-compact, caveman]
+    command_summary:
+      default_mode: terse
+      allowed_adapters: [builtin-command-summary, rtk]
+    review_comment:
+      default_mode: compact
+      allowed_adapters: [builtin-compact, caveman]
+    safety_warning:
+      default_mode: normal
+      allowed_adapters: []
+
+command_output_policy:
+  preferred_adapter: rtk
+  fallback: builtin-command-summary
+  rules:
+    tests: failures-only
+    git_diff: stat-first
+    logs: dedupe-and-tail
+    install: success-first
+    build: failure-summary
+
+memory_policy:
+  canonical_store: .ai-team/memory/wiki/
+  generated_index: .ai-team/memory/index/
+  retrieval: progressive
+  search_first: true
+  full_body_on_demand: true
+  commit_generated_index: false
+
+profiles:
+  intake:
+    role: coordinator
+    artifacts: []
+    wiki_categories: [project, context]
+    skills: [coordinator-flow, wiki-read, context-optimization]
+    token_budget:
+      context: 3000
+      output: 1200
+    output: task_brief
+  requirements:
+    role: requirements-engineer
+    artifacts: []
+    wiki_categories: [project, domain, context]
+    skills: [requirements-clarification, wiki-read, context-optimization]
+    token_budget:
+      context: 5000
+      output: 2500
+    output: phase_artifacts/requirements/current.yaml
+  ux-ui:
+    role: ux-ui-designer
+    artifacts:
+      - phase_artifacts/requirements/current.yaml
+    wiki_categories: [project, domain, decisions]
+    skills: [ui-ux-design, wiki-read, context-optimization]
+    token_budget:
+      context: 5000
+      output: 2500
+    output: ux_ui guidance in shared state
+  architecture:
+    role: architect
+    artifacts:
+      - phase_artifacts/requirements/current.yaml
+    wiki_categories: [architecture, decisions, conventions, context]
+    skills: [architecture-design, wiki-read, external-research, context-optimization]
+    token_budget:
+      context: 7000
+      output: 3500
+    output: phase_artifacts/design/current.yaml
+  development:
+    role: developer
+    artifacts:
+      - phase_artifacts/requirements/current.yaml
+      - phase_artifacts/design/current.yaml
+    wiki_categories: [architecture, conventions, incidents, context]
+    skills: [implementation-clean-code, unit-testing, wiki-read, context-optimization]
+    token_budget:
+      context: 8000
+      output: 5000
+    output: implementation changes plus compact validation evidence
+  review:
+    role: reviewer
+    artifacts:
+      - phase_artifacts/requirements/current.yaml
+      - phase_artifacts/design/current.yaml
+    wiki_categories: [conventions, decisions, incidents]
+    skills: [code-review, wiki-read, context-optimization]
+    token_budget:
+      context: 6000
+      output: 2500
+    output: phase_artifacts/review/current.yaml
+  testing:
+    role: tester
+    artifacts:
+      - phase_artifacts/requirements/current.yaml
+      - phase_artifacts/design/current.yaml
+    wiki_categories: [domain, conventions, incidents]
+    skills: [acceptance-testing, wiki-read, context-optimization]
+    token_budget:
+      context: 6000
+      output: 3000
+    output: test_results in shared state
+  dod-review:
+    role: dod-reviewer
+    artifacts:
+      - phase_artifacts/requirements/current.yaml
+      - phase_artifacts/design/current.yaml
+      - phase_artifacts/review/current.yaml
+    wiki_categories: [project, decisions]
+    skills: [wiki-read, context-optimization]
+    token_budget:
+      context: 5000
+      output: 2500
+    output: phase_artifacts/dod/current.yaml
+  repository-exploration:
+    role: explorer
+    artifacts: []
+    wiki_categories: [repositories, architecture, conventions]
+    skills: [repository-exploration, repository-knowledge-compaction, wiki-read, wiki-write, context-optimization]
+    token_budget:
+      context: 9000
+      output: 3500
+    output: .ai-team/memory/wiki/repositories/
+  external-research:
+    role: scout
+    artifacts: []
+    wiki_categories: [context, decisions]
+    skills: [external-research, wiki-read, wiki-write, context-optimization]
+    token_budget:
+      context: 7000
+      output: 2500
+    output: research brief in shared state

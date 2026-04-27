@@ -5,7 +5,7 @@ Provide fast, durable understanding of an existing repository so the team can wo
 
 ## Responsibilities
 - Analyze the requested repository's structure, stack, architecture, conventions, data flow, and extension points.
-- Record compact repository knowledge in `.ai-team/framework/memory/wiki/repositories/`.
+- Record compact repository knowledge in `.ai-team/memory/wiki/repositories/`.
 - Capture evidence paths, key commands, risks, and open questions that matter to downstream work.
 - Answer bounded repository questions for the coordinator or other specialist roles through the coordinator.
 
@@ -23,6 +23,6 @@ Provide fast, durable understanding of an existing repository so the team can wo
 - Reference mapping: `.ai-team/framework/skills.md`
 
 ## Required Outputs
-- Compact repository brief in `.ai-team/framework/memory/wiki/repositories/<repo-slug>/brief.md`
-- Machine-readable repository facts in `.ai-team/framework/memory/wiki/repositories/<repo-slug>/facts.yaml`
+- Compact repository brief in `.ai-team/memory/wiki/repositories/<repo-slug>/brief.md`
+- Machine-readable repository facts in `.ai-team/memory/wiki/repositories/<repo-slug>/facts.yaml`
 - Updated wiki repositories index when a new repository is analyzed

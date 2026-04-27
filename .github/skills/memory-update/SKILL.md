@@ -15,7 +15,7 @@ Use this skill when acting as the coordinator and a phase has been completed.
 ## Required Inputs
 - Reusable knowledge produced by the current run
 - Bootstrapped project metadata in `.ai-team/framework/init-metadata.json`
-- Existing wiki in `.ai-team/framework/memory/wiki/`
+- Existing wiki in `.ai-team/memory/wiki/`
 
 ## Required Outputs
 - Updated wiki pages via the `wiki-write` skill

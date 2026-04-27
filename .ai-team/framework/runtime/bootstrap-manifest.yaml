@@ -5,10 +5,15 @@ include_paths:
   - .gitignore
   - .github/agents/
   - .github/skills/
+  - .ai-team/context/
   - .ai-team/framework/
+  - .ai-team/runtime/
+  - .ai-team/ARCHITECTURE.md
   - .ai-team/flows/
-  - doc_templates/
+  - .ai-team/memory/
+  - phase_artifacts/
   - docs/README.md
 notes:
   - The bootstrap footprint is intentionally app-first and excludes skeleton source, validation harness code, and framework tests.
   - Bootstrapped projects receive .ai-team/ as the isolated framework root plus root-level AGENTS.md and Copilot assets.
+  - Project memory lives under .ai-team/memory/ and starts with empty wiki indexes in the skeleton.

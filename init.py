@@ -4,6 +4,7 @@ import argparse
 import json
 import subprocess
 import sys
+import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -28,10 +29,12 @@ def required_paths() -> list[Path]:
         REPO_ROOT / "README.md",
         REPO_ROOT / "CHANGELOG.md",
         ai_team_root() / "framework",
+        ai_team_root() / "context",
+        ai_team_root() / "runtime",
         ai_team_root() / "framework" / "runtime",
         ai_team_root() / "framework" / "roles",
         REPO_ROOT / ".github" / "skills",
-        REPO_ROOT / "doc_templates",
+        REPO_ROOT / "phase_artifacts",
         REPO_ROOT / "docs",
         REPO_ROOT / "src",
     ]
@@ -40,16 +43,16 @@ def required_paths() -> list[Path]:
 def active_artifact_paths() -> dict[str, dict[str, Path]]:
     return {
         "requirements": {
-            "yaml": REPO_ROOT / "doc_templates" / "requirements" / "current.yaml",
+            "yaml": REPO_ROOT / "phase_artifacts" / "requirements" / "current.yaml",
         },
         "design": {
-            "yaml": REPO_ROOT / "doc_templates" / "design" / "current.yaml",
+            "yaml": REPO_ROOT / "phase_artifacts" / "design" / "current.yaml",
         },
         "review": {
-            "yaml": REPO_ROOT / "doc_templates" / "review" / "current.yaml",
+            "yaml": REPO_ROOT / "phase_artifacts" / "review" / "current.yaml",
         },
         "dod": {
-            "yaml": REPO_ROOT / "doc_templates" / "dod" / "current.yaml",
+            "yaml": REPO_ROOT / "phase_artifacts" / "dod" / "current.yaml",
         },
     }
 
@@ -57,6 +60,17 @@ def active_artifact_paths() -> dict[str, dict[str, Path]]:
 def ensure_python_version() -> None:
     if sys.version_info < (3, 12):
         raise SystemExit("Python 3.12 or newer is required.")
+
+
+def validate_version_consistency() -> str:
+    version_file = (REPO_ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    pyproject_version = pyproject.get("project", {}).get("version")
+    if version_file != pyproject_version:
+        raise SystemExit(
+            f"Version mismatch: VERSION has {version_file!r}, pyproject.toml has {pyproject_version!r}"
+        )
+    return version_file
 
 
 def validate_structure() -> None:
@@ -96,6 +110,9 @@ def write_metadata(name: str, description: str, target_stack: str) -> Path:
         "created_utc": datetime.now(timezone.utc).isoformat(),
     }
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    written = json.loads(path.read_text(encoding="utf-8"))
+    if written.get("name") != name or written.get("description") != description:
+        raise SystemExit(f"Failed to verify bootstrap metadata at {path.relative_to(REPO_ROOT)}")
     return path
 
 
@@ -185,6 +202,7 @@ def main() -> int:
     args = parser.parse_args()
 
     validate_structure()
+    validate_version_consistency()
 
     if not args.skip_install:
         install_dependencies()

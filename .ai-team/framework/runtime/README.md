@@ -3,14 +3,14 @@
 This folder contains support utilities around the active flow-driven orchestrator.
 
 ## Purpose
-- Persist the latest orchestration state snapshot in `state.json`.
 - Keep release-doc export and repository support utilities available.
 - Preserve machine-readable team metadata in `team.yaml`.
 
 ## Files
 - `team.yaml`: role registry, ownership, and dispatch defaults.
-- `state.json`: machine-readable runtime state snapshot written by the active orchestrator.
-- `.ai-team/framework/memory/repository-knowledge/`: durable repository briefs and machine-readable facts for support exploration work.
+- `.ai-team/runtime/state.json`: mutable local runtime state snapshot written by the active orchestrator and ignored by git.
+- `.ai-team/memory/wiki/`: living project wiki for reusable project knowledge in bootstrapped repos.
+- `.ai-team/memory/changelog/`: append-only audit trail for wiki writes.
 - `spec_loader.py`: YAML spec loading.
 - `artifacts.py` / `export_docs.py`: release-doc export helpers.
 - `memory_store.py` / `memory_export.py`: optional structured memory helpers for bootstrapped project repos.
@@ -45,9 +45,15 @@ Check runtime state:
 python -m team_orchestrator.cli status
 ```
 
+Check package version metadata:
+
+```powershell
+python -m team_orchestrator.cli version
+```
+
 Repository exploration support is invoked by the coordinator when a task needs grounded repository analysis. It is not exposed as a standalone active role command in this runtime contract.
 
-Generate release-only user docs from `doc_templates/`:
+Generate release-only user docs from `phase_artifacts/`:
 
 ```powershell
 python -m team_orchestrator.cli export-docs

@@ -1,0 +1,82 @@
+version: 1
+name: context-optimization-adapters
+summary: Optional adapter registry. The skeleton works when every adapter is absent.
+
+modes:
+  disabled: Never use this adapter.
+  detected: Use when the adapter command or skill is available; otherwise fallback.
+  enabled: Prefer this adapter and warn when unavailable.
+  required: Fail doctor checks when unavailable.
+
+adapters:
+  builtin-compact:
+    kind: output-style
+    mode: enabled
+    optional: false
+    description: Dependency-free concise prose formatter used by default.
+    supports: [user_final, phase_handoff, routine_status, review_comment]
+    fallback: normal
+  builtin-command-summary:
+    kind: command-output
+    mode: enabled
+    optional: false
+    description: "Dependency-free command summary policy: success-first, failures-only, no raw logs."
+    supports: [command_summary]
+    fallback: normal
+  caveman:
+    kind: output-style
+    mode: detected
+    optional: true
+    description: Optional style adapter for terse routine handoffs and status updates.
+    detect:
+      skill: .github/skills/caveman
+    modes: [lite, full, ultra]
+    supports: [phase_handoff, routine_status, review_comment]
+    forbidden_for: [formal_artifact, safety_warning, destructive_action, legal_compliance]
+    fallback: builtin-compact
+  rtk:
+    kind: command-output
+    mode: detected
+    optional: true
+    description: Optional command-output compressor for git, tests, build, lint, logs, and package managers.
+    detect:
+      command: rtk --version
+    activate:
+      summary: Install RTK, then initialize the host-specific hook or call rtk commands explicitly.
+      macos: brew install rtk
+    supports: [command_summary]
+    forbidden_for: [formal_artifact, safety_warning]
+    fallback: builtin-command-summary
+  headroom:
+    kind: context-compression
+    mode: disabled
+    optional: true
+    description: Optional local reversible context compression/proxy. Keep disabled until explicitly adopted by a project.
+    detect:
+      command: headroom --version
+    activate:
+      summary: Install Headroom only in projects that want a local compression proxy or SDK.
+      python: pip install "headroom-ai[all]"
+    supports: [input_context, command_summary]
+    forbidden_for: [formal_artifact, safety_warning, destructive_action]
+    fallback: phase-profile-budgeting
+  serena:
+    kind: semantic-code-tools
+    mode: detected
+    optional: true
+    description: Optional MCP/LSP semantic code retrieval and editing layer for larger codebases.
+    detect:
+      command: serena --version
+    activate:
+      summary: Install and configure Serena MCP in the active host when semantic code tools are desired.
+    supports: [repository_exploration, code_navigation, refactoring]
+    fallback: native-search-and-symbol-tools
+  memory-index:
+    kind: memory-retrieval
+    mode: detected
+    optional: true
+    description: Optional generated local index for wiki search. Generated data must stay out of git.
+    detect:
+      path: .ai-team/memory/index/
+    supports: [memory_search, progressive_retrieval]
+    fallback: wiki-index-only

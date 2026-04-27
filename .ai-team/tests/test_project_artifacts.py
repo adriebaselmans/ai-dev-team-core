@@ -71,7 +71,7 @@ def _write_blank_artifacts(root: Path) -> None:
         },
     }
     for artifact_name, payload in artifact_payloads.items():
-        path = root / "doc_templates" / artifact_name / "current.yaml"
+        path = root / "phase_artifacts" / artifact_name / "current.yaml"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
 
@@ -106,8 +106,8 @@ def test_skeleton_repo_does_not_sync_project_artifacts_without_metadata(tmp_path
 
     orchestrator.run(create_initial_state("Build a robust orchestrator."))
 
-    requirements = yaml.safe_load((tmp_path / "doc_templates" / "requirements" / "current.yaml").read_text(encoding="utf-8"))
-    dod = yaml.safe_load((tmp_path / "doc_templates" / "dod" / "current.yaml").read_text(encoding="utf-8"))
+    requirements = yaml.safe_load((tmp_path / "phase_artifacts" / "requirements" / "current.yaml").read_text(encoding="utf-8"))
+    dod = yaml.safe_load((tmp_path / "phase_artifacts" / "dod" / "current.yaml").read_text(encoding="utf-8"))
     assert requirements["title"] == ""
     assert dod["decision"] == "Not evaluated."
     assert query_memory(limit=10, active_only=False, include_superseded=True, root=tmp_path) == []
@@ -124,10 +124,10 @@ def test_bootstrapped_project_syncs_phase_artifacts(tmp_path: Path) -> None:
 
     orchestrator.run(create_initial_state("Build a robust orchestrator."))
 
-    requirements = yaml.safe_load((tmp_path / "doc_templates" / "requirements" / "current.yaml").read_text(encoding="utf-8"))
-    design = yaml.safe_load((tmp_path / "doc_templates" / "design" / "current.yaml").read_text(encoding="utf-8"))
-    review = yaml.safe_load((tmp_path / "doc_templates" / "review" / "current.yaml").read_text(encoding="utf-8"))
-    dod = yaml.safe_load((tmp_path / "doc_templates" / "dod" / "current.yaml").read_text(encoding="utf-8"))
+    requirements = yaml.safe_load((tmp_path / "phase_artifacts" / "requirements" / "current.yaml").read_text(encoding="utf-8"))
+    design = yaml.safe_load((tmp_path / "phase_artifacts" / "design" / "current.yaml").read_text(encoding="utf-8"))
+    review = yaml.safe_load((tmp_path / "phase_artifacts" / "review" / "current.yaml").read_text(encoding="utf-8"))
+    dod = yaml.safe_load((tmp_path / "phase_artifacts" / "dod" / "current.yaml").read_text(encoding="utf-8"))
 
     assert requirements["title"] == "Example Product"
     assert requirements["status"] == "Ready."

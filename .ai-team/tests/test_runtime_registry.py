@@ -16,12 +16,12 @@ def test_runtime_map_covers_all_active_roles() -> None:
     assert roles.issubset(set(runtime_map))
 
 
-def test_host_runtime_map_declares_copilot_and_codex() -> None:
+def test_host_runtime_map_declares_native_and_instruction_hosts() -> None:
     host_map = load_host_runtime_map()
 
-    assert host_map["github-copilot-vscode"].primary is True
-    assert "custom-agents" in host_map["github-copilot-vscode"].capabilities
-    assert "codex" in host_map
+    assert host_map["native-agent-host"].primary is True
+    assert "custom-agents" in host_map["native-agent-host"].capabilities
+    assert "instruction-file-host" in host_map
 
 
 def test_trace_entries_include_role_runtime_metadata() -> None:
@@ -31,8 +31,8 @@ def test_trace_entries_include_role_runtime_metadata() -> None:
     developer_entries = [entry for entry in final_state["trace"] if entry["role"] == "developer"]
     assert developer_entries
     for entry in developer_entries:
-        assert entry["runtime"]["primary_host"] == "github-copilot-vscode"
-        assert "codex" in entry["runtime"]["compatible_hosts"]
+        assert entry["runtime"]["primary_host"] == "native-agent-host"
+        assert "instruction-file-host" in entry["runtime"]["compatible_hosts"]
 
 
 def test_runtime_agent_profile_paths_exist() -> None:

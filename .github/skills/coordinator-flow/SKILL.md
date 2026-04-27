@@ -22,19 +22,19 @@ Use this skill when acting as the coordinator in this repository.
 - `.ai-team/flows/software_delivery.yaml`
 - `.ai-team/framework/runtime/team.yaml`
 - `.ai-team/framework/config/runtimes.yaml`
-- `.ai-team/framework/runtime/state.json`
-- Active artifacts in `doc_templates/`
-- Project wiki in `.ai-team/framework/memory/wiki/`
+- `.ai-team/runtime/state.json`
+- Active artifacts in `phase_artifacts/`
+- Project wiki in `.ai-team/memory/wiki/`
 
 ## Required Outputs
-- Updated `.ai-team/framework/runtime/state.json`
+- Updated `.ai-team/runtime/state.json`
 - Updated durable memory entries only when reusable cross-run knowledge is produced in a bootstrapped project repo
 - Final user-facing delivery summary
 
 ## Procedure
 1. Read `.ai-team/framework/AGENTS.md` and `.ai-team/flows/software_delivery.yaml`.
 2. Read `.ai-team/framework/runtime/team.yaml` and `.ai-team/framework/config/runtimes.yaml`.
-3. Update `.ai-team/framework/runtime/state.json` before and after each run.
+3. Update `.ai-team/runtime/state.json` before and after each run.
 4. Route the correct specialist role for the active phase through the shared-state flow.
 5. Route explorer, scout, or UX/UI support only through coordinator-mediated support approval.
 6. Validate that the required artifact for that phase exists and is coherent when artifact persistence is enabled.
@@ -65,11 +65,11 @@ Use this skill when acting as the coordinator in this repository.
 - Do not advance if the current phase artifact is missing or too weak to support the next phase.
 
 ## Memory Rules
-- At phase start, use `wiki-read` to retrieve relevant project knowledge from `.ai-team/framework/memory/wiki/`.
+- At phase start, use `wiki-read` to retrieve relevant project knowledge from `.ai-team/memory/wiki/`.
 - After each phase that produces reusable knowledge, use `wiki-write` to persist it as wiki pages.
 - Wiki pages are living documents — update existing pages, do not create duplicates.
-- Keep `.ai-team/framework/memory/wiki/repositories/` current when repository exploration produces reusable intelligence.
-- Every wiki write automatically appends to `.ai-team/framework/memory/changelog/`.
+- Keep `.ai-team/memory/wiki/repositories/` current when repository exploration produces reusable intelligence.
+- Every wiki write automatically appends to `.ai-team/memory/changelog/`.
 - Write wiki pages only in bootstrapped project repos, not in the bare skeleton repo.
 
 ## Interaction Rules

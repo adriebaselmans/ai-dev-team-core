@@ -3,7 +3,7 @@ description: Navigate the project wiki index to find and retrieve only the knowl
 response_mode: one-shot
 required_inputs:
   - current task or phase objective
-  - .ai-team/framework/memory/wiki/_index.yaml
+  - .ai-team/memory/wiki/_index.yaml
 expected_outputs:
   - set of wiki page paths read
   - knowledge gaps discovered

@@ -67,3 +67,56 @@ def test_cli_supports_legacy_short_form_run_invocation(tmp_path: Path, capsys) -
     assert exit_code == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["completed"] is True
+
+
+def test_cli_context_status_reports_adapter_state(capsys) -> None:
+    exit_code = main(["context", "status"])
+
+    assert exit_code == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["policy"] == ".ai-team/context/policy.yaml"
+    assert payload["default_output_mode"] == "compact"
+    assert "rtk" in payload["adapter_status"]
+    assert "fallback" in payload["adapter_status"]["rtk"]
+
+
+def test_cli_context_doctor_passes_for_pristine_skeleton(capsys) -> None:
+    exit_code = main(["context", "doctor"])
+
+    assert exit_code == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["passed"] is True
+    assert payload["errors"] == []
+
+
+def test_cli_version_reports_consistent_metadata(capsys) -> None:
+    exit_code = main(["version"])
+
+    assert exit_code == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["version"] == "1.0.5"
+
+
+def test_cli_export_docs_fails_safely_for_bare_skeleton(capsys) -> None:
+    exit_code = main(["export-docs"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert "only enabled for bootstrapped project repos" in captured.err
+
+
+def test_cli_export_memory_renders_snapshot(capsys) -> None:
+    exit_code = main(["export-memory", "--view", "known-context", "--limit", "5"])
+
+    assert exit_code == 0
+    assert "# Known Context Snapshot" in capsys.readouterr().out
+
+
+def test_cli_repository_tool_builds_request(capsys) -> None:
+    exit_code = main(["repository-tool", "--target-path", ".", "--objective", "Map the skeleton."])
+
+    assert exit_code == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["tool"] == "repository-exploration"
+    assert payload["target_path"] == "."
+    assert payload["wiki_category"] == "repositories"

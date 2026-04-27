@@ -1,79 +1,49 @@
 # ai-dev-team-core
 
-Native AI dev team skeleton with:
-- GitHub Copilot in Visual Studio Code as the primary runtime
-- Codex compatibility through the same role, flow, and prompt contracts
-- flow-driven orchestration as the canonical framework model
-- structured role outputs, artifacts, and reusable repository knowledge
-- a small Python validation harness for contracts, state, artifacts, and tests
+Reusable, host-agnostic AI dev team skeleton for flow-driven software delivery.
 
 ## Version
 - Current release: `1.0.5`
 
-## Runtime Priority
-1. GitHub Copilot in Visual Studio Code via `.github/agents/*.agent.md`
-2. Codex compatibility through repository `AGENTS.md` plus the canonical framework files
-3. Python validation harness for tests, state simulation, artifact sync, and contract checks
-
-The repo no longer treats API or CLI backends as a primary role-execution path.
-
-## Canonical Framework Files
-- `AGENTS.md`: root entry point for Codex compatibility
-- `.ai-team/framework/AGENTS.md`: canonical coordinator workflow contract
-- `.ai-team/flows/software_delivery.yaml`: active delivery flow
-- `.ai-team/framework/runtime/team.yaml`: role registry and ownership metadata
-- `.ai-team/framework/config/runtimes.yaml`: native host runtime mapping for roles
-- `.ai-team/framework/config/copilot_role_models.yaml`: VS Code Copilot role-to-model preferences
-- `.ai-team/framework/roles/*.md`: role-specific behavior contracts
-- `.ai-team/framework/prompts/*`: layered prompt assets
-- `.ai-team/framework/schemas/role_outputs.schema.yaml`: structured role output contract
-- `.github/skills/*`: reusable skill guidance
-- `.github/agents/*.agent.md`: native Copilot custom agent profiles
-- `.ai-team/framework/runtime/bootstrap-manifest.yaml`: slim app-repo footprint used by `ai-dev-team-cli`
-
 ## What This Repo Is
-This repo is a reusable skeleton for AI-assisted software delivery.
+This repository is a pristine framework skeleton, not an application repo. It provides:
+- a canonical role and flow contract for AI-assisted delivery
+- native agent profiles for hosts that support project agents
+- instruction-file compatibility for hosts that read repository guidance
+- structured phase artifacts under `phase_artifacts/`
+- project memory under `.ai-team/memory/wiki/`
+- a small Python validation harness for contracts, state, artifacts, memory, and tests
 
-The framework contract is defined once and consumed in two ways:
-- natively by GitHub Copilot in Visual Studio Code through custom agent profiles and handoff conventions
-- compatibly by Codex through the repo instructions and the same role, prompt, and flow files
+The skeleton must stay reusable. Project-specific knowledge belongs in bootstrapped project repos, not in this core repo.
 
-The Python code in this repo exists to:
-- validate the flow and contracts
-- simulate the role pipeline for tests
-- persist structured artifacts and reusable memory in bootstrapped project repos
-- keep the framework coherent outside a specific host runtime
+## Canonical Map
+- [AGENTS.md](AGENTS.md): thin host entry point.
+- [.ai-team/framework/AGENTS.md](.ai-team/framework/AGENTS.md): authoritative workflow, memory, artifact, and role-boundary contract.
+- [.ai-team/ARCHITECTURE.md](.ai-team/ARCHITECTURE.md): compact framework structure and invariants.
+- [.ai-team/flows/software_delivery.yaml](.ai-team/flows/software_delivery.yaml): active delivery flow.
+- [.ai-team/framework/runtime/team.yaml](.ai-team/framework/runtime/team.yaml): role registry and ownership metadata.
+- [.ai-team/framework/config/runtimes.yaml](.ai-team/framework/config/runtimes.yaml): host runtime capability map.
+- [.ai-team/context](.ai-team/context): context optimization policy, optional adapters, activation docs, and fallbacks.
+- [.ai-team/framework/config/copilot_role_models.yaml](.ai-team/framework/config/copilot_role_models.yaml): VS Code Copilot model preferences when that host is used.
+- [.ai-team/framework/roles](.ai-team/framework/roles): role-specific behavior contracts.
+- [.ai-team/framework/prompts](.ai-team/framework/prompts): shared prompt layers.
+- [.github/agents](.github/agents): native project-agent profiles.
+- [.github/skills](.github/skills): reusable skill guidance.
+- [phase_artifacts](phase_artifacts): current phase artifacts in bootstrapped projects; pristine placeholders here.
+- [.ai-team/memory/wiki](.ai-team/memory/wiki): living project wiki in bootstrapped projects; empty here.
+- [docs](docs): generated user-facing release docs only.
 
-It is not the preferred day-to-day specialist execution path.
+## Runtime Model
+1. Native project-agent hosts use `.github/agents/*.agent.md` when supported.
+2. Instruction-compatible hosts use [AGENTS.md](AGENTS.md) and the same canonical framework files.
+3. The Python harness validates contracts, simulates the flow, persists phase artifacts, exports docs, and checks memory behavior.
 
-## Team
-- Coordinator
-- Requirements Engineer
-- UX/UI Designer
-- Scout
-- Architect
-- Developer
-- Reviewer
-- Tester
-- DoD Reviewer
-- Repository Exploration Support
-
-## Repo Structure
-- `.github/agents/`: native Copilot custom agent profiles
-- `.github/skills/`: project-local skills and role procedures
-- `.ai-team/agents/`: deterministic validation-harness role stubs for tests
-- `.ai-team/team_orchestrator/`: flow engine, trace logging, artifact sync, runtime metadata loaders
-- `.ai-team/flows/`: YAML flow definitions
-- `.ai-team/state/`: shared state factory, merge logic, and persistence helpers
-- `.ai-team/framework/`: team rules, prompts, roles, runtime metadata, schemas, and helper scripts
-- `.ai-team/framework/runtime/`: runtime support utilities for snapshots, artifacts, memory, and repository tooling
-- `src/`: implementation code
-- `.ai-team/tests/`: automated validation for the skeleton
+No provider-specific compatibility path owns the framework. Host-specific profiles are adapters over the same role, flow, prompt, and artifact contracts.
 
 ## Prerequisites
 - Python 3.12+
 - `pip`
-- GitHub Copilot in Visual Studio Code for the primary runtime experience
+- Optional: a host that supports project agent profiles, such as GitHub Copilot in Visual Studio Code
 
 ## Setup
 Run the guided bootstrap:
@@ -82,64 +52,26 @@ Run the guided bootstrap:
 python init.py
 ```
 
-That script checks Python 3.12+, installs dependencies from `pyproject.toml`, validates the repository structure, and captures project metadata for the bootstrap flow.
-
-## Primary Use: GitHub Copilot in VS Code
-Open the repo in Visual Studio Code with GitHub Copilot enabled.
-
-The native agent profiles in `.github/agents/` mirror the canonical framework roles. The intended operating model is:
-- use the coordinator profile as the top-level entry point
-- hand off to specialist roles through the flow contract
-- keep support roles coordinator-mediated
-- keep specialist profiles hidden from direct user selection
-- keep structured artifact expectations aligned with the framework schemas
-- configure per-role Copilot models through `.ai-team/framework/config/copilot_role_models.yaml`
-
-GitHub Copilot custom agents support a per-agent `model` field in `.agent.md` frontmatter. This repo keeps those preferences in `.ai-team/framework/config/copilot_role_models.yaml` and mirrors them into `.github/agents/*.agent.md`.
-Treat `.ai-team/framework/config/copilot_role_models.yaml` as the source of truth. If that file changes, update the `.github/agents/*.agent.md` `model` frontmatter to match it and rerun the profile tests.
-
-Current limitation:
-- the official docs support per-agent `model`
-- this repo does not assume a supported per-agent reasoning-effort field for Copilot custom agents
-- model availability still depends on the current Copilot plan and model picker access
-
-## Compatible Use: Codex
-Start Codex in the repo root.
-
-The root [AGENTS.md](AGENTS.md) directs Codex to the same canonical framework files used by Copilot:
-- [.ai-team/framework/AGENTS.md](.ai-team/framework/AGENTS.md)
-- [.ai-team/flows/software_delivery.yaml](.ai-team/flows/software_delivery.yaml)
-- [.ai-team/framework/runtime/team.yaml](.ai-team/framework/runtime/team.yaml)
-- [.ai-team/framework/config/runtimes.yaml](.ai-team/framework/config/runtimes.yaml)
-- [.ai-team/framework/roles](.ai-team/framework/roles)
-- [.ai-team/framework/prompts](.ai-team/framework/prompts)
-
-Codex should follow the same role and flow contracts rather than a separate team model.
+That script checks Python 3.12+, installs dependencies from `pyproject.toml`, validates the repository structure, and captures project metadata for bootstrapped project behavior.
 
 ## Validation Harness
-The Python harness remains useful for:
-- contract validation
-- orchestration simulation
-- artifact export
-- reusable memory sync
-- automated tests
-
-Run the validation harness with:
+Run the harness with:
 
 ```powershell
 python -m team_orchestrator.cli run --input "Build a small REST API for tasks"
 python -m team_orchestrator.cli status
+python -m team_orchestrator.cli version
+python -m team_orchestrator.cli context status
+python -m team_orchestrator.cli context doctor
 python -m pytest -q
 ```
 
-## Runtime Behavior
-- The canonical flow remains data-driven and lives in `.ai-team/flows/`.
-- Shared state is the single source of truth for routing, gating, and artifact sync.
-- Trace entries record runtime metadata from `.ai-team/framework/config/runtimes.yaml` and layered prompt metadata.
-- Native Copilot agent profiles are the preferred execution surface.
-- Codex compatibility uses the same contracts, not a separate framework fork.
-- Support roles remain coordinator-mediated.
-- Review, testing, and DoD gates return structured decisions with explicit rework targets.
-- In bootstrapped project repos, durable phase artifacts are written to `doc_templates/*/current.yaml`.
-- Bootstrapped project repos receive the manifest-defined slim runtime footprint instead of the full skeleton source tree.
-- In the bare skeleton repo, `doc_templates/` and `docs/` remain pristine placeholders.
+## Context Optimization
+The skeleton works without external token tools. Optional adapters for command summaries, output style, context compression, semantic code navigation, and generated memory search are documented in [.ai-team/context/README.md](.ai-team/context/README.md).
+
+## Skeleton Invariants
+- Keep `.ai-team/memory/wiki/` empty except indexes and schema in this skeleton.
+- Keep `phase_artifacts/*/current.yaml` as pristine placeholders in this skeleton.
+- Keep `docs/` generated-only; do not edit release docs by hand.
+- Keep host-specific files as adapters, not alternate framework contracts.
+- Keep reusable knowledge in wiki pages only after a project is bootstrapped from the skeleton.

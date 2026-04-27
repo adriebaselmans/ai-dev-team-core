@@ -1,19 +1,21 @@
 # TODO
 
-## Highest-Priority Gap
+## Highest-Priority Gaps
 
 ### Prove Native Host Execution End to End
-The framework is now designed around native GitHub Copilot in Visual Studio Code execution, with Codex as the compatibility runtime. Current automated coverage validates contracts, flow behavior, runtime metadata, and native agent profile consistency, but it still does not prove real host-native execution end to end.
+Automated coverage validates contracts, flow behavior, runtime metadata, phase artifacts, memory behavior, and native profile consistency. It still does not prove real host-native execution end to end.
 
-What is still missing:
-- verify GitHub Copilot in Visual Studio Code with the native `.github/agents/*.agent.md` profiles
-- verify Codex compatibility against the same role and flow contracts in a real Codex session
-- confirm native handoffs, support-role dispatch, and role selection behave as intended in both hosts
-- add an opt-in integration validation path that checks host-native behavior without making normal CI depend on an interactive editor or hosted agent environment
+Acceptance items:
+- verify `.github/agents/*.agent.md` profiles in a native project-agent host
+- verify instruction-file fallback behavior in a second host without adding provider-specific rules
+- confirm handoffs, support-role dispatch, role selection, and hidden specialist profiles behave as intended
+- add opt-in integration validation that runs only when the required host environment is available
 
-Why this matters:
-- the orchestration, contracts, prompts, and native agent profiles are now in place
-- the main remaining risk is real host-native behavior rather than local framework consistency
+### Tighten RTK Token Controls
+The skeleton now declares phase context profiles, but runtime enforcement can go further.
 
-Suggested next step:
-- add host-gated integration checks that run only when the required native environment is available
+Acceptance items:
+- keep loader/validator coverage for `.ai-team/context/policy.yaml` and `.ai-team/context/adapters.yaml`
+- add optional state trace entries for context profile, compact mode, and budget decisions
+- keep wiki reads index-first and profile-scoped
+- measure token policy results without storing raw transcripts

@@ -12,10 +12,10 @@ except ImportError:  # pragma: no cover - compatibility for direct script-style 
 
 
 ARTIFACT_FILES = {
-    "requirements": "doc_templates/requirements/current.yaml",
-    "design": "doc_templates/design/current.yaml",
-    "review": "doc_templates/review/current.yaml",
-    "dod": "doc_templates/dod/current.yaml",
+    "requirements": "phase_artifacts/requirements/current.yaml",
+    "design": "phase_artifacts/design/current.yaml",
+    "review": "phase_artifacts/review/current.yaml",
+    "dod": "phase_artifacts/dod/current.yaml",
 }
 
 

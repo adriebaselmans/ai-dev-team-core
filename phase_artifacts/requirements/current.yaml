@@ -21,6 +21,6 @@ constraints:
 - Keep role boundaries and owned write scopes intact.
 assumptions:
 - The skeleton is used primarily in GitHub Copilot in Visual Studio Code.
-- Codex remains a compatible secondary runtime.
+- Instruction-compatible hosts follow the same framework contract.
 open_questions: []
 definition_of_ready: Ready.

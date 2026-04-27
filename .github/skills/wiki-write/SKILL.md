@@ -14,7 +14,7 @@ Use this skill after completing phase work that produced reusable knowledge — 
 
 ## Required Inputs
 - The knowledge to persist (fact, decision, convention, lesson, etc.)
-- `.ai-team/framework/memory/wiki/_schema.yaml` (category registry)
+- `.ai-team/memory/wiki/_schema.yaml` (category registry)
 - The existing page if updating (check before creating)
 
 ## Required Outputs
@@ -152,7 +152,7 @@ If no existing category fits:
 
 ### Do NOT write to wiki
 - Current-run orchestration state (that's `state.json`)
-- Phase artifacts (that's `doc_templates/*/current.yaml`)
+- Phase artifacts (that's `phase_artifacts/*/current.yaml`)
 - Raw logs, traces, or verbose command output
 - Temporary investigation notes
 - Anything that is only relevant to the current run, not future runs

@@ -14,7 +14,7 @@ Use this skill at the start of any phase to ground your work in existing project
 
 ## Required Inputs
 - The current task or phase objective (to know what's relevant)
-- `.ai-team/framework/memory/wiki/_index.yaml`
+- `.ai-team/memory/wiki/_index.yaml`
 
 ## Required Outputs
 - The set of wiki pages read, cited by path
@@ -23,7 +23,7 @@ Use this skill at the start of any phase to ground your work in existing project
 ## Procedure
 
 ### Step 1 — Read the root index
-Read `.ai-team/framework/memory/wiki/_index.yaml`. This file lists every category with a summary and the most recently updated pages per category. This is your map.
+Read `.ai-team/memory/wiki/_index.yaml`. This file lists every category with a summary and the most recently updated pages per category. This is your map.
 
 ### Step 2 — Identify relevant categories
 Match your current task against category summaries. Typical mappings:
@@ -54,4 +54,4 @@ If your task needs knowledge that doesn't exist in the wiki yet, note this as a 
 The root `_index.yaml` has an `updated` timestamp. If it is older than the most recent page you encounter (check file modification or frontmatter `updated`), treat the index as stale and rebuild it before relying on it.
 
 ## Fallback: No Wiki Yet
-If `.ai-team/framework/memory/wiki/` does not exist or has no pages, the project has no wiki knowledge yet. Proceed without wiki context and note that wiki-write should initialize the wiki after this phase produces reusable knowledge.
+If `.ai-team/memory/wiki/` does not exist or has no pages, the project has no wiki knowledge yet. Proceed without wiki context and note that wiki-write should initialize the wiki after this phase produces reusable knowledge.

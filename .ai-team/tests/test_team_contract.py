@@ -31,7 +31,7 @@ def test_scout_support_contract_covers_architect_and_developer() -> None:
     assert "scout" in developer_optional
 
 
-def test_codex_entry_contract_enforces_role_discipline() -> None:
+def test_entry_contract_enforces_role_discipline() -> None:
     root = Path(__file__).resolve().parents[2]
     entry = (root / "AGENTS.md").read_text(encoding="utf-8")
     framework = (root / ".ai-team" / "framework" / "AGENTS.md").read_text(encoding="utf-8")
@@ -46,3 +46,19 @@ def test_codex_entry_contract_enforces_role_discipline() -> None:
     assert "Do not treat review or testing as the first place compiler or type errors are discovered" in framework
     assert "a specialist phase counts as executed only when the active role has been explicitly switched" in framework
     assert "Treat any coordinator-side implementation edit as a workflow violation" in coordinator
+
+
+def test_framework_contract_is_host_agnostic() -> None:
+    root = Path(__file__).resolve().parents[2]
+    checked_paths = [
+        root / "README.md",
+        root / "AGENTS.md",
+        root / "TODO.md",
+        root / ".ai-team" / "framework" / "AGENTS.md",
+        root / ".ai-team" / "framework" / "config" / "runtimes.yaml",
+        root / ".github" / "skills" / "README.md",
+    ]
+
+    for path in checked_paths:
+        forbidden = "Co" + "dex"
+        assert forbidden not in path.read_text(encoding="utf-8")

@@ -15,7 +15,7 @@ Use this skill after repository exploration or when refreshing an existing repos
 ## Required Inputs
 - Raw repository findings
 - Existing repository brief or facts file, if any
-- `.ai-team/framework/memory/wiki/repositories/` for existing entries
+- `.ai-team/memory/wiki/repositories/` for existing entries
 
 ## Required Outputs
 - Updated `brief.md` in `wiki/repositories/<repo-slug>/`

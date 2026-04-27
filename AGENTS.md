@@ -1,13 +1,13 @@
 # AI Dev Team Entry Point
 
-This repository is the entry point for the AI dev team framework.
+This repository is the host-agnostic entry point for the AI dev team framework.
 
-When Codex starts in this repo, use the coordinator workflow defined in [.ai-team/framework/AGENTS.md](.ai-team/framework/AGENTS.md).
+Any instruction-compatible host should use the coordinator workflow defined in [.ai-team/framework/AGENTS.md](.ai-team/framework/AGENTS.md).
 
 ## Default Behavior
 - Treat the user request as input for the coordinator.
-- Prefer the native Copilot agent model declared in `.github/agents/` when the host supports it.
-- In Codex, follow the same role, flow, prompt, and runtime contracts as a compatibility path.
+- Prefer native project-agent profiles declared in `.github/agents/` when the host supports them.
+- Otherwise, follow the same role, flow, prompt, and runtime contracts from repository instructions.
 - Move through the active flow defined in `.ai-team/flows/software_delivery.yaml`, using the coordinator policy in `.ai-team/framework/AGENTS.md`.
 - Use the project-local skills in `.github/skills/` and the role mapping in `.ai-team/framework/skills.md` where applicable.
 - Use `.ai-team/framework/runtime/` for team metadata, state snapshots, artifact export, memory helpers, and repository exploration support utilities.
@@ -26,7 +26,7 @@ When Codex starts in this repo, use the coordinator workflow defined in [.ai-tea
 - If `.ai-team/framework/config/copilot_role_models.yaml` changes, update the `model` frontmatter in `.github/agents/*.agent.md` to match it before finishing.
 - After changing Copilot role model preferences, rerun the native-agent profile tests.
 
-## Codex Enforcement
+## Compatibility Enforcement
 - State the active role before substantial work.
 - Follow the active flow in `.ai-team/flows/software_delivery.yaml`. Do not skip required phases: requirements, architecture, development, review, testing, DoD review, and coordinator finalization.
 - The coordinator is read-only for implementation work.
@@ -41,14 +41,14 @@ When Codex starts in this repo, use the coordinator workflow defined in [.ai-tea
 - Do not let specialists skip review, testing, or DoD review to reach a final answer faster.
 
 ## Output Locations
-- Requirements: [doc_templates/requirements/current.yaml](doc_templates/requirements/current.yaml)
-- Design: [doc_templates/design/current.yaml](doc_templates/design/current.yaml)
-- Review: [doc_templates/review/current.yaml](doc_templates/review/current.yaml)
-- DoD: [doc_templates/dod/current.yaml](doc_templates/dod/current.yaml)
+- Requirements: [phase_artifacts/requirements/current.yaml](phase_artifacts/requirements/current.yaml)
+- Design: [phase_artifacts/design/current.yaml](phase_artifacts/design/current.yaml)
+- Review: [phase_artifacts/review/current.yaml](phase_artifacts/review/current.yaml)
+- DoD: [phase_artifacts/dod/current.yaml](phase_artifacts/dod/current.yaml)
 - User-facing generated docs: [docs](docs)
 - Source code: [src](src)
-- Project wiki: [.ai-team/framework/memory/wiki](.ai-team/framework/memory/wiki)
-- Wiki changelog: [.ai-team/framework/memory/changelog](.ai-team/framework/memory/changelog)
+- Project wiki: [.ai-team/memory/wiki](.ai-team/memory/wiki)
+- Wiki changelog: [.ai-team/memory/changelog](.ai-team/memory/changelog)
 
 ## Team
 - Coordinator

@@ -13,9 +13,9 @@ Use this skill when acting as the UX/UI designer in this repository.
 - Reduce implementation guesswork around flows, states, and accessibility expectations.
 
 ## Required Inputs
-- `doc_templates/requirements/current.yaml`
-- `doc_templates/design/current.yaml`
-- Relevant project memory in `.ai-team/framework/memory/`
+- `phase_artifacts/requirements/current.yaml`
+- `phase_artifacts/design/current.yaml`
+- Relevant project memory in `.ai-team/memory/`
 
 ## Required Output
 - Bounded UX/UI guidance for the active task

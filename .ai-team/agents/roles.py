@@ -74,7 +74,7 @@ def _build_task_brief(state: dict[str, Any], request: str, repo_mode: str, ui_he
         "sdk",
         "api",
         "copilot",
-        "codex",
+        "instruction-compatible host",
         "claude",
         "openai",
         "github",
@@ -397,13 +397,13 @@ class RequirementsEngineerAgent(Agent):
                     "Support reusable support-role dispatch through the coordinator.",
                 ],
                 "assumptions": [
-                    "The skeleton is used primarily in GitHub Copilot in Visual Studio Code.",
-                    "Codex remains a compatible secondary runtime.",
+                    "The skeleton is used with native project-agent hosts when available.",
+                    "Instruction-compatible hosts follow the same framework contract.",
                 ]
                 if ui_heavy
                 else [
-                    "The skeleton is used primarily in GitHub Copilot in Visual Studio Code.",
-                    "Codex remains a compatible secondary runtime.",
+                    "The skeleton is used with native project-agent hosts when available.",
+                    "Instruction-compatible hosts follow the same framework contract.",
                 ],
                 "open_questions": [],
             },
@@ -505,8 +505,8 @@ class ArchitectAgent(Agent):
                     "Use the coordinator-owned task brief as the compact handoff contract for downstream roles.",
                     "Keep support work isolated through explorer and scout when extra repository or external context is needed.",
                 ] + ([] if compact else [
-                    "Treat Copilot VS Code custom agents as the primary execution surface.",
-                    "Keep Codex compatible through the same role, prompt, and flow contracts.",
+                    "Treat native project-agent profiles as the preferred execution surface.",
+                    "Keep instruction-compatible hosts aligned through the same role, prompt, and flow contracts.",
                     "Keep Python orchestration as a validation and test harness rather than the main runtime.",
                 ]),
                 "non_functional_requirements": (

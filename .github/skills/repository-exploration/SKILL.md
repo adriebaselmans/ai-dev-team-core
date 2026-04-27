@@ -15,11 +15,11 @@ Use this skill when the user asks to base work on a specific repository, asks fo
 ## Required Inputs
 - Target repository path, URL, or checkout location
 - The user request or downstream role question that motivates the exploration
-- Existing repository knowledge in `.ai-team/framework/memory/wiki/repositories/` when available
+- Existing repository knowledge in `.ai-team/memory/wiki/repositories/` when available
 
 ## Required Outputs
-- `.ai-team/framework/memory/wiki/repositories/<repo-slug>/brief.md`
-- `.ai-team/framework/memory/wiki/repositories/<repo-slug>/facts.yaml`
+- `.ai-team/memory/wiki/repositories/<repo-slug>/brief.md`
+- `.ai-team/memory/wiki/repositories/<repo-slug>/facts.yaml`
 - Updated `wiki/repositories/_index.yaml` when the repository is new to the knowledge store
 
 ## Procedure

@@ -14,11 +14,11 @@ Use this skill when acting as the requirements engineer in this repository.
 
 ## Required Inputs
 - User need from the coordinator
-- `doc_templates/requirements/current.yaml`
-- Relevant project memory in `.ai-team/framework/memory/`
+- `phase_artifacts/requirements/current.yaml`
+- Relevant project memory in `.ai-team/memory/`
 
 ## Required Output
-- Updated `doc_templates/requirements/current.yaml`
+- Updated `phase_artifacts/requirements/current.yaml`
 - Clarification questions for the coordinator when needed
 
 ## Procedure

@@ -12,9 +12,12 @@ from framework.runtime.memory_export import render_memory_snapshot
 from framework.runtime.repository_tool import repository_exploration_request
 from state.factory import create_initial_state
 from state.store import StateStore
+from team_orchestrator.context_status import build_context_doctor, build_context_status
 from team_orchestrator.engine import Orchestrator
 from team_orchestrator.flow_loader import load_flow
-DEFAULT_STATE_PATH = Path(__file__).resolve().parents[2] / ".ai-team" / "framework" / "runtime" / "state.json"
+from team_orchestrator.versioning import load_project_version
+
+DEFAULT_STATE_PATH = Path(__file__).resolve().parents[2] / ".ai-team" / "runtime" / "state.json"
 
 
 def _print_json(payload: object) -> None:
@@ -88,6 +91,27 @@ def cmd_repository_tool(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_context_status(_: argparse.Namespace) -> int:
+    _print_json(build_context_status())
+    return 0
+
+
+def cmd_context_doctor(_: argparse.Namespace) -> int:
+    result = build_context_doctor()
+    _print_json(result)
+    return 0 if result["passed"] else 1
+
+
+def cmd_version(_: argparse.Namespace) -> int:
+    try:
+        version = load_project_version()
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+    _print_json({"version": version})
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the ai-dev-team-core orchestration system.")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -109,7 +133,10 @@ def build_parser() -> argparse.ArgumentParser:
     status.add_argument("--json", action="store_true", help="Print the full saved state.")
     status.set_defaults(func=cmd_status)
 
-    export_docs = sub.add_parser("export-docs", help="Generate release-only user-facing docs from doc_templates YAML.")
+    version = sub.add_parser("version", help="Show the package version and verify version metadata consistency.")
+    version.set_defaults(func=cmd_version)
+
+    export_docs = sub.add_parser("export-docs", help="Generate release-only user-facing docs from phase_artifacts YAML.")
     export_docs.set_defaults(func=cmd_export_docs)
 
     export_memory = sub.add_parser("export-memory", help="Render an on-demand human-readable memory snapshot.")
@@ -121,6 +148,15 @@ def build_parser() -> argparse.ArgumentParser:
     repo_tool.add_argument("--target-path", required=True, help="Repository path to explore.")
     repo_tool.add_argument("--objective", required=True, help="Exploration objective.")
     repo_tool.set_defaults(func=cmd_repository_tool)
+
+    context = sub.add_parser("context", help="Inspect context optimization policy and adapters.")
+    context_sub = context.add_subparsers(dest="context_command", required=True)
+
+    context_status = context_sub.add_parser("status", help="Show active context policy and adapter state.")
+    context_status.set_defaults(func=cmd_context_status)
+
+    context_doctor = context_sub.add_parser("doctor", help="Validate context policy, adapters, and flow coverage.")
+    context_doctor.set_defaults(func=cmd_context_doctor)
     return parser
 
 

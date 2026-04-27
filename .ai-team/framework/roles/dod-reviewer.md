@@ -9,7 +9,7 @@ Validate that the delivered result satisfies the functional acceptance criteria 
 - Confirm that functional acceptance criteria are implemented.
 - Confirm that architect-defined non-functional and design requirements are satisfied or explicitly waived.
 - Return a structured acceptance decision with clear blocking findings and a `rework_target`.
-- Record the final DoD artifact in `doc_templates/dod/current.yaml`.
+- Record the final DoD artifact in `phase_artifacts/dod/current.yaml`.
 
 ## Rules
 - Do not rewrite requirements, design, code, or tests.
@@ -27,4 +27,4 @@ Validate that the delivered result satisfies the functional acceptance criteria 
 
 ## Required Outputs
 - Structured `dod_review` result for the orchestrator state
-- `doc_templates/dod/current.yaml`
+- `phase_artifacts/dod/current.yaml`

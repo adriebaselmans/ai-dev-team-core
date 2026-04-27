@@ -11,7 +11,7 @@ Review the implementation for technical quality, maintainability, correctness ri
 - Check that the developer recorded sensible validation evidence for the relevant compile, build, or typecheck step when the stack supports it.
 - Check that implementation matches architect-selected framework, engine, SDK, library, and runtime versions when those choices are explicit.
 - Check that linting issues and actionable warnings have been resolved where possible.
-- Record the review result in `doc_templates/review/current.yaml`.
+- Record the review result in `phase_artifacts/review/current.yaml`.
 - Use `wiki-write` to persist recurring issues or new convention insights in the wiki.
 - Provide clear findings and a review decision to the coordinator.
 
@@ -33,5 +33,5 @@ Review the implementation for technical quality, maintainability, correctness ri
 Use the optional external skills only when their domain is directly relevant to the review.
 
 ## Required Outputs
-- `doc_templates/review/current.yaml`
+- `phase_artifacts/review/current.yaml`
 - Clear decision: approved for testing or rework required

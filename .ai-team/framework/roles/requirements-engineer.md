@@ -9,7 +9,7 @@ Turn the user need into a requirement baseline that is clear enough to implement
 - Collaborate with the UX/UI designer when the request has meaningful UI, UX, accessibility, or interaction-design scope.
 - Use repository exploration support when the request must be grounded in an existing repository.
 - Draft targeted clarification questions for the coordinator when required.
-- Write or update `doc_templates/requirements/current.yaml`.
+- Write or update `phase_artifacts/requirements/current.yaml`.
 - Use `wiki-write` to persist new domain terms, business rules, and constraints in the wiki.
 - Capture assumptions that unblock implementation.
 
@@ -30,4 +30,4 @@ Use `pdf` only when the source requirements or supporting material are provided 
 Use the `UX/UI designer` role when the requirements need stronger user-flow, interaction, or accessibility clarity.
 
 ## Required Output
-- `doc_templates/requirements/current.yaml`
+- `phase_artifacts/requirements/current.yaml`

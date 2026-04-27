@@ -24,8 +24,8 @@ This repository uses project-local skills as the operational layer beneath the t
 - `acceptance-testing`
 - `memory-update`
 
-## Reusable OpenAI Skills
-These are useful when installed and available in Codex:
+## Reusable External Skills
+These are useful when installed and available in the active host:
 - `openai-docs`: use for official OpenAI or model/platform guidance.
 - `playwright`: use for browser-based acceptance or end-to-end testing when the stack supports it.
 - `security-best-practices`: use when a feature has meaningful security impact.

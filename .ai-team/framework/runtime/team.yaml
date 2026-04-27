@@ -40,7 +40,7 @@ roles:
       extends:
         - specialist
     writes:
-      - doc_templates/requirements/current.yaml
+      - phase_artifacts/requirements/current.yaml
   ux-ui-designer:
     agent_type: specialist
     user_facing: false
@@ -99,7 +99,7 @@ roles:
         - role: scout
           purpose: gather current external evidence when up-to-date sources could change the design
     writes:
-      - doc_templates/design/current.yaml
+      - phase_artifacts/design/current.yaml
   developer:
     agent_type: specialist
     user_facing: false
@@ -135,7 +135,7 @@ roles:
         - role: developer
           purpose: findings handling and rework coordination
     writes:
-      - doc_templates/review/current.yaml
+      - phase_artifacts/review/current.yaml
   tester:
     agent_type: specialist
     user_facing: false
@@ -161,21 +161,21 @@ roles:
         - specialist
     focus: acceptance-gate
     writes:
-      - doc_templates/dod/current.yaml
+      - phase_artifacts/dod/current.yaml
 
 shared_tools:
   repository-exploration:
     contract_module: .ai-team/framework/runtime/repository_tool.py
     writes:
-      - .ai-team/framework/memory/wiki/repositories/
+      - .ai-team/memory/wiki/repositories/
   wiki-read:
     skill: .github/skills/wiki-read
     writes: []
   wiki-write:
     skill: .github/skills/wiki-write
     writes:
-      - .ai-team/framework/memory/wiki/
-      - .ai-team/framework/memory/changelog/
+      - .ai-team/memory/wiki/
+      - .ai-team/memory/changelog/
 
 spawn_rules:
   - Only the coordinator dispatches specialist work.

@@ -1,8 +1,8 @@
-version: 1
-default_host: github-copilot-vscode
+version: 2
+default_host: native-agent-host
 
 hosts:
-  github-copilot-vscode:
+  native-agent-host:
     kind: native
     primary: true
     capabilities:
@@ -10,66 +10,68 @@ hosts:
       - handoffs
       - subagents
     notes:
-      - Primary host runtime for this skeleton.
+      - Preferred host class when project-agent profiles are supported.
+      - GitHub Copilot in Visual Studio Code is the maintained native profile set for this repo.
       - Use .github/agents/*.agent.md as the native execution surface.
-  codex:
-    kind: compatibility
+  instruction-file-host:
+    kind: instruction-compatible
     primary: false
     capabilities:
       - prompt-layering
       - sub-agents-when-host-supports-them
+      - repository-instructions
     notes:
-      - Codex compatibility runtime.
-      - Follow the same role, flow, and prompt contracts defined for the framework.
+      - Generic fallback host class for tools that read repository instructions.
+      - Follow the same role, flow, prompt, and runtime contracts defined for the framework.
 
 roles:
   coordinator:
-    primary_host: github-copilot-vscode
+    primary_host: native-agent-host
     compatible_hosts:
-      - codex
+      - instruction-file-host
     agent_profile: .github/agents/coordinator.agent.md
   requirements-engineer:
-    primary_host: github-copilot-vscode
+    primary_host: native-agent-host
     compatible_hosts:
-      - codex
+      - instruction-file-host
     agent_profile: .github/agents/requirements-engineer.agent.md
   ux-ui-designer:
-    primary_host: github-copilot-vscode
+    primary_host: native-agent-host
     compatible_hosts:
-      - codex
+      - instruction-file-host
     agent_profile: .github/agents/ux-ui-designer.agent.md
   explorer:
-    primary_host: github-copilot-vscode
+    primary_host: native-agent-host
     compatible_hosts:
-      - codex
+      - instruction-file-host
     agent_profile: .github/agents/explorer.agent.md
   scout:
-    primary_host: github-copilot-vscode
+    primary_host: native-agent-host
     compatible_hosts:
-      - codex
+      - instruction-file-host
     agent_profile: .github/agents/scout.agent.md
   architect:
-    primary_host: github-copilot-vscode
+    primary_host: native-agent-host
     compatible_hosts:
-      - codex
+      - instruction-file-host
     agent_profile: .github/agents/architect.agent.md
   developer:
-    primary_host: github-copilot-vscode
+    primary_host: native-agent-host
     compatible_hosts:
-      - codex
+      - instruction-file-host
     agent_profile: .github/agents/developer.agent.md
   reviewer:
-    primary_host: github-copilot-vscode
+    primary_host: native-agent-host
     compatible_hosts:
-      - codex
+      - instruction-file-host
     agent_profile: .github/agents/reviewer.agent.md
   tester:
-    primary_host: github-copilot-vscode
+    primary_host: native-agent-host
     compatible_hosts:
-      - codex
+      - instruction-file-host
     agent_profile: .github/agents/tester.agent.md
   dod-reviewer:
-    primary_host: github-copilot-vscode
+    primary_host: native-agent-host
     compatible_hosts:
-      - codex
+      - instruction-file-host
     agent_profile: .github/agents/dod-reviewer.agent.md

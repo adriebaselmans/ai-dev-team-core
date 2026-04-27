@@ -13,8 +13,8 @@ Use this skill when acting as the developer in this repository.
 - Leave the change ready for technical review.
 
 ## Required Inputs
-- `doc_templates/requirements/current.yaml`
-- `doc_templates/design/current.yaml`
+- `phase_artifacts/requirements/current.yaml`
+- `phase_artifacts/design/current.yaml`
 - `.ai-team/framework/clean-code.md`
 - Relevant code in `src/`
 

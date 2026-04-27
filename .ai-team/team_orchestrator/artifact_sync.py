@@ -9,10 +9,10 @@ from team_orchestrator.project_context import artifacts_enabled, load_project_me
 
 
 ARTIFACT_RELATIVE_PATHS = {
-    "requirements": Path("doc_templates/requirements/current.yaml"),
-    "design": Path("doc_templates/design/current.yaml"),
-    "review": Path("doc_templates/review/current.yaml"),
-    "dod": Path("doc_templates/dod/current.yaml"),
+    "requirements": Path("phase_artifacts/requirements/current.yaml"),
+    "design": Path("phase_artifacts/design/current.yaml"),
+    "review": Path("phase_artifacts/review/current.yaml"),
+    "dod": Path("phase_artifacts/dod/current.yaml"),
 }
 
 
