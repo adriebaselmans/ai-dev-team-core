@@ -13,6 +13,13 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent
 
+# Make in-tree packages importable without depending on `pip install -e .`
+# having propagated to the current interpreter. This keeps init.py self-contained
+# whether it's the first run after `git clone` or a re-run inside an installed env.
+_AI_TEAM_DIR = str(REPO_ROOT / ".ai-team")
+if _AI_TEAM_DIR not in sys.path:
+    sys.path.insert(0, _AI_TEAM_DIR)
+
 
 def ai_team_root() -> Path:
     return REPO_ROOT / ".ai-team"
