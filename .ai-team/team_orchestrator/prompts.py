@@ -7,6 +7,8 @@ from typing import Any
 
 import yaml
 
+from team_orchestrator.paths import repo_root
+
 
 @dataclass(frozen=True)
 class RolePromptConfig:
@@ -24,10 +26,6 @@ class RolePromptConfig:
         if include_prompt:
             payload["prompt"] = self.prompt
         return payload
-
-
-def repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
 
 
 def team_config_path(root: Path | None = None) -> Path:

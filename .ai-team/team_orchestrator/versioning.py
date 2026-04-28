@@ -5,9 +5,7 @@ from importlib import metadata
 from pathlib import Path
 from typing import Any
 
-
-def repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+from team_orchestrator.paths import repo_root
 
 
 def version_file_path(root: Path | None = None) -> Path:

@@ -8,6 +8,7 @@ import yaml
 from agents.registry import build_default_agent_registry
 from flows import default_flow_path
 from team_orchestrator.artifact_sync import ArtifactSynchronizer
+from team_orchestrator.artifact_templates import blank_artifact_payloads
 from team_orchestrator.engine import Orchestrator
 from team_orchestrator.flow_loader import load_flow
 from team_orchestrator.memory_sync import MemorySynchronizer
@@ -17,59 +18,7 @@ from framework.runtime.memory_store import query_memory
 
 
 def _write_blank_artifacts(root: Path) -> None:
-    artifact_payloads = {
-        "requirements": {
-            "status": "Pending.",
-            "title": "",
-            "user_need": "",
-            "goal": "",
-            "in_scope": [],
-            "out_of_scope": [],
-            "functional_requirements": [],
-            "acceptance_criteria": [],
-            "constraints": [],
-            "assumptions": [],
-            "open_questions": [],
-            "definition_of_ready": "Not ready.",
-        },
-        "design": {
-            "title": "",
-            "design_goal": "",
-            "architecture_approach": [],
-            "affected_areas": [],
-            "separation_of_concerns": [],
-            "module_boundaries": [],
-            "data_flow": [],
-            "interfaces": [],
-            "technology_and_environment_considerations": [],
-            "technology_choices": [],
-            "clean_code_constraints": [],
-            "performance_considerations": [],
-            "risks_and_tradeoffs": [],
-            "non_goals": [],
-        },
-        "review": {
-            "status": "Pending.",
-            "title": "",
-            "decision": "Not reviewed.",
-            "findings": [],
-            "residual_risks": [],
-            "recommendation": "",
-        },
-        "dod": {
-            "status": "Pending.",
-            "title": "",
-            "delivery_summary": [],
-            "requirements_coverage": [],
-            "what_was_built": [],
-            "what_was_verified": [],
-            "automated_regression_coverage": [],
-            "acceptance_test_coverage": [],
-            "known_gaps_or_risks": [],
-            "decision": "Not evaluated.",
-            "user_feedback_needed": [],
-        },
-    }
+    artifact_payloads = blank_artifact_payloads()
     for artifact_name, payload in artifact_payloads.items():
         path = root / "phase_artifacts" / artifact_name / "current.yaml"
         path.parent.mkdir(parents=True, exist_ok=True)

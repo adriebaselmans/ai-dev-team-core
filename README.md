@@ -55,23 +55,21 @@ python init.py
 That script checks Python 3.12+, installs dependencies from `pyproject.toml`, validates the repository structure, and captures project metadata for bootstrapped project behavior.
 
 ## Validation Harness
-Run the harness with:
+After `python init.py` (or `python init.py --skip-install` plus a manual `pip install -e .`), the console scripts are available. Either form works:
 
 ```powershell
-python -m team_orchestrator.cli run --input "Build a small REST API for tasks"
-python -m team_orchestrator.cli status
-python -m team_orchestrator.cli version
-python -m team_orchestrator.cli context status
-python -m team_orchestrator.cli context doctor
+ai-dev-team-run run --input "Build a small REST API for tasks"
+ai-dev-team-run status
+ai-dev-team-run version
+ai-dev-team-run context status
+ai-dev-team-run context doctor
 python -m pytest -q
 ```
+
+The fully-qualified `python -m team_orchestrator.cli ...` invocation is equivalent and remains supported.
 
 ## Context Optimization
 The skeleton works without external token tools. Optional adapters for command summaries, output style, context compression, semantic code navigation, and generated memory search are documented in [.ai-team/context/README.md](.ai-team/context/README.md).
 
 ## Skeleton Invariants
-- Keep `.ai-team/memory/wiki/` empty except indexes and schema in this skeleton.
-- Keep `phase_artifacts/*/current.yaml` as pristine placeholders in this skeleton.
-- Keep `docs/` generated-only; do not edit release docs by hand.
-- Keep host-specific files as adapters, not alternate framework contracts.
-- Keep reusable knowledge in wiki pages only after a project is bootstrapped from the skeleton.
+See [.ai-team/ARCHITECTURE.md](.ai-team/ARCHITECTURE.md#skeleton-invariants) for the canonical list.

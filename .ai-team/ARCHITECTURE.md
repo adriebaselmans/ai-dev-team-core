@@ -13,30 +13,19 @@ This skeleton is a reusable framework core. Keep project-specific state out of t
 - Context: `.ai-team/context/` explains token policy, optional adapters, activation modes, and fallbacks.
 - Runtime harness: `.ai-team/team_orchestrator/`, `.ai-team/state/`, and `.ai-team/agents/` validate the contract locally.
 
-## Project Data Locations
-
-- `phase_artifacts/*/current.yaml`: current phase outputs in bootstrapped projects; pristine placeholders here.
-- `.ai-team/memory/wiki/`: living project wiki for reusable knowledge; empty here except indexes and schema.
-- `.ai-team/memory/changelog/`: audit trail for wiki writes.
-- `docs/`: generated release docs only.
-- `src/`: application source in bootstrapped projects; placeholder here.
+For concrete paths and project data locations, see the Canonical Map in `README.md`.
 
 ## Context Optimization Policy
 
-The source of truth is `.ai-team/context/policy.yaml`, with optional adapter activation in `.ai-team/context/adapters.yaml`.
-
-Rules:
-- Load wiki index first, then only phase-relevant pages.
-- Prefer phase artifacts and compact handoff briefs over transcript rereads.
-- Cache indexes in runtime state when useful; do not commit cached page content.
-- Use compact modes only for routine handoffs, command summaries, or explicit token-saving requests.
-- Keep formal artifacts, safety warnings, and irreversible-operation messages uncompressed.
-- Use fallback behavior when optional external adapters are unavailable.
+The source of truth is `.ai-team/context/policy.yaml`, with optional adapter activation in `.ai-team/context/adapters.yaml`. Runtime guidance lives in `.ai-team/framework/AGENTS.md` under "Token Policy" and "Memory Policy".
 
 ## Skeleton Invariants
 
 - No provider-specific compatibility branch may become a second framework contract.
-- No project wiki pages should be committed to this skeleton.
-- No generated docs should be hand-maintained under `docs/`.
-- No phase artifact path should use obsolete template-oriented naming.
 - Agent profiles may be host-specific adapters, but the framework contract stays host-agnostic.
+- Keep `.ai-team/memory/wiki/` empty except indexes and schema in this skeleton.
+- Keep reusable knowledge in wiki pages only after a project is bootstrapped from the skeleton.
+- Keep `phase_artifacts/*/current.yaml` as pristine placeholders in this skeleton.
+- No phase artifact path should use obsolete template-oriented naming.
+- Keep `docs/` generated-only; do not edit release docs by hand.
+

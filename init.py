@@ -7,7 +7,6 @@ import sys
 import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 
 import yaml
 
@@ -29,10 +28,11 @@ def required_paths() -> list[Path]:
         REPO_ROOT / "README.md",
         REPO_ROOT / "CHANGELOG.md",
         ai_team_root() / "framework",
-        ai_team_root() / "context",
-        ai_team_root() / "runtime",
         ai_team_root() / "framework" / "runtime",
         ai_team_root() / "framework" / "roles",
+        ai_team_root() / "context",
+        ai_team_root() / "runtime",
+        ai_team_root() / "memory",
         REPO_ROOT / ".github" / "skills",
         REPO_ROOT / "phase_artifacts",
         REPO_ROOT / "docs",
@@ -125,58 +125,36 @@ def _seed_if_blank(path: Path, content: str) -> bool:
 
 
 def _seed_artifacts(metadata: dict[str, str]) -> list[str]:
-    seeds: dict[str, dict[str, Any]] = {
-        "requirements": {
-            "status": "Pending first feature request.",
-            "title": metadata["name"],
-            "user_need": metadata["description"],
-            "goal": metadata["description"],
-            "in_scope": [],
-            "out_of_scope": [],
-            "functional_requirements": [],
-            "acceptance_criteria": [],
-            "constraints": [f"Target stack: {metadata['target_stack']}"],
-            "assumptions": ["Bootstrap metadata recorded by init.py."],
-            "open_questions": [],
-            "definition_of_ready": "Not ready.",
-        },
-        "design": {
-            "title": metadata["name"],
-            "design_goal": metadata["description"],
-            "architecture_approach": [],
-            "affected_areas": [],
-            "separation_of_concerns": [],
-            "module_boundaries": [],
-            "data_flow": [],
-            "interfaces": [],
-            "technology_and_environment_considerations": [f"Target stack: {metadata['target_stack']}"],
-            "clean_code_constraints": ["Follow .ai-team/framework/clean-code.md."],
-            "performance_considerations": [],
-            "risks_and_tradeoffs": [],
-            "non_goals": [],
-        },
-        "review": {
-            "status": "Pending implementation review.",
-            "title": metadata["name"],
-            "decision": "Not reviewed yet.",
-            "findings": [],
-            "residual_risks": [],
-            "recommendation": "No recommendation yet.",
-        },
-        "dod": {
-            "status": "Pending implementation validation.",
-            "title": metadata["name"],
-            "delivery_summary": [],
-            "requirements_coverage": [],
-            "what_was_built": [],
-            "what_was_verified": [],
-            "automated_regression_coverage": [],
-            "acceptance_test_coverage": [],
-            "known_gaps_or_risks": [],
-            "decision": "Not accepted.",
-            "user_feedback_needed": [],
-        },
-    }
+    from team_orchestrator.artifact_templates import blank_artifact_payloads
+
+    seeds = blank_artifact_payloads()
+
+    requirements = seeds["requirements"]
+    requirements["status"] = "Pending first feature request."
+    requirements["title"] = metadata["name"]
+    requirements["user_need"] = metadata["description"]
+    requirements["goal"] = metadata["description"]
+    requirements["constraints"] = [f"Target stack: {metadata['target_stack']}"]
+    requirements["assumptions"] = ["Bootstrap metadata recorded by init.py."]
+
+    design = seeds["design"]
+    design["title"] = metadata["name"]
+    design["design_goal"] = metadata["description"]
+    design["technology_and_environment_considerations"] = [
+        f"Target stack: {metadata['target_stack']}"
+    ]
+    design["clean_code_constraints"] = ["Follow .ai-team/framework/clean-code.md."]
+
+    review = seeds["review"]
+    review["status"] = "Pending implementation review."
+    review["title"] = metadata["name"]
+    review["decision"] = "Not reviewed yet."
+    review["recommendation"] = "No recommendation yet."
+
+    dod = seeds["dod"]
+    dod["status"] = "Pending implementation validation."
+    dod["title"] = metadata["name"]
+    dod["decision"] = "Not accepted."
 
     seeded: list[str] = []
     for name, payload in seeds.items():

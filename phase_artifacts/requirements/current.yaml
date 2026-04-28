@@ -1,26 +1,12 @@
-status: Ready.
-title: Example Project
-user_need: Refactor the orchestration runtime.
-goal: Refactor the orchestration runtime.
-in_scope:
-- Requested repository change
-out_of_scope:
-- Long-running cloud-hosted execution
-functional_requirements:
-- Keep the implementation path compact and phase outputs concise.
-- Persist phase outcomes in shared state.
-- Support reusable support-role dispatch through the coordinator.
-acceptance_criteria:
-- Required phases complete with structured outputs.
-- Review, testing, and DoD gates pass.
-constraints:
-- 'Target stack: Python 3.12'
-- Coordinator stays read-only for implementation artifacts.
-- Support roles are coordinator-mediated.
-- Follow the coordinator-mediated workflow.
-- Keep role boundaries and owned write scopes intact.
-assumptions:
-- The skeleton is used primarily in GitHub Copilot in Visual Studio Code.
-- Instruction-compatible hosts follow the same framework contract.
+status: Pending.
+title: ''
+user_need: ''
+goal: ''
+in_scope: []
+out_of_scope: []
+functional_requirements: []
+acceptance_criteria: []
+constraints: []
+assumptions: []
 open_questions: []
-definition_of_ready: Ready.
+definition_of_ready: Not ready.

@@ -6,6 +6,8 @@ from typing import Any
 
 import yaml
 
+from team_orchestrator.paths import repo_root
+
 
 @dataclass(frozen=True)
 class CopilotRoleModelConfig:
@@ -18,10 +20,6 @@ class CopilotRoleModelConfig:
         payload = asdict(self)
         payload["model"] = list(self.model)
         return payload
-
-
-def repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
 
 
 def copilot_role_models_path() -> Path:

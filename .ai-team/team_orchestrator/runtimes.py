@@ -6,6 +6,8 @@ from typing import Any
 
 import yaml
 
+from team_orchestrator.paths import repo_root
+
 
 @dataclass(frozen=True)
 class HostRuntimeConfig:
@@ -33,10 +35,6 @@ class RoleRuntimeConfig:
         payload = asdict(self)
         payload["compatible_hosts"] = list(self.compatible_hosts)
         return payload
-
-
-def repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
 
 
 def runtimes_config_path() -> Path:

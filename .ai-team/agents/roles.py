@@ -112,27 +112,18 @@ def _inferred_support_request(state: dict[str, Any], requester: str) -> dict[str
     coordination = state.get("coordination") or {}
     task_brief = state.get("task_brief") or {}
     completed_ids = set(state.get("meta", {}).get("completed_support_requests", []))
-    request_key = None
-    question = None
-    support_role = None
 
-    if requester == "architect" and task_brief.get("needs_freshness_check"):
-        request_key = "architect-scout-auto"
-        support_role = "scout"
-        question = "Verify external versions, current guidance, or recent changes that could affect the design."
-    elif requester == "developer" and task_brief.get("needs_freshness_check"):
-        request_key = "developer-scout-auto"
-        support_role = "scout"
-        question = "Verify implementation-sensitive external behavior, versions, or recent changes before coding."
-    elif requester == "requirements-engineer" and coordination.get("ui_heavy"):
-        request_key = "requirements-ux-auto"
-        support_role = "ux-ui-designer"
-        question = "Clarify important user flows, states, and accessibility expectations."
-
-    if not request_key or request_key in completed_ids:
+    inference = _AUTO_SUPPORT_RULES.get(requester)
+    if inference is None:
+        return None
+    spec = inference(task_brief, coordination)
+    if spec is None:
+        return None
+    request_id, support_role, question = spec
+    if request_id in completed_ids:
         return None
     return {
-        "id": request_key,
+        "id": request_id,
         "pending": True,
         "requested_by": requester,
         "support_role": support_role,
@@ -140,6 +131,49 @@ def _inferred_support_request(state: dict[str, Any], requester: str) -> dict[str
         "resume_step": str(state.get("meta", {}).get("current_step", "")),
         "reason": "Automatically requested because the task brief indicates the downstream role would otherwise need broad additional context.",
     }
+
+
+def _auto_support_for_architect(
+    task_brief: dict[str, Any], coordination: dict[str, Any]
+) -> tuple[str, str, str] | None:
+    if task_brief.get("needs_freshness_check"):
+        return (
+            "architect-scout-auto",
+            "scout",
+            "Verify external versions, current guidance, or recent changes that could affect the design.",
+        )
+    return None
+
+
+def _auto_support_for_developer(
+    task_brief: dict[str, Any], coordination: dict[str, Any]
+) -> tuple[str, str, str] | None:
+    if task_brief.get("needs_freshness_check"):
+        return (
+            "developer-scout-auto",
+            "scout",
+            "Verify implementation-sensitive external behavior, versions, or recent changes before coding.",
+        )
+    return None
+
+
+def _auto_support_for_requirements(
+    task_brief: dict[str, Any], coordination: dict[str, Any]
+) -> tuple[str, str, str] | None:
+    if coordination.get("ui_heavy"):
+        return (
+            "requirements-ux-auto",
+            "ux-ui-designer",
+            "Clarify important user flows, states, and accessibility expectations.",
+        )
+    return None
+
+
+_AUTO_SUPPORT_RULES = {
+    "architect": _auto_support_for_architect,
+    "developer": _auto_support_for_developer,
+    "requirements-engineer": _auto_support_for_requirements,
+}
 
 
 def _effective_support_request(state: dict[str, Any], requester: str) -> dict[str, Any] | None:
@@ -198,6 +232,55 @@ def _default_technology_choices(state: dict[str, Any]) -> list[dict[str, Any]]:
     return choices
 
 
+_COORDINATION_INHERITED_FIELDS: tuple[str, ...] = (
+    "repo_mode",
+    "ui_heavy",
+    "mode",
+    "task_size",
+    "risk_level",
+    "needs_repo_grounding",
+    "needs_freshness_check",
+    "parallel_development",
+    "work_items",
+    "integration_owner",
+    "support_resume_step",
+    "support_dispatch",
+    "final_summary",
+)
+
+_COORDINATION_BOOL_FIELDS: frozenset[str] = frozenset(
+    {"ui_heavy", "needs_repo_grounding", "needs_freshness_check", "parallel_development"}
+)
+_COORDINATION_LIST_FIELDS: frozenset[str] = frozenset({"work_items"})
+
+
+def _coordination_payload(
+    existing: dict[str, Any],
+    *,
+    status: str,
+    overrides: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Build a coordination dict by inheriting from ``existing`` and applying overrides.
+
+    Centralises the field list so each step in CoordinatorAgent only declares
+    what it actually changes instead of re-copying every key.
+    """
+    overrides = overrides or {}
+    payload: dict[str, Any] = {"status": status}
+    for field in _COORDINATION_INHERITED_FIELDS:
+        if field in overrides:
+            payload[field] = overrides[field]
+        elif field in _COORDINATION_BOOL_FIELDS:
+            payload[field] = bool(existing.get(field))
+        elif field in _COORDINATION_LIST_FIELDS:
+            payload[field] = list(existing.get(field, []))
+        elif field == "integration_owner":
+            payload[field] = existing.get(field, "designated-developer")
+        else:
+            payload[field] = existing.get(field)
+    return payload
+
+
 class CoordinatorAgent(Agent):
     def __init__(self) -> None:
         super().__init__("coordinator", {"coordination", "support_request", "task_brief"})
@@ -216,22 +299,25 @@ class CoordinatorAgent(Agent):
             )
             task_brief = _build_task_brief(state, request, repo_mode, ui_heavy)
             return {
-                "coordination": {
-                    "status": "ready" if request else "blocked",
-                    "repo_mode": repo_mode,
-                    "ui_heavy": ui_heavy,
-                    "mode": task_brief["mode"],
-                    "task_size": task_brief["task_size"],
-                    "risk_level": task_brief["risk_level"],
-                    "needs_repo_grounding": task_brief["needs_repo_grounding"],
-                    "needs_freshness_check": task_brief["needs_freshness_check"],
-                    "parallel_development": bool(existing.get("parallel_development", False)),
-                    "work_items": list(existing.get("work_items", [])),
-                    "integration_owner": existing.get("integration_owner", "designated-developer"),
-                    "support_resume_step": None,
-                    "support_dispatch": None,
-                    "final_summary": None,
-                },
+                "coordination": _coordination_payload(
+                    existing,
+                    status="ready" if request else "blocked",
+                    overrides={
+                        "repo_mode": repo_mode,
+                        "ui_heavy": ui_heavy,
+                        "mode": task_brief["mode"],
+                        "task_size": task_brief["task_size"],
+                        "risk_level": task_brief["risk_level"],
+                        "needs_repo_grounding": task_brief["needs_repo_grounding"],
+                        "needs_freshness_check": task_brief["needs_freshness_check"],
+                        "parallel_development": bool(existing.get("parallel_development", False)),
+                        "work_items": list(existing.get("work_items", [])),
+                        "integration_owner": existing.get("integration_owner", "designated-developer"),
+                        "support_resume_step": None,
+                        "support_dispatch": None,
+                        "final_summary": None,
+                    },
+                ),
                 "task_brief": task_brief,
                 "support_request": None,
             }
@@ -245,22 +331,17 @@ class CoordinatorAgent(Agent):
             if not work_items:
                 work_items = [{"id": "core", "description": "Implement the approved design end to end."}]
             return {
-                "coordination": {
-                    "status": "development-planned",
-                    "repo_mode": existing.get("repo_mode"),
-                    "ui_heavy": bool(existing.get("ui_heavy")),
-                    "mode": existing.get("mode"),
-                    "task_size": existing.get("task_size"),
-                    "risk_level": existing.get("risk_level"),
-                    "needs_repo_grounding": bool(existing.get("needs_repo_grounding")),
-                    "needs_freshness_check": bool(existing.get("needs_freshness_check")),
-                    "parallel_development": parallel_development,
-                    "work_items": work_items,
-                    "integration_owner": "designated-developer",
-                    "support_resume_step": existing.get("support_resume_step"),
-                    "support_dispatch": None,
-                    "final_summary": None,
-                },
+                "coordination": _coordination_payload(
+                    existing,
+                    status="development-planned",
+                    overrides={
+                        "parallel_development": parallel_development,
+                        "work_items": work_items,
+                        "integration_owner": "designated-developer",
+                        "support_dispatch": None,
+                        "final_summary": None,
+                    },
+                ),
                 "task_brief": state.get("task_brief"),
                 "support_request": None,
             }
@@ -276,44 +357,25 @@ class CoordinatorAgent(Agent):
                 "question": request_payload.get("question"),
             }
             return {
-                "coordination": {
-                    "status": "support-approved" if approved else "support-rejected",
-                    "repo_mode": existing.get("repo_mode"),
-                    "ui_heavy": bool(existing.get("ui_heavy")),
-                    "mode": existing.get("mode"),
-                    "task_size": existing.get("task_size"),
-                    "risk_level": existing.get("risk_level"),
-                    "needs_repo_grounding": bool(existing.get("needs_repo_grounding")),
-                    "needs_freshness_check": bool(existing.get("needs_freshness_check")),
-                    "parallel_development": bool(existing.get("parallel_development")),
-                    "work_items": list(existing.get("work_items", [])),
-                    "integration_owner": existing.get("integration_owner", "designated-developer"),
-                    "support_resume_step": request_payload.get("resume_step"),
-                    "support_dispatch": dispatch,
-                    "final_summary": existing.get("final_summary"),
-                },
+                "coordination": _coordination_payload(
+                    existing,
+                    status="support-approved" if approved else "support-rejected",
+                    overrides={
+                        "support_resume_step": request_payload.get("resume_step"),
+                        "support_dispatch": dispatch,
+                    },
+                ),
                 "task_brief": state.get("task_brief"),
                 "support_request": request_payload if approved else None,
             }
 
         if step == "support-finalize":
             return {
-                "coordination": {
-                    "status": "support-complete",
-                    "repo_mode": existing.get("repo_mode"),
-                    "ui_heavy": bool(existing.get("ui_heavy")),
-                    "mode": existing.get("mode"),
-                    "task_size": existing.get("task_size"),
-                    "risk_level": existing.get("risk_level"),
-                    "needs_repo_grounding": bool(existing.get("needs_repo_grounding")),
-                    "needs_freshness_check": bool(existing.get("needs_freshness_check")),
-                    "parallel_development": bool(existing.get("parallel_development")),
-                    "work_items": list(existing.get("work_items", [])),
-                    "integration_owner": existing.get("integration_owner", "designated-developer"),
-                    "support_resume_step": existing.get("support_resume_step"),
-                    "support_dispatch": None,
-                    "final_summary": existing.get("final_summary"),
-                },
+                "coordination": _coordination_payload(
+                    existing,
+                    status="support-complete",
+                    overrides={"support_dispatch": None},
+                ),
                 "task_brief": state.get("task_brief"),
                 "support_request": None,
             }
@@ -321,27 +383,20 @@ class CoordinatorAgent(Agent):
         if step == "finalize":
             dod_review = state.get("dod_review") or {}
             development = state.get("development") or {}
+            final_summary = (
+                f"Delivered revision {development.get('revision', 0)} with acceptance confirmed."
+                if dod_review.get("approved")
+                else "Flow ended without satisfying Definition of Done."
+            )
             return {
-                "coordination": {
-                    "status": "done" if dod_review.get("approved") else "incomplete",
-                    "repo_mode": existing.get("repo_mode"),
-                    "ui_heavy": bool(existing.get("ui_heavy")),
-                    "mode": existing.get("mode"),
-                    "task_size": existing.get("task_size"),
-                    "risk_level": existing.get("risk_level"),
-                    "needs_repo_grounding": bool(existing.get("needs_repo_grounding")),
-                    "needs_freshness_check": bool(existing.get("needs_freshness_check")),
-                    "parallel_development": bool(existing.get("parallel_development")),
-                    "work_items": list(existing.get("work_items", [])),
-                    "integration_owner": existing.get("integration_owner", "designated-developer"),
-                    "support_resume_step": existing.get("support_resume_step"),
-                    "support_dispatch": None,
-                    "final_summary": (
-                        f"Delivered revision {development.get('revision', 0)} with acceptance confirmed."
-                        if dod_review.get("approved")
-                        else "Flow ended without satisfying Definition of Done."
-                    ),
-                },
+                "coordination": _coordination_payload(
+                    existing,
+                    status="done" if dod_review.get("approved") else "incomplete",
+                    overrides={
+                        "support_dispatch": None,
+                        "final_summary": final_summary,
+                    },
+                ),
                 "task_brief": state.get("task_brief"),
                 "support_request": None,
             }
@@ -361,7 +416,6 @@ class RequirementsEngineerAgent(Agent):
         task_brief = state.get("task_brief") or {}
         request = str(task_brief.get("objective") or state.get("input", "")).strip()
         support_request = _effective_support_request(state, "requirements-engineer")
-        ui_heavy = bool((state.get("coordination") or {}).get("ui_heavy"))
         compact = (state.get("coordination") or {}).get("mode") == "compact"
         return {
             "requirements": {
@@ -397,11 +451,6 @@ class RequirementsEngineerAgent(Agent):
                     "Support reusable support-role dispatch through the coordinator.",
                 ],
                 "assumptions": [
-                    "The skeleton is used with native project-agent hosts when available.",
-                    "Instruction-compatible hosts follow the same framework contract.",
-                ]
-                if ui_heavy
-                else [
                     "The skeleton is used with native project-agent hosts when available.",
                     "Instruction-compatible hosts follow the same framework contract.",
                 ],

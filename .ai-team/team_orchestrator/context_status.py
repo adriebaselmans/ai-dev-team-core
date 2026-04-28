@@ -110,9 +110,9 @@ def build_context_status(paths: ContextPaths | None = None) -> dict[str, Any]:
         }
 
     return {
-        "context_dir": str(resolved.context_dir.relative_to(resolved.root)),
-        "policy": str(resolved.policy_path.relative_to(resolved.root)),
-        "adapters": str(resolved.adapters_path.relative_to(resolved.root)),
+        "context_dir": resolved.context_dir.relative_to(resolved.root).as_posix(),
+        "policy": resolved.policy_path.relative_to(resolved.root).as_posix(),
+        "adapters": resolved.adapters_path.relative_to(resolved.root).as_posix(),
         "default_output_mode": policy.get("output_policy", {}).get("default_mode"),
         "memory_store": policy.get("memory_policy", {}).get("canonical_store"),
         "adapter_status": adapter_status,
@@ -126,9 +126,10 @@ def build_context_doctor(paths: ContextPaths | None = None) -> dict[str, Any]:
 
     for label, path in {"policy": resolved.policy_path, "adapters": resolved.adapters_path}.items():
         exists = path.exists()
-        checks.append({"name": f"{label}-exists", "passed": exists, "path": str(path.relative_to(resolved.root))})
+        relative = path.relative_to(resolved.root).as_posix()
+        checks.append({"name": f"{label}-exists", "passed": exists, "path": relative})
         if not exists:
-            errors.append(f"Missing {label} file: {path.relative_to(resolved.root)}")
+            errors.append(f"Missing {label} file: {relative}")
 
     if errors:
         return {"passed": False, "checks": checks, "errors": errors}

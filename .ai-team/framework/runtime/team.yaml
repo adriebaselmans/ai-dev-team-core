@@ -121,7 +121,7 @@ roles:
       - src/
       - .ai-team/framework/runtime/
       - .ai-team/framework/runtime/tests/
-      - tests/
+      - .ai-team/tests/
   reviewer:
     agent_type: specialist
     user_facing: false
@@ -152,7 +152,8 @@ roles:
         - role: architect
           purpose: non-functional requirement validation or clarification
     writes:
-      - tests/
+      - .ai-team/tests/
+      - .ai-team/framework/runtime/tests/
   dod-reviewer:
     agent_type: specialist
     user_facing: false

@@ -72,14 +72,16 @@ class Orchestrator:
             elif step.get("kind") == "parallel-agent":
                 role_key = str(step["agent"])
                 next_step = str(step["next"])
-                working_state = self._run_parallel_step(working_state, current_step, role_key, step)
+                working_state, parallel_count = self._run_parallel_step(
+                    working_state, current_step, role_key, step
+                )
                 self._record_transition(
                     working_state,
                     current_step,
                     role_key,
                     {},
                     next_step,
-                    f"[{role_key.upper()}] parallel={len(resolve_path(working_state, step['items_path'], []) or [])}",
+                    f"[{role_key.upper()}] parallel={parallel_count}",
                 )
             elif step.get("kind") == "dynamic-agent":
                 role_key = str(resolve_path(working_state, step["agent_path"]))
@@ -164,7 +166,7 @@ class Orchestrator:
         step_name: str,
         role_key: str,
         step: dict[str, Any],
-    ) -> dict[str, Any]:
+    ) -> tuple[dict[str, Any], int]:
         agent = self.agents[role_key]
         items = resolve_path(state, step["items_path"], [])
         if not isinstance(items, list):
@@ -197,9 +199,18 @@ class Orchestrator:
                 }
             )
         set_path(updated_state, step["store_path"], collected)
-        return updated_state
+        return updated_state, len(items)
 
     def _resolve_next_step(self, step: dict[str, Any], state: dict[str, Any]) -> str:
+        try:
+            return self._resolve_next_step_inner(step, state)
+        except ValueError as exc:
+            current_step = state.get("meta", {}).get("current_step")
+            raise ValueError(
+                f"Failed to resolve next step from step '{current_step}': {exc}"
+            ) from exc
+
+    def _resolve_next_step_inner(self, step: dict[str, Any], state: dict[str, Any]) -> str:
         if "next" in step:
             return str(step["next"])
         if "next_path" in step:

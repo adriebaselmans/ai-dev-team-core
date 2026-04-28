@@ -95,14 +95,10 @@ class ArtifactSynchronizer:
     def _review_payload(self, state: dict[str, Any], *, title: str) -> dict[str, Any]:
         review = state.get("review") or {}
         if not review:
-            return {
-                "status": "Pending.",
-                "title": title,
-                "decision": "Not reviewed.",
-                "findings": [],
-                "residual_risks": [],
-                "recommendation": "",
-            }
+            from team_orchestrator.artifact_templates import blank_artifact_payload
+            blank = blank_artifact_payload("review")
+            blank["title"] = title
+            return blank
         return {
             "status": "Complete.",
             "title": title,
@@ -119,19 +115,10 @@ class ArtifactSynchronizer:
         coordination = state.get("coordination") or {}
         requirements = state.get("requirements") or {}
         if not dod_review:
-            return {
-                "status": "Pending.",
-                "title": title,
-                "delivery_summary": [],
-                "requirements_coverage": [],
-                "what_was_built": [],
-                "what_was_verified": [],
-                "automated_regression_coverage": [],
-                "acceptance_test_coverage": [],
-                "known_gaps_or_risks": [],
-                "decision": "Not evaluated.",
-                "user_feedback_needed": [],
-            }
+            from team_orchestrator.artifact_templates import blank_artifact_payload
+            blank = blank_artifact_payload("dod")
+            blank["title"] = title
+            return blank
         verified = []
         if test_results:
             verified.append(
