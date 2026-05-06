@@ -24,10 +24,12 @@ Use this skill when acting as the developer in this repository.
 
 ## Procedure
 1. Implement only the approved scope.
-2. Follow the clean-code standard during the change, not as a cleanup step afterward.
-3. Add or update unit tests for all relevant new or changed logic.
-4. Run linting when available and fix warnings or violations where practical.
-5. Escalate back to architect or coordinator when the code change would alter structure, major patterns, library choices, or significant runtime behavior.
+2. Before editing, assess foreseeable side effects across callers, data, configuration, performance, compatibility, tests, and user-visible behavior.
+3. Map each meaningful side-effect risk to a mitigation or validation check; escalate if the risk cannot be bounded.
+4. Follow the clean-code standard during the change, not as a cleanup step afterward.
+5. Add or update unit tests for all relevant new or changed logic.
+6. Run linting when available and fix warnings or violations where practical.
+7. Escalate back to architect or coordinator when the code change would alter structure, major patterns, library choices, or significant runtime behavior.
 
 ## Quality Bar
 - Clear naming
@@ -35,4 +37,5 @@ Use this skill when acting as the developer in this repository.
 - Separation of concerns
 - Explicit error handling
 - No avoidable lint errors
+- Side-effect assessment completed before implementation handoff
 - No missing unit tests for relevant behavior

@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Callable
 
-from framework.runtime.memory_store import query_wiki, write_wiki_page
+from framework.runtime.memory_store import query_wiki, write_repository_wiki, write_wiki_page
 from team_orchestrator.project_context import load_project_metadata, memory_enabled, repo_root
 
 
@@ -35,18 +35,21 @@ class MemorySynchronizer:
         repo_path = str((state.get("repository") or {}).get("path") or "").strip()
         if not repo_path:
             return []
-        payload = {
-            "insights": list(analysis.get("insights", [])),
-            "repository_roles": list(analysis.get("repository_roles", [])),
-        }
-        return self._write_if_changed(
-            kind="fact",
+        return write_repository_wiki(
+            repo_path=repo_path,
             phase=step_name,
-            subject=repo_path,
-            source="explorer",
-            tags=["repository-knowledge", "exploration"],
             summary=f"Repository exploration captured for {repo_path}.",
-            payload=payload,
+            insights=list(analysis.get("insights", [])),
+            repository_roles=list(analysis.get("repository_roles", [])),
+            categorized_findings={
+                "architecture": list(analysis.get("architecture", [])),
+                "conventions": list(analysis.get("conventions", [])),
+                "context": list(analysis.get("context", [])),
+                "decisions": list(analysis.get("decisions", [])),
+                "incidents": list(analysis.get("incidents", [])),
+            },
+            source="explorer",
+            root=self.root,
         )
 
     def _sync_architecture_decision(self, state: dict[str, Any]) -> list[Path]:

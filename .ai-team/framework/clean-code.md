@@ -32,6 +32,7 @@ This file defines the engineering baseline for architecture and implementation i
 - Keep functions, classes, modules, and components focused and reasonably small.
 
 ## Logic and State
+- Before feature, performance, refactor, runtime, or test changes, assess foreseeable side effects and map them to mitigations and validation.
 - Minimize side effects and make them explicit when necessary.
 - Prefer predictable data flow.
 - Minimize mutable shared state.

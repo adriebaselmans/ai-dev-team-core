@@ -105,6 +105,8 @@ Support roles are reusable. They are requested through shared state and dispatch
 - Do not skip review before testing.
 - Do not treat review or testing as the first place compiler or type errors are discovered when a practical developer-side validation command exists.
 - Do not let architect-selected framework, engine, SDK, library, or runtime versions disappear into prose-only context.
+- Before analysis handoffs or code-changing work for features, performance enhancements, refactors, or behavior changes, record a side-effect assessment with mitigations and validation expectations.
+- Do not proceed with analysis handoff, implementation handoff, review approval, test pass, or DoD approval when required side-effect assessment evidence is missing or unmitigated.
 - Use structured decision outputs, never string parsing, for gate behavior.
 - Keep implementation in `src/` unless the task is framework work inside this skeleton itself.
 - Follow the engineering standards in `.ai-team/framework/clean-code.md`.
@@ -134,6 +136,7 @@ Support roles are reusable. They are requested through shared state and dispatch
 - Indexes (`_index.yaml`) are rebuildable caches derived from page frontmatter, not authoritative sources.
 - Do not duplicate active shared state, execution trace, or phase artifacts in wiki pages.
 - The bare skeleton repo should remain pristine. Do not populate wiki pages here during framework development.
+- Repository exploration memory and category pages are written only in bootstrapped project repos where memory persistence is enabled, never as generated project state in the pristine skeleton repo.
 
 ## Token Policy
 - Use `.ai-team/context/policy.yaml` as the source for phase context loading, output classes, memory retrieval, and command summary policy.

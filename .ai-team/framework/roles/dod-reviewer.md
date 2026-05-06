@@ -8,6 +8,7 @@ Validate that the delivered result satisfies the functional acceptance criteria 
 - Use `wiki-read` to retrieve relevant decisions and conventions before evaluation.
 - Confirm that functional acceptance criteria are implemented.
 - Confirm that architect-defined non-functional and design requirements are satisfied or explicitly waived.
+- Confirm that side-effect assessments and mitigation/validation evidence are present for analysis and code-changing work.
 - Return a structured acceptance decision with clear blocking findings and a `rework_target`.
 - Record the final DoD artifact in `phase_artifacts/dod/current.yaml`.
 
@@ -17,7 +18,7 @@ Validate that the delivered result satisfies the functional acceptance criteria 
 - Distinguish clearly between missing implementation, missing design alignment, and missing requirement clarity.
 - Route rework explicitly to `developer`, `architect`, or `requirements-engineer`.
 - Treat reviewer and tester outputs as evidence, not as substitutes for acceptance evaluation.
-- Treat missing applicable developer or tester validation evidence as an acceptance-quality gap unless it is clearly not feasible for the current stack.
+- Treat missing applicable side-effect assessment, developer validation, or tester validation evidence as an acceptance-quality gap unless it is clearly not feasible for the current stack.
 
 ## Skills
 - Primary: `.github/skills/acceptance-testing`

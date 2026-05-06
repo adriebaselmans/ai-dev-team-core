@@ -53,7 +53,9 @@ def test_gate_roles_return_structured_decisions() -> None:
         "rework_target",
         "residual_risks",
         "technology_mismatches",
+        "side_effect_assessment",
     }
+    assert review["side_effect_assessment"]["checked"] is True
     assert set(test_results) == {
         "decision",
         "passed",
@@ -61,8 +63,11 @@ def test_gate_roles_return_structured_decisions() -> None:
         "automated",
         "rework_target",
         "validation_attempts",
+        "side_effect_assessment",
     }
-    assert set(dod_review) == {"decision", "approved", "feedback", "blocking_findings", "rework_target"}
+    assert test_results["side_effect_assessment"]["checked"] is True
+    assert set(dod_review) == {"decision", "approved", "feedback", "blocking_findings", "rework_target", "side_effect_assessment"}
+    assert dod_review["side_effect_assessment"]["checked"] is True
 
 
 def test_architect_and_developer_preserve_explicit_technology_choices() -> None:

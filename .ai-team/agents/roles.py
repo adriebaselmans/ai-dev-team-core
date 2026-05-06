@@ -200,6 +200,24 @@ def _compact_validation_attempt(
     }
 
 
+def _side_effect_assessment(
+    *,
+    scope: str,
+    foreseeable_side_effects: list[str] | None = None,
+    mitigations: list[str] | None = None,
+    validation_plan: list[str] | None = None,
+    decision: str = "safe_to_proceed",
+) -> dict[str, Any]:
+    return {
+        "checked": True,
+        "decision": decision,
+        "scope": scope,
+        "foreseeable_side_effects": foreseeable_side_effects or [],
+        "mitigations": mitigations or ["Keep changes within the approved scope and owned write boundaries."],
+        "validation_plan": validation_plan or ["Run the cheapest deterministic validation that can reveal regressions before handoff."],
+    }
+
+
 def _default_technology_choices(state: dict[str, Any]) -> list[dict[str, Any]]:
     request = str((state.get("task_brief") or {}).get("objective") or state.get("input", "")).lower()
     choices: list[dict[str, Any]] = []
@@ -491,16 +509,39 @@ class ExplorerAgent(Agent):
         request_payload = state.get("support_request") or {}
         repo_mode = (state.get("coordination") or {}).get("repo_mode")
         active = repo_mode == "existing" or request_payload.get("support_role") == "explorer"
+        architecture = [
+            "Repository contains existing runtime configs and tests that should be preserved during refactor.",
+        ] if active else []
+        conventions = [
+            "Native Copilot agent profiles should align with the canonical flow and role contracts.",
+        ] if active else []
+        context = [
+            "Repository role registry is discoverable and should be used for role-aware changes.",
+        ] if active else []
+        incidents: list[str] = []
+        decisions: list[str] = []
         return {
             "analysis": {
                 "status": "ready" if active else "skipped",
-                "repository_roles": self._known_roles,
-                "insights": [
-                    "Repository contains existing runtime configs and tests that should be preserved during refactor.",
-                    "Native Copilot agent profiles should align with the canonical flow and role contracts.",
-                ]
-                if active
-                else [],
+                "repository_roles": self._known_roles if active else [],
+                "insights": [*architecture, *conventions, *context, *decisions, *incidents],
+                "architecture": architecture,
+                "conventions": conventions,
+                "context": context,
+                "decisions": decisions,
+                "incidents": incidents,
+                "side_effect_assessment": _side_effect_assessment(
+                    scope="repository exploration and memory handoff",
+                    foreseeable_side_effects=[
+                        "Repository findings could become stale or over-broad if not tied to evidence and revision context.",
+                    ] if active else [],
+                    mitigations=[
+                        "Keep exploration compact, evidence-based, and isolated to wiki memory when memory persistence is enabled.",
+                    ] if active else ["No repository analysis was performed."],
+                    validation_plan=[
+                        "Write only repository knowledge artifacts and category pages in bootstrapped project memory.",
+                    ] if active else ["No validation needed for skipped exploration."],
+                ),
                 "requested_by": request_payload.get("requested_by"),
             }
         }
@@ -588,6 +629,21 @@ class ArchitectAgent(Agent):
                     else ["Removing provider backends reduces flexibility but sharply reduces maintenance burden."]
                 ),
                 "technology_choices": list(existing_design.get("technology_choices", [])) or _default_technology_choices(state),
+                "side_effect_assessment": _side_effect_assessment(
+                    scope="architecture plan for requested change",
+                    foreseeable_side_effects=[
+                        "Flow, prompt, schema, or runtime contract changes can affect downstream specialist behavior.",
+                        "Compact handoffs can hide required context if phase classification is wrong.",
+                    ],
+                    mitigations=[
+                        "Keep module boundaries explicit and route structural concerns back through architecture.",
+                        "Define validation expectations before development begins.",
+                    ],
+                    validation_plan=[
+                        "Developer must run the relevant compile, typecheck, or test validation before review.",
+                        "Reviewer and tester must verify side-effect assessment evidence before approval.",
+                    ],
+                ),
             },
             "support_request": support_request,
         }
@@ -610,6 +666,12 @@ class DeveloperAgent(Agent):
                     "worker_id": work_item.get("id"),
                     "description": work_item.get("description"),
                     "status": "implemented",
+                    "side_effect_assessment": _side_effect_assessment(
+                        scope="parallel development worker item",
+                        foreseeable_side_effects=["Worker output can conflict with adjacent parallel changes during integration."],
+                        mitigations=["Keep worker changes bounded to the assigned work item and require integration stabilization."],
+                        validation_plan=["Integration developer must verify combined side effects before review."],
+                    ),
                 },
                 "support_request": support_request,
             }
@@ -669,6 +731,20 @@ class DeveloperAgent(Agent):
                     ),
                 ],
                 "technology_alignment": technology_alignment,
+                "side_effect_assessment": _side_effect_assessment(
+                    scope="implementation revision before handoff",
+                    foreseeable_side_effects=[
+                        "Schema or contract changes can break native agent profile validation or orchestration tests.",
+                        "Runtime memory writes can accidentally dirty the pristine skeleton if persistence guards fail.",
+                    ],
+                    mitigations=[
+                        "Keep implementation inside approved write scopes and preserve bootstrapped-project guards for memory/artifacts.",
+                        "Update role output schemas, native profiles, and tests together when contracts change.",
+                    ],
+                    validation_plan=[
+                        "Run focused contract tests first, then the full test suite for framework/runtime changes.",
+                    ],
+                ),
             },
             "support_request": support_request,
         }
@@ -716,6 +792,13 @@ class ReviewerAgent(Agent):
                 "rework_target": str(scenario.get("rework_target", "developer")),
                 "residual_risks": list(scenario.get("residual_risks", [])),
                 "technology_mismatches": technology_mismatches,
+                "side_effect_assessment": _side_effect_assessment(
+                    scope="technical review of side-effect controls",
+                    foreseeable_side_effects=[] if approved else ["Implementation may have unmitigated side-effect or version-alignment risks."],
+                    mitigations=["Block approval when validation, version alignment, or side-effect evidence is missing."],
+                    validation_plan=["Review development side-effect assessment and validation attempts before testing proceeds."],
+                    decision="safe_to_proceed" if approved else "needs_review",
+                ),
             },
             "support_request": support_request,
         }
@@ -747,6 +830,13 @@ class TesterAgent(Agent):
                         summary="" if passed else ", ".join(errors),
                     )
                 ],
+                "side_effect_assessment": _side_effect_assessment(
+                    scope="acceptance and regression validation",
+                    foreseeable_side_effects=[] if passed else errors,
+                    mitigations=["Use acceptance and regression coverage to detect user-visible side effects."],
+                    validation_plan=["Validate happy paths, error paths, and relevant regressions before DoD review."],
+                    decision="safe_to_proceed" if passed else "needs_review",
+                ),
             },
             "support_request": support_request,
         }
@@ -774,5 +864,12 @@ class DodReviewerAgent(Agent):
                 ),
                 "blocking_findings": list(scenario.get("blocking_findings", [])),
                 "rework_target": str(scenario.get("rework_target", "developer")),
+                "side_effect_assessment": _side_effect_assessment(
+                    scope="definition of done side-effect acceptance",
+                    foreseeable_side_effects=[] if approved else list(scenario.get("blocking_findings", [])),
+                    mitigations=["Accept only when functional, non-functional, design, validation, and side-effect evidence are sufficient."],
+                    validation_plan=["Confirm reviewer and tester evidence before final acceptance."],
+                    decision="safe_to_proceed" if approved else "blocked",
+                ),
             }
         }

@@ -130,7 +130,7 @@ def test_native_profile_tool_aliases_cover_role_capabilities() -> None:
         "coordinator": {"read", "search", "agent"},
         "requirements-engineer": {"read", "edit", "search"},
         "ux-ui-designer": {"read", "search", "web"},
-        "explorer": {"read", "search"},
+        "explorer": {"read", "edit", "search"},
         "scout": {"read", "search", "web"},
         "architect": {"read", "edit", "search", "web"},
         "developer": {"read", "edit", "search", "execute"},

@@ -20,7 +20,11 @@ Use this skill when the user asks to base work on a specific repository, asks fo
 ## Required Outputs
 - `.ai-team/memory/wiki/repositories/<repo-slug>/brief.md`
 - `.ai-team/memory/wiki/repositories/<repo-slug>/facts.yaml`
-- Updated `wiki/repositories/_index.yaml` when the repository is new to the knowledge store
+- Category-specific wiki pages under `.ai-team/memory/wiki/{architecture,conventions,context,decisions,incidents}/` when findings exist
+- Updated wiki indexes when repository knowledge is written
+- Structured side-effect assessment covering stale knowledge, provenance, and downstream misuse risks
+
+Memory outputs are written only in bootstrapped project repositories where memory persistence is enabled. Do not generate project-specific wiki entries in the pristine skeleton repository.
 
 ## Procedure
 1. Identify the target repository, its local path or source URL, and its current revision when available.
@@ -29,7 +33,9 @@ Use this skill when the user asks to base work on a specific repository, asks fo
 4. Trace the user-relevant or task-relevant flows instead of reading the entire repo indiscriminately.
 5. Record key modules, architectural patterns, naming conventions, testing approach, and build or run commands.
 6. Separate direct evidence from informed inference.
-7. Hand off compact findings that another role can use without rescanning the same repo.
+7. Classify findings into repository, architecture, conventions, context, decisions, and incidents where applicable.
+8. Assess side effects of the analysis handoff, including stale knowledge, missing provenance, and downstream misuse risks.
+9. Hand off compact findings that another role can use without rescanning the same repo.
 
 ## Exploration Rules
 - Prefer breadth-first orientation first, then drill into task-relevant areas.

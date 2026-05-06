@@ -28,4 +28,4 @@ Use this skill when acting as the tester for a feature where acceptance or end-t
 - Prefer stable, maintainable test flows over brittle end-to-end scripts.
 - Map automated checks back to the acceptance criteria wherever practical.
 - Treat manual-only validation as a fallback, not the default, when a stable automated path exists.
-- Be explicit about what the tests prove and what they do not prove.
+- Be explicit about what the tests prove, what side-effect risks they cover, and what they do not prove.

@@ -27,7 +27,8 @@ Use this skill when acting as the reviewer in this repository.
 - Does the code respect the approved design?
 - Are module boundaries and responsibilities clean?
 - Are naming, control flow, and abstractions understandable?
-- Are there correctness risks or likely regressions?
+- Are there correctness risks, side effects, or likely regressions?
+- Did the developer complete side-effect assessment before handoff and map mitigations to validation?
 - Are unit tests meaningful and sufficient for the changed logic?
 - Are lint issues or actionable warnings left unresolved without good reason?
 
@@ -40,7 +41,7 @@ Use this skill when acting as the reviewer in this repository.
 
 ## Blocking Criteria
 - Correctness risk
-- Regression risk
+- Regression or unmitigated side-effect risk
 - Significant maintainability issue
 - Missing meaningful test coverage
 - Avoidable lint or warning issues that indicate real quality problems

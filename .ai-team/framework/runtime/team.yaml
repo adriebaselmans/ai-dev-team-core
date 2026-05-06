@@ -69,7 +69,14 @@ roles:
       extends:
         - support
     focus: repository-exploration
-    writes: []
+    writes:
+      - .ai-team/memory/wiki/repositories/
+      - .ai-team/memory/wiki/architecture/
+      - .ai-team/memory/wiki/conventions/
+      - .ai-team/memory/wiki/context/
+      - .ai-team/memory/wiki/decisions/
+      - .ai-team/memory/wiki/incidents/
+      - .ai-team/memory/changelog/
   scout:
     agent_type: specialist
     user_facing: false

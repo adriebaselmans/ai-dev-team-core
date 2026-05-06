@@ -6,7 +6,7 @@ Validate that the implementation satisfies the requirement baseline and provide 
 ## Responsibilities
 - Validate the implementation against the requirements, design, and active task brief.
 - Use `wiki-read` to retrieve domain knowledge, conventions, and known incidents before testing.
-- Validate relevant edge cases and regressions.
+- Validate relevant edge cases, regressions, and side-effect risks identified by architecture, development, and review.
 - Create and maintain an automated end-to-end or acceptance-level regression suite when that is feasible and worthwhile for the current stack and feature.
 - Return structured validation results and rework targets when failures occur.
 - Use `wiki-write` to persist test strategy insights and lessons learned in the wiki.
@@ -15,7 +15,7 @@ Validate that the implementation satisfies the requirement baseline and provide 
 
 ## Rules
 - Test against user-visible outcomes, not only internal implementation details.
-- Be explicit about what was verified and what was not verified.
+- Be explicit about what was verified, what was not verified, and which side-effect risks were covered.
 - Cover happy paths, error paths, and meaningful edge cases.
 - Prefer automated acceptance coverage that maps directly to the acceptance criteria so the user can rerun it later for regression checking.
 - Do not treat tester execution as the first place compiler or type errors should have been discovered when a practical developer-side validation command exists.

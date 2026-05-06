@@ -27,6 +27,7 @@ VALID_CONFIDENCE_LEVELS = {"low", "medium", "high"}
 
 # Wiki page status values
 VALID_PAGE_STATUSES = {"active", "stale", "archived"}
+REPOSITORY_KNOWLEDGE_CATEGORIES = {"architecture", "conventions", "context", "decisions", "incidents"}
 
 # Category-to-record-kind mapping for wiki placement
 KIND_CATEGORY_MAP: dict[str, str] = {
@@ -201,6 +202,38 @@ def _update_category_index(category: str, *, root: Path | None = None) -> None:
     index_path.write_text(yaml.safe_dump(index_data, sort_keys=False), encoding="utf-8")
 
 
+def _update_repository_index(*, root: Path | None = None) -> None:
+    """Rebuild the repositories category index from explorer repository briefs."""
+    category = "repositories"
+    cat_dir = wiki_root(root) / category
+    if not cat_dir.exists():
+        return
+
+    pages: list[dict[str, Any]] = []
+    for brief_file in sorted(cat_dir.glob("*/brief.md")):
+        fm = _parse_wiki_page(brief_file)
+        if not fm or fm.get("status") == "archived":
+            continue
+        repo_dir = brief_file.parent
+        pages.append({
+            "id": fm.get("id", repo_dir.name),
+            "summary": fm.get("summary", ""),
+            "tags": fm.get("tags", []),
+            "rev": fm.get("rev", 1),
+            "updated": fm.get("updated", ""),
+            "brief": str(brief_file.relative_to(wiki_root(root))),
+            "facts": str((repo_dir / "facts.yaml").relative_to(wiki_root(root))),
+        })
+    pages.sort(key=lambda p: p.get("updated", ""), reverse=True)
+    index_data = {
+        "category": category,
+        "updated": timestamp_utc(),
+        "pages": pages,
+    }
+    index_path = cat_dir / "_index.yaml"
+    index_path.write_text(yaml.safe_dump(index_data, sort_keys=False), encoding="utf-8")
+
+
 def _update_root_index(*, root: Path | None = None) -> None:
     """Rebuild the root wiki _index.yaml from all category indexes."""
     w_root = wiki_root(root)
@@ -310,6 +343,7 @@ def write_wiki_page(
                 body_lines.append(f"- {key}: {value}")
     body = "\n".join(body_lines)
 
+    existed = (wiki_root(root) / category / f"{page_id}.md").exists()
     page_path = _write_wiki_page(
         category=category,
         page_id=page_id,
@@ -320,7 +354,7 @@ def write_wiki_page(
         root=root,
     )
 
-    action = "updated" if page_path.exists() else "created"
+    action = "updated" if existed else "created"
     _update_category_index(category, root=root)
     _update_root_index(root=root)
     _append_changelog(
@@ -332,6 +366,195 @@ def write_wiki_page(
     )
 
     return page_path
+
+
+def _clean_repository_findings(categorized_findings: dict[str, list[str]] | None) -> dict[str, list[str]]:
+    if not categorized_findings:
+        return {}
+    clean: dict[str, list[str]] = {}
+    for category, findings in categorized_findings.items():
+        if category not in REPOSITORY_KNOWLEDGE_CATEGORIES:
+            continue
+        clean_findings = _clean_text_list(findings)
+        if clean_findings:
+            clean[category] = clean_findings
+    return clean
+
+
+def _write_repository_category_page(
+    *,
+    category: str,
+    slug: str,
+    repo_path: str,
+    phase: str,
+    findings: list[str],
+    source: str,
+    root: Path | None = None,
+) -> Path:
+    page_id = f"{slug}-repository-{category}"
+    page_path = wiki_root(root) / category / f"{page_id}.md"
+    existing = _parse_wiki_page(page_path)
+    now = timestamp_utc()
+    rev = 1
+    created = now
+    if existing:
+        rev = int(existing.get("rev", 0)) + 1
+        created = existing.get("created", now)
+    summary = f"Repository {category} findings for {repo_path}."
+    frontmatter = {
+        "id": page_id,
+        "cat": category,
+        "rev": rev,
+        "created": created,
+        "updated": now,
+        "by": source,
+        "tags": ["repository-knowledge", "exploration", category, phase],
+        "summary": summary,
+        "status": "active",
+        "refs": [repo_path, f"repositories/{slug}/brief.md", f"repositories/{slug}/facts.yaml"],
+    }
+    body_lines = [
+        f"# Repository {category.title()} Findings",
+        "",
+        f"Repository: `{repo_path}`",
+        "",
+        "## Findings",
+    ]
+    for finding in findings:
+        body_lines.append(f"- {finding}")
+
+    page_path.parent.mkdir(parents=True, exist_ok=True)
+    page_path.write_text(
+        "---\n"
+        + yaml.safe_dump(frontmatter, sort_keys=False, default_flow_style=None)
+        + "---\n"
+        + "\n".join(body_lines)
+        + "\n",
+        encoding="utf-8",
+    )
+    _update_category_index(category, root=root)
+    _append_changelog(
+        role=source,
+        action="updated" if existing else "created",
+        target=f"wiki/{category}/{page_id}",
+        summary=summary,
+        root=root,
+    )
+    return page_path
+
+
+def write_repository_wiki(
+    *,
+    repo_path: str,
+    phase: str,
+    summary: str,
+    insights: list[str] | None = None,
+    repository_roles: list[str] | None = None,
+    categorized_findings: dict[str, list[str]] | None = None,
+    source: str = "explorer",
+    root: Path | None = None,
+) -> list[Path]:
+    """Write explorer repository knowledge to repository and semantic wiki categories."""
+    clean_repo_path = _required_text(repo_path, "Repository path must not be empty.")
+    clean_phase = _required_text(phase, "Repository exploration phase must not be empty.")
+    clean_summary = _required_text(summary, "Repository wiki summary must not be empty.")
+    slug = _page_id_from_subject(clean_repo_path, "repository", clean_phase)
+    category = "repositories"
+    tags = ["repository-knowledge", "exploration", "fact", clean_phase]
+    clean_findings = _clean_repository_findings(categorized_findings)
+
+    repo_dir = wiki_root(root) / category / slug
+    repo_dir.mkdir(parents=True, exist_ok=True)
+    brief_path = repo_dir / "brief.md"
+    facts_path = repo_dir / "facts.yaml"
+    existed = brief_path.exists() or facts_path.exists()
+
+    now = timestamp_utc()
+    rev = 1
+    created = now
+    existing = _parse_wiki_page(brief_path)
+    if existing:
+        rev = int(existing.get("rev", 0)) + 1
+        created = existing.get("created", now)
+
+    frontmatter = {
+        "id": slug,
+        "cat": category,
+        "rev": rev,
+        "created": created,
+        "updated": now,
+        "by": source,
+        "tags": tags,
+        "summary": clean_summary,
+        "status": "active",
+        "refs": [clean_repo_path],
+    }
+    body_lines = [
+        f"# Repository Brief: {slug}",
+        "",
+        "## Repository",
+        f"- Path: {clean_repo_path}",
+        "",
+        "## Insights",
+    ]
+    for insight in _clean_text_list(insights):
+        body_lines.append(f"- {insight}")
+    if len(body_lines) == 6:
+        body_lines.append("- None recorded.")
+    body_lines.extend(["", "## Repository Roles"])
+    for role in _clean_text_list(repository_roles):
+        body_lines.append(f"- {role}")
+    if body_lines[-1] == "## Repository Roles":
+        body_lines.append("- None recorded.")
+    for finding_category, findings in clean_findings.items():
+        body_lines.extend(["", f"## {finding_category.title()} Findings"])
+        for finding in findings:
+            body_lines.append(f"- {finding}")
+
+    brief_path.write_text(
+        "---\n"
+        + yaml.safe_dump(frontmatter, sort_keys=False, default_flow_style=None)
+        + "---\n"
+        + "\n".join(body_lines)
+        + "\n",
+        encoding="utf-8",
+    )
+
+    facts = {
+        "id": slug,
+        "repository": {"path": clean_repo_path},
+        "phase": clean_phase,
+        "source": source,
+        "updated": now,
+        "summary": clean_summary,
+        "insights": _clean_text_list(insights),
+        "repository_roles": _clean_text_list(repository_roles),
+        "categorized_findings": clean_findings,
+    }
+    facts_path.write_text(yaml.safe_dump(facts, sort_keys=False), encoding="utf-8")
+
+    written = [brief_path, facts_path]
+    for finding_category, findings in clean_findings.items():
+        written.append(_write_repository_category_page(
+            category=finding_category,
+            slug=slug,
+            repo_path=clean_repo_path,
+            phase=clean_phase,
+            findings=findings,
+            source=source,
+            root=root,
+        ))
+
+    _update_repository_index(root=root)
+    _update_root_index(root=root)
+    _append_changelog(
+        role=source,
+        action="updated" if existed else "created",
+        target=f"wiki/{category}/{slug}",
+        summary=clean_summary,
+        root=root,
+    )
+    return written
 
 
 def query_wiki(
@@ -355,7 +578,9 @@ def query_wiki(
     for cat_dir in dirs:
         if not cat_dir.is_dir() or cat_dir.name.startswith("_"):
             continue
-        for md_file in sorted(cat_dir.glob("*.md"), reverse=True):
+        for md_file in sorted(cat_dir.rglob("*.md"), reverse=True):
+            if md_file.name.startswith("_"):
+                continue
             fm = _parse_wiki_page(md_file)
             if not fm or fm.get("status") == "archived":
                 continue

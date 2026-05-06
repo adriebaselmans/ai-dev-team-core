@@ -31,6 +31,19 @@ def test_scout_support_contract_covers_architect_and_developer() -> None:
     assert "scout" in developer_optional
 
 
+def test_explorer_role_declares_repository_wiki_write_scope() -> None:
+    team_spec = load_team_spec()
+    writes = team_spec["roles"]["explorer"].get("writes", [])
+
+    assert ".ai-team/memory/wiki/repositories/" in writes
+    assert ".ai-team/memory/wiki/architecture/" in writes
+    assert ".ai-team/memory/wiki/conventions/" in writes
+    assert ".ai-team/memory/wiki/context/" in writes
+    assert ".ai-team/memory/wiki/decisions/" in writes
+    assert ".ai-team/memory/wiki/incidents/" in writes
+    assert ".ai-team/memory/changelog/" in writes
+
+
 def test_entry_contract_enforces_role_discipline() -> None:
     root = Path(__file__).resolve().parents[2]
     entry = (root / "AGENTS.md").read_text(encoding="utf-8")

@@ -88,3 +88,21 @@ def test_role_output_schema_materializes_shared_definitions() -> None:
     assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
     assert "definitions" in schema
     assert "review" in schema["properties"]
+
+
+def test_side_effect_assessment_is_required_for_analysis_and_change_gates() -> None:
+    contracts = {
+        "explorer": "analysis",
+        "architect": "design",
+        "developer": "development",
+        "reviewer": "review",
+        "tester": "test_results",
+        "dod-reviewer": "dod_review",
+    }
+
+    for role_key, payload_key in contracts.items():
+        schema = load_role_output_schema(role_key)
+        payload_ref = schema["properties"][payload_key]["$ref"]
+        definition_key = payload_ref.rsplit("/", 1)[-1]
+        definition = schema["definitions"][definition_key]
+        assert "side_effect_assessment" in definition["required"]

@@ -4,7 +4,7 @@ description: Repository-grounding support agent for existing codebases and local
 target: vscode
 model:
   - Claude Haiku 4.5 (copilot)
-tools: [read, search]
+tools: [read, edit, search]
 user-invocable: false
 ---
 

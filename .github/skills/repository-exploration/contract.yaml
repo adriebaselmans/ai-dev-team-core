@@ -4,14 +4,20 @@ response_mode: one-shot
 required_inputs:
   - target repository path, URL, or checkout location
   - user request or downstream role question
-  - existing repository knowledge in .ai-team/memory/repository-knowledge/ when available
+  - existing repository knowledge in .ai-team/memory/wiki/repositories/ when available
 expected_outputs:
-  - .ai-team/memory/repository-knowledge/<repo-slug>/brief.md
-  - .ai-team/memory/repository-knowledge/<repo-slug>/facts.json
-  - .ai-team/memory/repository-knowledge/index.md when the repository is new
+  - .ai-team/memory/wiki/repositories/<repo-slug>/brief.md
+  - .ai-team/memory/wiki/repositories/<repo-slug>/facts.yaml
+  - .ai-team/memory/wiki/repositories/_index.yaml when the repository is new
+  - category-specific wiki pages under .ai-team/memory/wiki/{architecture,conventions,context,decisions,incidents}/ when findings exist
 owned_artifacts:
-  - .ai-team/memory/repository-knowledge/<repo-slug>/brief.md
-  - .ai-team/memory/repository-knowledge/<repo-slug>/facts.json
+  - .ai-team/memory/wiki/repositories/<repo-slug>/brief.md
+  - .ai-team/memory/wiki/repositories/<repo-slug>/facts.yaml
+  - .ai-team/memory/wiki/repositories/_index.yaml
+  - .ai-team/memory/wiki/{architecture,conventions,context,decisions,incidents}/<repo-slug>-repository-*.md
 completion_criteria:
   - The brief captures structure, conventions, risks, and open questions.
   - Evidence paths and provenance are included in the output.
+  - Repository category findings are exported only when memory persistence is enabled in a bootstrapped project repo.
+  - Side-effect assessment covers stale knowledge, provenance, and downstream misuse risks.
+  - Repository wiki index and changelog updates are produced when memory persistence is enabled.

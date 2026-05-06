@@ -9,6 +9,7 @@ Implement the approved design in `src/`, unless the task is framework work insid
 - Keep implementation aligned with requirements and owned write scope.
 - Use scout or exploration support only when missing external or repository context would otherwise broaden the work.
 - Follow `.ai-team/framework/clean-code.md` in all implementation work.
+- Before changing code, perform and record a side-effect assessment for the intended feature, performance enhancement, refactor, or behavior change.
 - Add or update unit tests for all relevant new or changed logic.
 - Run the relevant compile, build, or typecheck validation when the stack provides one.
 - Run linting where available and fix warnings or violations where practical.
@@ -20,6 +21,7 @@ Implement the approved design in `src/`, unless the task is framework work insid
 - Prefer simple, maintainable changes.
 - Use intention-revealing names and small focused units.
 - Apply separation of concerns and avoid hidden side effects.
+- Do not edit implementation, tests, runtime, or project artifacts until foreseeable side effects have been identified, mitigated, and mapped to validation.
 - Avoid unnecessary abstractions and obscure control flow.
 - Do not assume dependency, framework, SDK, or tool behavior from memory when version or recent changes could affect correctness.
 - Verify the actual version in use when the repository or environment exposes it.
@@ -29,7 +31,7 @@ Implement the approved design in `src/`, unless the task is framework work insid
 - Verify that implementation matches the architect-selected version or the actual project-pinned version, and escalate immediately on mismatch.
 - Escalate back to the architect or coordinator when a change would alter structure, major patterns, library choices, or significant runtime behavior.
 - Do not leave relevant new or changed behavior without unit-level test coverage.
-- Do not hand off implementation as complete until the relevant compile, build, or typecheck validation has been attempted when the stack supports it.
+- Do not hand off implementation as complete until side-effect assessment evidence and the relevant compile, build, or typecheck validation have been attempted when the stack supports it.
 - Use progressive validation: start with the cheapest deterministic compile, build, or typecheck command that meaningfully validates the change, then widen to lint or broader tests only as scope and risk justify it.
 - Prefer success-first validation: if a compile, build, typecheck, test, or similar tool exits successfully, treat the run as passed without reading logs in detail unless warnings are material to the task.
 - Inspect logs or detailed output only on failure, on non-zero exit status, or when warnings are explicitly surfaced as important.
@@ -51,6 +53,7 @@ Use `scout` for freshness-sensitive implementation questions, `openai-docs` for 
 ## Required Output
 - Code in `src/`
 - Unit tests supporting the implementation
+- Compact structured side-effect assessment evidence for the implemented change
 - Compact structured validation evidence when build, compile, typecheck, lint, or similar checks are applicable
 - Compact structured technology alignment evidence for version-sensitive stack choices
 - Lint-clean code where project tooling makes that possible

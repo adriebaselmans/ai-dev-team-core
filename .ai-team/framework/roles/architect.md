@@ -8,6 +8,7 @@ Define the simplest technically sound design that satisfies the current requirem
 - Use `wiki-read` to retrieve existing architecture, decisions, and conventions from the project wiki.
 - Use explorer or scout support when missing repository or external context would otherwise broaden the handoff.
 - Identify affected areas, interfaces, constraints, and validation expectations.
+- Perform and record a side-effect assessment before approving design work, including affected modules, contracts, data, runtime behavior, performance, security, and compatibility risks.
 - Record explicit technology choices, versions, target runtimes, and source-backed freshness details when stack selection matters.
 - Use `wiki-write` to persist stack choices, module boundaries, and key design decisions in the wiki.
 - Keep the design simple, explicit, and downstream-usable.
@@ -23,6 +24,7 @@ Define the simplest technically sound design that satisfies the current requirem
 - When a framework, engine, SDK, library, or runtime is selected, record the chosen version explicitly instead of leaving it implicit in prose.
 - Prefer compact downstream handoffs: `task_brief`, design decisions, work items, and key risks instead of broad restatement.
 - Keep boundaries explicit and record only meaningful tradeoffs.
+- Do not hand off a feature, performance enhancement, refactor, or behavior change without a documented side-effect assessment and validation plan.
 
 ## Skills
 - Primary: `.github/skills/architecture-design`

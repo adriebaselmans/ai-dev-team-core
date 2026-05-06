@@ -74,6 +74,29 @@ definitions:
       - status
       - inspected_output
       - summary
+  side_effect_assessment:
+    type: object
+    additionalProperties: false
+    properties:
+      checked:
+        type: boolean
+      decision:
+        enum: ["safe_to_proceed", "blocked", "needs_review"]
+      scope:
+        type: string
+      foreseeable_side_effects:
+        $ref: "#/definitions/string_list"
+      mitigations:
+        $ref: "#/definitions/string_list"
+      validation_plan:
+        $ref: "#/definitions/string_list"
+    required:
+      - checked
+      - decision
+      - scope
+      - foreseeable_side_effects
+      - mitigations
+      - validation_plan
   task_brief:
     type: object
     additionalProperties: false
@@ -271,6 +294,18 @@ definitions:
         $ref: "#/definitions/string_list"
       insights:
         $ref: "#/definitions/string_list"
+      architecture:
+        $ref: "#/definitions/string_list"
+      conventions:
+        $ref: "#/definitions/string_list"
+      context:
+        $ref: "#/definitions/string_list"
+      decisions:
+        $ref: "#/definitions/string_list"
+      incidents:
+        $ref: "#/definitions/string_list"
+      side_effect_assessment:
+        $ref: "#/definitions/side_effect_assessment"
       requested_by:
         anyOf:
           - type: string
@@ -279,6 +314,12 @@ definitions:
       - status
       - repository_roles
       - insights
+      - architecture
+      - conventions
+      - context
+      - decisions
+      - incidents
+      - side_effect_assessment
       - requested_by
   research:
     type: object
@@ -347,12 +388,15 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/technology_choice"
+      side_effect_assessment:
+        $ref: "#/definitions/side_effect_assessment"
     required:
       - approved_for_build
       - architecture
       - non_functional_requirements
       - work_items
       - technology_choices
+      - side_effect_assessment
   development:
     type: object
     additionalProperties: false
@@ -406,6 +450,8 @@ definitions:
             - actual_version
             - status
             - summary
+      side_effect_assessment:
+        $ref: "#/definitions/side_effect_assessment"
     required:
       - status
       - revision
@@ -415,6 +461,7 @@ definitions:
       - integration_owner
       - validation_attempts
       - technology_alignment
+      - side_effect_assessment
   development_artifact:
     type: object
     additionalProperties: false
@@ -429,10 +476,13 @@ definitions:
           - type: "null"
       status:
         type: string
+      side_effect_assessment:
+        $ref: "#/definitions/side_effect_assessment"
     required:
       - worker_id
       - description
       - status
+      - side_effect_assessment
   review:
     type: object
     additionalProperties: false
@@ -453,6 +503,8 @@ definitions:
         $ref: "#/definitions/string_list"
       technology_mismatches:
         $ref: "#/definitions/string_list"
+      side_effect_assessment:
+        $ref: "#/definitions/side_effect_assessment"
     required:
       - decision
       - approved
@@ -461,6 +513,7 @@ definitions:
       - blocking_findings
       - rework_target
       - technology_mismatches
+      - side_effect_assessment
   test_results:
     type: object
     additionalProperties: false
@@ -479,6 +532,8 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/validation_attempt"
+      side_effect_assessment:
+        $ref: "#/definitions/side_effect_assessment"
     required:
       - decision
       - passed
@@ -486,6 +541,7 @@ definitions:
       - automated
       - rework_target
       - validation_attempts
+      - side_effect_assessment
   dod_review:
     type: object
     additionalProperties: false
@@ -500,12 +556,15 @@ definitions:
         $ref: "#/definitions/string_list"
       rework_target:
         enum: ["developer", "architect", "requirements-engineer"]
+      side_effect_assessment:
+        $ref: "#/definitions/side_effect_assessment"
     required:
       - decision
       - approved
       - feedback
       - blocking_findings
       - rework_target
+      - side_effect_assessment
 roles:
   coordinator:
     type: object
