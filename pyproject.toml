@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-dev-team-core"
-version = "1.0.5"
+version = "3.2.0"
 description = "Model-agnostic AI dev team framework skeleton"
 readme = "README.md"
 requires-python = ">=3.12"

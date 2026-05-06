@@ -3,8 +3,7 @@
 Reusable, host-agnostic AI dev team skeleton for flow-driven software delivery.
 
 ## Version
-- Current release: `1.0.5`
-
+- Current release: `3.2.0`
 ## What This Repo Is
 This repository is a pristine framework skeleton, not an application repo. It provides:
 - a canonical role and flow contract for AI-assisted delivery

@@ -94,8 +94,7 @@ def test_cli_version_reports_consistent_metadata(capsys) -> None:
 
     assert exit_code == 0
     payload = json.loads(capsys.readouterr().out)
-    assert payload["version"] == "1.0.5"
-
+    assert payload["version"] == "3.2.0"
 
 def test_cli_export_docs_fails_safely_for_bare_skeleton(capsys) -> None:
     exit_code = main(["export-docs"])
