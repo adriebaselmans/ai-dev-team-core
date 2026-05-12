@@ -10,12 +10,12 @@ roles:
     inherit_picker: true
   requirements-engineer:
     model:
-      - GPT-5.4 (copilot)
-      - Claude Sonnet 4.5 (copilot)
+      - GPT-5.5 (copilot)
+      - Claude Opus 4.7 (copilot)
   ux-ui-designer:
     model:
-      - GPT-5.4 (copilot)
-      - Claude Sonnet 4.5 (copilot)
+      - GPT-5.5 (copilot)
+      - Claude Sonnet 4.6 (copilot)
   explorer:
     model:
       - Claude Haiku 4.5 (copilot)
@@ -24,19 +24,22 @@ roles:
       - Claude Haiku 4.5 (copilot)
   architect:
     model:
-      - Claude Opus 4.6 (copilot)
-      - Claude Sonnet 4.5 (copilot)
+      - GPT-5.5 (copilot)
+      - Claude Opus 4.7 (copilot)
   developer:
     model:
-      - GPT-5.4 (copilot)
-      - Claude Sonnet 4.5 (copilot)
+      - GPT-5.5 (copilot)
+      - Claude Sonnet 4.6 (copilot)
     reasoning_note: Copilot custom-agent frontmatter does not expose a verified per-agent reasoning-effort setting.
   reviewer:
     model:
-      - Claude Sonnet 4.5 (copilot)
+      - Claude Sonnet 4.6 (copilot)
+      - GPT-5.5 (copilot)
   tester:
     model:
-      - Claude Sonnet 4.5 (copilot)
+      - Claude Sonnet 4.6 (copilot)
+      - GPT-5.5 (copilot)
   dod-reviewer:
     model:
-      - Claude Sonnet 4.5 (copilot)
+      - Claude Sonnet 4.6 (copilot)
+      - GPT-5.5 (copilot)
